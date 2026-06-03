@@ -350,7 +350,28 @@ app.post('/reset', requireLogin, (req,res)=>{ const name=safeName(req.body.sessi
 app.get('/groups/:session', requireLogin, async(req,res)=>{ const s=sess(req.params.session); if(!s.connected||!s.sock)return res.json({success:false,error:'WhatsApp não conectado.'}); const groups=await s.sock.groupFetchAllParticipating(); res.json({success:true,groups:Object.values(groups).map(g=>({id:g.id,name:g.subject||g.id,participants:g.participants?.length||0}))}) })
 
 app.get('/ads', requireLogin, (req,res)=>res.json(read(files.ads,[]).filter(a=>a.userEmail===req.user.email || req.user.role==='admin')))
-app.post('/ads', requireLogin, upload.single('media'), (req,res)=>{ const ads=read(files.ads,[]); const ad={id:uid('ad'),userEmail:req.user.email,name:req.body.name||'Anúncio',message:req.body.message||'',note:req.body.note||'',mediaPath:req.file?.path||'',mediaUrl:req.file?'/uploads/'+path.basename(req.file.path):'',mediaName:req.file?.originalname||'',mimetype:req.file?.mimetype||'',createdAt:now()}; ads.unshift(ad); write(files.ads,ads); res.json({success:true,ad}) })
+app.post('/ads', requireLogin, upload.single('media'), (req,res)=>{
+  const message = String(req.body.message || '').trim()
+  const name = String(req.body.name || 'Anúncio').trim()
+  const note = String(req.body.note || '').trim()
+  if(!message && !req.file) return res.json({success:false,error:'Preencha o texto ou envie uma foto/vídeo/documento.'})
+  const ads=read(files.ads,[])
+  const ad={
+    id:uid('ad'),
+    userEmail:req.user.email,
+    name:name || 'Anúncio',
+    message,
+    note,
+    mediaPath:req.file?.path||'',
+    mediaUrl:req.file?'/uploads/'+path.basename(req.file.path):'',
+    mediaName:req.file?.originalname||'',
+    mimetype:req.file?.mimetype||mime.lookup(req.file?.originalname||'')||'',
+    createdAt:now()
+  }
+  ads.unshift(ad)
+  write(files.ads,ads)
+  res.json({success:true,ad})
+})
 app.delete('/ads/:id', requireLogin, (req,res)=>{ const ads=read(files.ads,[]); const ad=ads.find(a=>a.id===req.params.id); if(ad&&ad.mediaPath)try{fs.unlinkSync(ad.mediaPath)}catch{}; write(files.ads, ads.filter(a=>a.id!==req.params.id || (a.userEmail!==req.user.email && req.user.role!=='admin'))); res.json({success:true}) })
 
 function buildCampaignAds(req, filesUpload){
@@ -390,7 +411,18 @@ function buildCampaignAds(req, filesUpload){
 }
 async function sendToTarget(sessionName, jid, payload){
   const s=sess(sessionName); if(!s.connected||!s.sock) throw new Error(display(sessionName)+' não conectado')
-  await s.sock.sendMessage(jid, payload)
+  try{
+    await s.sock.sendMessage(jid, payload)
+  }catch(e){
+    // Alguns formatos de vídeo podem falhar como vídeo. Tenta reenviar como documento.
+    if(payload && payload.video){
+      const doc={document:payload.video, mimetype:'video/mp4', fileName:'video.mp4'}
+      if(payload.caption) doc.caption=payload.caption
+      await s.sock.sendMessage(jid, doc)
+    }else{
+      throw e
+    }
+  }
   try{ await s.sock.sendPresenceUpdate('unavailable') }catch{}
   s.sentToday=(s.sentToday||0)+1
 }

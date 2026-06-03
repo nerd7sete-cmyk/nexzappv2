@@ -1,7 +1,7 @@
 {
   "name": "nex-zapp-rebuild-v1",
-  "version": "3.0.0",
-  "description": "NEX-ZAPP Rebuild V3 - corre\u00e7\u00e3o de disparo, m\u00eddia e lista inteligente",
+  "version": "4.0.0",
+  "description": "NEX-ZAPP Rebuild V4 - landing login modal, revendedor, an\u00fancios e v\u00eddeo fix",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

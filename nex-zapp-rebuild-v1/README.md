@@ -65,3 +65,14 @@ Correções:
 - Planilhas aceitam colunas telefone, Telefone, numero, número, celular, WhatsApp.
 - Adicionadas explicações nas abas de anúncios, lista e grupos.
 - Variáveis visíveis para copiar: {nome}, {telefone}, {pedido}, {plano}, {empresa}, {data}.
+
+## Rebuild V4 - Landing, Anúncios e Vídeo Fix
+
+- Login removido da landing inicial.
+- Botão "Entrar agora" abre modal de login.
+- Senha/admin não fica exposto na página pública.
+- Área "Quero ser revendedor" visível na landing.
+- Modal de revendedor melhorado.
+- Anúncios do cliente validam texto/mídia e salvam corretamente.
+- Campos de anúncio limpam após salvar.
+- Envio de vídeo tenta como vídeo e, se falhar, reenvia como documento.
