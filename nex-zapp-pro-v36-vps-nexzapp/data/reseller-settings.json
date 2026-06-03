@@ -1,0 +1,7 @@
+{
+  "type": "percent",
+  "starter": 10,
+  "pro": 20,
+  "enterprise": 40,
+  "minWithdraw": 50
+}

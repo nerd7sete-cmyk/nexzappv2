@@ -1,0 +1,24 @@
+[
+  {
+    "id": "admin",
+    "name": "Admin Master",
+    "email": "admin@nexzapp.local",
+    "password": "admin123",
+    "role": "admin",
+    "status": "active",
+    "planId": "enterprise",
+    "expiresAt": "2099-12-31",
+    "createdAt": "2026-06-02T00:00:00.000Z"
+  },
+  {
+    "id": "cliente-demo",
+    "name": "Cliente Demo",
+    "email": "cliente@nexzapp.local",
+    "password": "123456",
+    "role": "client",
+    "status": "active",
+    "planId": "pro",
+    "expiresAt": "2099-12-31",
+    "createdAt": "2026-06-02T00:00:00.000Z"
+  }
+]

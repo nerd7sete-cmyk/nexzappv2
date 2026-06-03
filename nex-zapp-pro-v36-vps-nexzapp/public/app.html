@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>NEX-ZAPP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+--bg:#0B1120;--side:#0A0F1C;--panel:#111827;--panel2:#0F172A;--field:#070D18;--line:#243044;--line2:#334155;
+--text:#F8FAFC;--muted:#94A3B8;--blue:#2563EB;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;--purple:#2563EB;--cyan:#38BDF8;
+--shadow:0 24px 80px rgba(0,0,0,.42);--radius:24px
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Inter,Arial,sans-serif;background:radial-gradient(circle at top,#172554 0%,#0B1120 36%,#050816 100%);color:var(--text)}
+svg{width:18px;height:18px;stroke:currentColor}
+.app{min-height:100vh;display:grid;grid-template-columns:292px 1fr}
+.sidebar{height:100vh;position:sticky;top:0;background:linear-gradient(180deg,rgba(10,15,28,.98),rgba(5,8,22,.98));border-right:1px solid rgba(148,163,184,.14);padding:22px}
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+.logo{width:52px;height:52px;border-radius:18px;background:linear-gradient(135deg,#2563EB,#1D4ED8,#0F172A);display:grid;place-items:center;font-weight:900;box-shadow:0 16px 50px rgba(37,211,102,.30)}
+.logo span{font-size:19px}
+.brand h1{margin:0;font-size:24px;letter-spacing:-.5px}.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.nav{display:grid;gap:10px}.nav button{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;border-radius:16px;border:1px solid transparent;background:transparent;color:var(--text);font-weight:800;cursor:pointer;text-align:left;box-shadow:none}
+.nav button.active{background:linear-gradient(135deg,rgba(37,211,102,.22),rgba(18,140,126,.18));border-color:rgba(37,211,102,.42)}
+.nav button:hover{background:rgba(148,163,184,.08)}
+.main{padding:26px;max-width:1440px;width:100%;margin:0 auto}
+.header{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:22px}
+.header h2{margin:0;font-size:34px;letter-spacing:-.8px}.header p{margin:6px 0 0;color:var(--muted)}
+.mobile-nav{display:none}
+.page{display:none}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s12{grid-column:span 12}
+.card{background:linear-gradient(180deg,rgba(17,24,39,.96),rgba(15,23,42,.90));border:1px solid rgba(148,163,184,.16);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 8px;font-size:21px}.card .desc{color:var(--muted);font-size:14px;line-height:1.45;margin-bottom:14px}
+.help{background:rgba(15,23,42,.88);border:1px solid rgba(37,211,102,.18);color:#cbd5e1;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.45}
+label{display:block;margin:14px 0 7px;color:#c2cee3;font-size:13px;font-weight:800}
+input,textarea,select{width:100%;padding:13px 14px;border-radius:16px;border:1px solid var(--line);background:linear-gradient(180deg,#070D18,#0A1020);color:var(--text);outline:none;font-size:14px}
+textarea{min-height:130px;resize:vertical}
+button{border:0;border-radius:16px;padding:13px 16px;background:var(--blue);color:white;font-weight:900;cursor:pointer;box-shadow:0 12px 28px rgba(37,211,102,.22)}
+button:hover{filter:brightness(1.08)}button.green{background:var(--green);box-shadow:0 12px 28px rgba(34,197,94,.22)}button.red{background:var(--red);box-shadow:0 12px 28px rgba(239,68,68,.2)}button.gray{background:#475569;box-shadow:none}button.purple{background:var(--purple)}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap}.btnrow button{flex:1;min-width:130px}.session-card .btnrow button{min-width:0;padding:12px 10px}
+.session-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:stretch}
+.session-card{background:linear-gradient(180deg,#0B1220,#070D18);border:1px solid var(--line);border-radius:22px;padding:18px}
+.session-card.connected{border-color:rgba(34,197,94,.7);box-shadow:0 0 0 1px rgba(34,197,94,.1),var(--shadow)}
+.session-card.starting{border-color:rgba(245,158,11,.75)}
+.session-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:900;border-radius:999px;padding:7px 10px;background:#1E293B;color:var(--muted)}
+.status.ok{background:rgba(34,197,94,.15);color:#4ade80}.status.bad{background:rgba(239,68,68,.13);color:#f87171}.status.wait{background:rgba(245,158,11,.14);color:#fbbf24}.status.qr{background:rgba(37,211,102,.16);color:#8ff2b5}
+.checkline{display:flex;align-items:center;gap:8px;margin-top:12px;color:var(--muted);font-weight:800;font-size:13px}.checkline input{width:auto}
+.qr{display:block;width:100%;max-width:240px;background:white;border-radius:18px;padding:10px;margin:14px auto}
+.loader{height:8px;background:#071426;border-radius:999px;overflow:hidden;margin:14px 0}.loader span{display:block;width:45%;height:100%;background:linear-gradient(90deg,#2f6df6,#2f6df6);border-radius:999px;animation:move 1.2s infinite}
+@keyframes move{0%{transform:translateX(-110%)}100%{transform:translateX(250%)}}
+pre{background:#070D18;border:1px solid #243044;border-radius:16px;padding:13px;color:#cbd5e1;font-size:12px;white-space:pre-wrap;overflow:hidden;max-height:none}
+.delay-options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.delay-card{background:linear-gradient(180deg,#070D18,#0F172A);border:1px solid var(--line);border-radius:20px;padding:16px;cursor:pointer}
+.delay-card.active{border-color:#2f6df6;box-shadow:0 0 0 2px rgba(37,211,102,.16)}
+.delay-card b{font-size:18px}.delay-card span{display:block;color:var(--muted);font-size:12px;margin-top:5px}
+.ad{border-left:5px solid #2f6df6}.ad.two{border-left-color:#19b46b}.ad.three{border-left-color:#8bdc83}
+.filebox{border:1px dashed var(--line2);background:#070D18;border-radius:16px;padding:12px}
+.group-select-card{background:#070D18;border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:10px}
+.select-like{background:#070D18;border:1px solid var(--line);border-radius:18px;padding:12px}
+.group-list{background:#070D18;border:1px solid var(--line);border-radius:20px;padding:10px;max-height:520px;overflow:auto}
+.group-item{display:flex;gap:12px;align-items:center;padding:13px;border-radius:16px;margin:7px 0;background:#0F172A;border:1px solid transparent;cursor:pointer}
+.group-item.selected{border-color:#2f6df6;background:rgba(37,211,102,.16)}.group-item input{width:auto}.group-id{color:var(--muted);font-size:11px;word-break:break-all;margin-top:3px}
+.ad-list{display:grid;gap:12px}.ad-item{background:#070D18;border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;gap:14px;justify-content:space-between;align-items:center}.ad-thumb{width:74px;height:54px;border-radius:14px;background:#0f201a;object-fit:cover}.ad-text{flex:1}
+.mode-card{display:flex;gap:10px;align-items:center;background:#070D18;border:1px solid var(--line);border-radius:18px;padding:13px;cursor:pointer}.mode-card input{width:auto}
+.saved-picker{background:#070D18;border:1px solid var(--line);border-radius:20px;padding:12px;display:grid;gap:8px}.saved-row{display:flex;gap:10px;align-items:center;padding:10px;border-radius:14px;background:#0F172A}.saved-row input{width:auto}
+.hidden{display:none}.toast{position:fixed;right:18px;bottom:18px;background:#070D18;border:1px solid var(--line);border-radius:16px;padding:13px 16px;display:none;z-index:99}
+
+.hero-panel{background:linear-gradient(135deg,rgba(37,99,235,.28),rgba(15,23,42,.96) 52%,rgba(18,140,126,.18));}
+.hero-content{display:flex;justify-content:space-between;gap:18px;align-items:center}.hero-content h3{font-size:28px}.hero-actions{min-width:360px}
+.metric-card span{color:var(--muted);font-size:13px;font-weight:800}.metric-card b{display:block;font-size:34px;letter-spacing:-1px;margin:10px 0}.metric-card small{color:var(--muted)}
+.timeline{display:grid;gap:9px}.timeline-item{padding:12px;border:1px solid var(--line);border-radius:14px;background:#070D18;color:#cbd5e1;font-size:13px}
+.checklist{display:grid;gap:10px}.checklist div{display:flex;gap:12px;align-items:flex-start;background:#070D18;border:1px solid var(--line);border-radius:16px;padding:12px}.checklist b{display:grid;place-items:center;min-width:28px;height:28px;border-radius:999px;background:rgba(37,211,102,.18);color:#8ff2b5}.checklist span{color:#cbd5e1;font-size:13px;line-height:1.4}
+.summary-card{background:linear-gradient(180deg,#0B1220,#070D18);border:1px solid var(--line);border-radius:22px;padding:18px;min-height:100%}.summary-card h3{font-size:20px}.summary-row{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid rgba(148,163,184,.12)}.summary-row:last-child{border-bottom:0}.summary-row span{color:var(--muted);font-size:13px}.summary-row b{font-size:15px}.mini-steps{display:grid;gap:9px;margin-top:12px}.mini-steps div{display:flex;gap:9px;align-items:center;color:#cbd5e1;font-size:13px}.mini-steps em{display:grid;place-items:center;width:22px;height:22px;border-radius:999px;background:rgba(34,197,94,.15);color:#4ade80;font-style:normal;font-weight:900}
+.ad-composer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.ad-compose{background:linear-gradient(180deg,#080e1b,#050914);border:1px solid var(--line);border-radius:22px;padding:16px;min-height:340px}.ad-compose-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.ad-compose-head span{font-size:20px;font-weight:900}.ad-compose-head small{color:var(--muted);background:#0f201a;padding:6px 9px;border-radius:999px}.ad-compose textarea{min-height:125px}.filebox small{display:block;margin-top:8px;color:var(--muted);font-size:12px}
+@media(max-width:1050px){.hero-content{display:block}.hero-actions{min-width:0;margin-top:14px}.session-layout{grid-template-columns:1fr}.summary-card{position:static}.ad-composer-grid{grid-template-columns:1fr}.metric-card b{font-size:28px}}
+
+@media(max-width:1050px){.app{display:block}.sidebar{display:none}.main{padding:16px}.mobile-nav{display:flex;gap:8px;overflow:auto;margin-top:14px}.mobile-nav button{white-space:nowrap;box-shadow:none;background:#0f201a}.header{display:block}.header h2{font-size:28px}.session-grid,.delay-options{grid-template-columns:1fr}.s3,.s4,.s5,.s6,.s7,.s8{grid-column:span 12}.ad-item{display:block}.ad-thumb{margin-bottom:10px}}
+
+input[type=file]{background:#06110e;color:#d8fbe5}
+input[type=file]::file-selector-button{border:0;border-radius:10px;background:#16382d;color:#dfffea;font-weight:800;padding:9px 12px;margin-right:10px;cursor:pointer}
+.header{background:linear-gradient(90deg,rgba(29,78,216,.42),rgba(15,23,42,.80));padding:18px;border-radius:24px;border:1px solid rgba(96,165,250,.18)}
+.nav button.active{box-shadow:0 0 0 1px rgba(37,211,102,.18),0 16px 42px rgba(37,211,102,.08)}
+
+
+.card{border-color:rgba(92,150,124,.18)}
+.help{background:rgba(6,16,13,.86);border-color:rgba(37,211,102,.16)}
+.nav button.active{background:linear-gradient(135deg,rgba(37,211,102,.16),rgba(18,140,126,.10));border-color:rgba(37,211,102,.34)}
+.nav button:hover{background:rgba(37,211,102,.07)}
+button.gray{background:#3a4a45;color:#effff6}
+button.purple{background:#128C7E}
+.session-card.connected{border-color:rgba(37,211,102,.72);box-shadow:0 0 0 1px rgba(37,211,102,.12),var(--shadow)}
+.summary-card{border-color:rgba(37,211,102,.18)}
+.group-item.selected{border-color:#2f6df6;background:rgba(37,211,102,.12)}
+.saved-row{background:#0F172A}
+.mode-card{background:#070D18;border-color:#243044}
+.select-like{background:#070D18;border-color:#243044}
+.group-list{background:#070D18;border-color:#243044}
+.ad-item{background:#070D18;border-color:#243044}
+
+
+/* v15 premium color correction */
+.nav button.active{background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(29,78,216,.10));border-color:rgba(96,165,250,.45);box-shadow:0 0 0 1px rgba(37,99,235,.12),0 18px 48px rgba(37,99,235,.08)}
+.nav button:hover{background:rgba(37,99,235,.08)}
+.card{background:linear-gradient(180deg,rgba(17,24,39,.96),rgba(15,23,42,.90));border-color:rgba(148,163,184,.16)}
+.session-card,.summary-card,.ad-item,.group-list,.select-like,.saved-row,.mode-card{background:linear-gradient(180deg,#0B1220,#070D18);border-color:#243044}
+.help{background:rgba(7,13,24,.86);border-color:rgba(96,165,250,.16)}
+button.green{background:#22C55E;box-shadow:0 12px 28px rgba(34,197,94,.20)}
+button.purple{background:#2563EB}
+button.gray{background:#475569;color:#F8FAFC}
+.status.ok{background:rgba(34,197,94,.14);color:#4ADE80}
+.status.bad{background:rgba(239,68,68,.14);color:#F87171}
+.status.qr{background:rgba(37,99,235,.16);color:#93C5FD}
+.group-item.selected{border-color:#60A5FA;background:rgba(37,99,235,.14)}
+.ad{border-left-color:#2563EB}.ad.two{border-left-color:#38BDF8}.ad.three{border-left-color:#8B5CF6}
+.summary-card{border-color:rgba(96,165,250,.18)}
+input[type=file]::file-selector-button{background:#1E293B;color:#F8FAFC}
+
+
+.dashboard-hero,.hero-card{background:linear-gradient(90deg,rgba(30,41,59,.96),rgba(15,23,42,.92))!important;border:1px solid rgba(96,165,250,.18)!important}
+
+
+.send-session-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.send-session-card{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:#070d18;border-radius:16px;padding:12px;cursor:pointer;font-weight:900}.send-session-card input{width:auto}.send-session-card.connected{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.08)}.send-session-card.disabled{opacity:.45}.send-session-card small{display:block;color:var(--muted);font-weight:700;margin-top:2px}.send-session-title{display:flex;align-items:center;justify-content:space-between;gap:10px}.send-session-title span{color:var(--muted);font-size:12px;font-weight:800}@media(max-width:900px){.send-session-grid{grid-template-columns:1fr}}
+
+.pix-renew-box{background:linear-gradient(180deg,#111827,#0f172a);border:1px solid rgba(96,165,250,.22);border-radius:22px;padding:18px}
+.pix-renew-price{font-size:32px;font-weight:950;margin:8px 0 12px}
+.pix-renew-key{display:flex;gap:10px;align-items:center;background:#070d18;border:1px solid #243044;border-radius:16px;padding:12px;margin:12px 0;word-break:break-all}
+.pix-renew-key code{flex:1;color:#bfdbfe;font-weight:900}
+.modal-bg{position:fixed;inset:0;background:rgba(2,6,23,.72);display:none;align-items:center;justify-content:center;z-index:999;padding:18px;backdrop-filter:blur(10px)}
+.modal-bg.active{display:flex}
+.modal-card{width:100%;max-width:500px;background:linear-gradient(180deg,#111827,#0f172a);border:1px solid rgba(148,163,184,.20);border-radius:28px;padding:22px;box-shadow:0 32px 110px rgba(0,0,0,.55)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.modal-close{width:40px;height:40px;min-width:0;padding:0;background:#1e293b!important;box-shadow:none!important}
+
+
+.renew-plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.renew-plan{border:1px solid var(--line);background:#070d18;border-radius:18px;padding:14px;cursor:pointer;transition:.2s}
+.renew-plan.active{border-color:#60a5fa;box-shadow:0 0 0 3px rgba(37,99,235,.18)}
+.renew-plan b{display:block;font-size:18px}.renew-plan .price{font-size:22px;font-weight:950;margin:8px 0}.renew-plan small{color:var(--muted)}
+@media(max-width:760px){.renew-plan-grid{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="brand"><div class="logo"><span>NZ</span></div><div><h1>NEX-ZAPP</h1><p>Central de Mensagens</p></div></div>
+<nav class="nav">
+<button class="active" onclick="openPage('dashboard',this)"><svg fill="none" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10Zm10 8h8V3h-8v18ZM3 21h8v-6H3v6Z" stroke-width="2"/></svg> Dashboard</button>
+<button onclick="openPage('sessions',this)"><svg fill="none" viewBox="0 0 24 24"><path d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" stroke-width="2"/><path d="M10 18h4" stroke-width="2"/></svg> WhatsApps</button>
+<button onclick="openPage('ads',this)"><svg fill="none" viewBox="0 0 24 24"><path d="M4 5h16v14H4z" stroke-width="2"/><path d="m4 15 4-4 3 3 3-4 6 6" stroke-width="2"/></svg> Anúncios salvos</button>
+<button onclick="openPage('list',this)"><svg fill="none" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke-width="2" stroke-linecap="round"/></svg> Disparo em lista</button>
+<button onclick="openPage('groups',this)"><svg fill="none" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM23 21v-2a4 4 0 0 0-3-3.87" stroke-width="2"/></svg> Disparo em grupos</button>
+<button onclick="openPage('billing',this)"><svg fill="none" viewBox="0 0 24 24"><path d="M3 7h18v10H3V7Zm3 3h4m8 4h0" stroke-width="2"/></svg> Planos e renovação</button>
+</nav><div style="position:absolute;left:22px;bottom:18px;color:var(--muted);font-size:12px">Versão 15 Integrada</div>
+</aside>
+
+<main class="main">
+<div class="header">
+<div><h2 id="title">WhatsApps</h2><p id="sub">Conecte e monitore as instâncias disponíveis.</p></div>
+<div class="btnrow"><button class="gray" onclick="refreshAll()">Atualizar painel</button><button class="red" onclick="logout()">Sair</button></div>
+<div class="mobile-nav"><button onclick="openPage('dashboard')">Dashboard</button><button onclick="openPage('sessions')">WhatsApps</button><button onclick="openPage('ads')">Anúncios</button><button onclick="openPage('list')">Lista</button><button onclick="openPage('groups')">Grupos</button><button onclick="openPage('billing')">Planos</button></div>
+</div>
+
+
+<section id="p-dashboard" class="page active">
+<div class="grid">
+<div class="card s12 hero-panel">
+  <div class="hero-content">
+    <div>
+      <h3>Central operacional</h3>
+      <div class="desc">Acompanhe conexões, anúncios, grupos e acesse rapidamente as principais operações do painel.</div>
+    </div>
+    <div class="btnrow hero-actions">
+      <button onclick="openPage('sessions')">Conectar WhatsApps</button>
+      <button class="purple" onclick="openPage('ads')">Criar anúncio</button>
+      <button class="green" onclick="openPage('list')">Disparo por lista</button>
+    </div>
+  </div>
+</div>
+<div class="card s3 metric-card"><span>WhatsApps ativos</span><b id="metricConnected">0/3</b><small>Instâncias conectadas</small></div>
+<div class="card s3 metric-card"><span>Anúncios salvos</span><b id="metricAds">0</b><small>Biblioteca disponível</small></div>
+<div class="card s3 metric-card"><span>Grupos em cache</span><b id="metricGroups">0</b><small>Carregados no navegador</small></div>
+<div class="card s3 metric-card"><span>Envios da sessão</span><b id="metricSent">0</b><small>Contador local</small></div>
+<div class="card s7">
+  <h3>Últimos eventos</h3>
+  <div id="dashboardLogs" class="timeline">Sem eventos registrados.</div>
+</div>
+<div class="card s5">
+  <h3>Checklist de uso</h3>
+  <div class="checklist">
+    <div><b>1</b><span>Conecte pelo menos um WhatsApp pelo QR Code.</span></div>
+    <div><b>2</b><span>Crie anúncios salvos ou prepare conteúdo temporário.</span></div>
+    <div><b>3</b><span>Carregue grupos ou cole sua lista de contatos.</span></div>
+    <div><b>4</b><span>Selecione o perfil de cadência e inicie a operação.</span></div>
+  </div>
+</div>
+</div>
+</section>
+
+<section id="p-sessions" class="page">
+<div class="card"><h3>Instâncias WhatsApp</h3><div class="desc">Conecte cada WhatsApp individualmente. Durante a conexão, o sistema mostra o andamento e libera o QR Code quando estiver pronto.</div><div id="sessionsBox" class="session-grid"></div></div>
+</section>
+
+<section id="p-ads" class="page">
+<div class="grid">
+<div class="card s5"><h3>Novo anúncio</h3><div class="help">Crie anúncios reutilizáveis com nome, texto e mídia. Depois, no disparo, escolha “usar anúncio salvo”.</div><label>Nome do anúncio</label><input id="adName" placeholder="Ex: Oferta institucional"><label>Texto</label><textarea id="adMessage" placeholder="Texto que será enviado. Aceita variáveis como {nome}."></textarea><label>Observação interna</label><input id="adNote" placeholder="Ex: campanha para clientes ativos"><label>Mídia</label><div class="filebox"><input id="adMedia" type="file" accept="image/*,video/*"></div><button class="green" onclick="saveAd()">Salvar anúncio</button></div>
+<div class="card s7"><h3>Biblioteca de anúncios</h3><div id="adsList" class="ad-list">Nenhum anúncio salvo.</div></div>
+</div>
+</section>
+
+<section id="p-list" class="page">
+<div class="grid">
+<div class="card s12"><div class="send-session-title"><h3>WhatsApps para este disparo em lista</h3><span>Escolha uma ou mais instâncias conectadas</span></div><div id="listSessionPicker" class="send-session-grid"></div></div>
+<div class="card s7"><h3>Base de contatos</h3><div class="help">Insira um contato por linha ou suba uma lista. O sistema tenta corrigir automaticamente números sem <b>55</b> e sem o <b>9º dígito</b>. Exemplo: <b>11999999999;nome=João;pedido=123</b>.</div><textarea id="targets" placeholder="11999999999;nome=João;pedido=123"></textarea><label>Importar lista ou planilha</label><div class="filebox"><input id="contactsFile" type="file" accept=".txt,.csv,.xlsx,.xls" onchange="previewContactFile()"><small>Formatos aceitos: TXT, CSV, XLSX. Colunas sugeridas: whatsapp, nome, pedido.</small></div><div id="contactsPreview" class="help" style="margin-top:10px">Nenhum arquivo selecionado.</div></div>
+<div class="card s5"><h3>Cadência</h3><div class="delay-options"><div class="delay-card" data-min="5000" data-max="9000" onclick="setDelay(this)"><b>Essencial</b><span>mais ágil</span></div><div class="delay-card active" data-min="9000" data-max="18000" onclick="setDelay(this)"><b>Equilibrado</b><span>recomendado</span></div><div class="delay-card" data-min="20000" data-max="45000" onclick="setDelay(this)"><b>Conservador</b><span>maior espaçamento</span></div></div><input id="minDelay" type="hidden" value="9000"><input id="maxDelay" type="hidden" value="18000"></div>
+<div class="card s12"><h3>Conteúdo do envio</h3><div class="grid"><div class="s6"><label class="mode-card"><input type="radio" name="adMode" value="manual" checked onchange="toggleAdMode()"> Criar conteúdo agora</label></div><div class="s6"><label class="mode-card"><input type="radio" name="adMode" value="saved" onchange="toggleAdMode()"> Usar anúncios salvos</label></div></div>
+<div id="manualBox"><div class="desc">Configure conteúdos temporários para este disparo. A ordem de uso será misturada automaticamente para não seguir um padrão fixo.</div><div class="ad-composer-grid"><div class="ad-compose ad"><div class="ad-compose-head"><span>Conteúdo A</span><small>principal</small></div><textarea id="msg1" placeholder="Digite a mensagem principal. Ex: Olá {nome}, temos uma novidade para você."></textarea><label>Mídia do conteúdo A</label><div class="filebox"><input id="media1" type="file" accept="image/*,video/*"><small>Imagem ou vídeo opcional.</small></div></div><div class="ad-compose ad two"><div class="ad-compose-head"><span>Conteúdo B</span><small>alternativo</small></div><textarea id="msg2" placeholder="Digite uma segunda versão para alternância."></textarea><label>Mídia do conteúdo B</label><div class="filebox"><input id="media2" type="file" accept="image/*,video/*"><small>Imagem ou vídeo opcional.</small></div></div><div class="ad-compose ad three"><div class="ad-compose-head"><span>Conteúdo C</span><small>complementar</small></div><textarea id="msg3" placeholder="Digite uma terceira versão, se desejar."></textarea><label>Mídia do conteúdo C</label><div class="filebox"><input id="media3" type="file" accept="image/*,video/*"><small>Imagem ou vídeo opcional.</small></div></div></div></div>
+<div id="savedBox" class="hidden"><div class="desc">Selecione um ou mais anúncios salvos. O sistema mistura a ordem durante a execução.</div><div id="savedAdsPicker" class="saved-picker"></div></div>
+</div>
+<div class="card s12"><button class="green" onclick="sendNumbers()">Iniciar disparo em lista</button><pre id="numberResult">Aguardando operação...</pre></div>
+</div>
+</section>
+
+<section id="p-groups" class="page">
+<div class="grid">
+<div class="card s5"><h3>Seleção de grupos</h3><div class="desc">Escolha uma instância conectada para carregar os grupos.</div><div class="select-like"><label>Instância para leitura</label><div id="groupSessionCards" class="group-select-card"></div></div><div class="btnrow"><button class="gray" onclick="loadGroups()">Carregar grupos</button><button class="purple" onclick="selectAllVisibleGroups()">Selecionar filtrados</button><button class="red" onclick="clearSelectedGroups()">Limpar seleção</button></div><label>Filtro</label><input id="groupSearch" placeholder="Pesquisar grupo..." oninput="renderGroups()"></div>
+<div class="card s7"><h3>Grupos disponíveis</h3><div id="groupsList" class="group-list">Carregue os grupos para visualizar a lista.</div></div>
+
+<div class="card s12"><div class="send-session-title"><h3>WhatsApps para este disparo em grupos</h3><span>Escolha qual(is) WhatsApp(s) vão enviar</span></div><div id="groupSendSessionPicker" class="send-session-grid"></div></div>
+<div class="card s12"><h3>Cadência do disparo em grupos</h3><div class="desc">Escolha o espaçamento usado somente no envio para grupos.</div><div class="delay-options"><div class="delay-card" data-min="5000" data-max="9000" onclick="setGroupDelay(this)"><b>Essencial</b><span>mais ágil</span></div><div class="delay-card group-active active" data-min="9000" data-max="18000" onclick="setGroupDelay(this)"><b>Equilibrado</b><span>recomendado</span></div><div class="delay-card" data-min="20000" data-max="45000" onclick="setGroupDelay(this)"><b>Conservador</b><span>maior espaçamento</span></div></div><input id="gMinDelay" type="hidden" value="9000"><input id="gMaxDelay" type="hidden" value="18000"></div>
+
+<div class="card s12"><h3>Conteúdo para grupos</h3><div class="help">Você pode criar um conteúdo apenas para este disparo ou selecionar anúncios salvos. A ordem dos anúncios selecionados será misturada automaticamente durante a operação.</div>
+<div class="grid" style="margin-top:14px"><div class="s6"><label class="mode-card"><input type="radio" name="gAdMode" value="manual" checked onchange="toggleGroupAdMode()"> Criar conteúdo agora</label></div><div class="s6"><label class="mode-card"><input type="radio" name="gAdMode" value="saved" onchange="toggleGroupAdMode()"> Usar anúncios salvos</label></div></div>
+<div id="gManualBox"><div class="desc">Configure até três anúncios temporários para grupos. Eles não ficam em ordem fixa.</div><div class="grid"><div class="card s4 ad"><h3>Anúncio A</h3><textarea id="gMsg1" placeholder="Mensagem para grupos"></textarea><label>Mídia A</label><div class="filebox"><input id="gMedia1" type="file" accept="image/*,video/*"></div></div><div class="card s4 ad two"><h3>Anúncio B</h3><textarea id="gMsg2" placeholder="Mensagem alternativa"></textarea><label>Mídia B</label><div class="filebox"><input id="gMedia2" type="file" accept="image/*,video/*"></div></div><div class="card s4 ad three"><h3>Anúncio C</h3><textarea id="gMsg3" placeholder="Mensagem complementar"></textarea><label>Mídia C</label><div class="filebox"><input id="gMedia3" type="file" accept="image/*,video/*"></div></div></div></div>
+<div id="gSavedBox" class="hidden"><div class="desc">Selecione um ou mais anúncios salvos para usar no disparo em grupos.</div><div id="gSavedAdsPicker" class="saved-picker"></div></div>
+</div>
+
+<div class="card s12"><button class="green" onclick="sendGroups()">Iniciar disparo em grupos</button><pre id="groupResult">Aguardando operação...</pre></div>
+</div>
+</section>
+
+<section id="p-billing" class="page">
+<div class="grid">
+  <div class="card s6"><h3>Minha assinatura</h3><div id="billingInfo" class="help">Carregando dados da assinatura...</div><h3 style="margin-top:18px">Escolha o plano para renovar</h3><div id="renewPlans" class="renew-plan-grid"></div><div class="btnrow" style="margin-top:14px"><button class="green" onclick="requestRenewal()">Gerar PIX de renovação</button><button onclick="loadBilling()">Atualizar</button></div><pre id="billingResult">Escolha um plano e gere o PIX de renovação.</pre></div>
+  <div class="card s6"><h3>Dados para pagamento PIX</h3><div id="pixInfo" class="preview"><p>Carregando PIX...</p></div></div>
+  <div class="card s12"><h3>Histórico de pagamentos</h3><div class="table-wrap"><table><thead><tr><th>Plano</th><th>Valor</th><th>Status</th><th>Data</th></tr></thead><tbody id="paymentsList"></tbody></table></div></div>
+</div>
+</section>
+
+</main>
+</div>
+
+<div id="renewPixModal" class="modal-bg">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div><h2 style="margin:0">PIX para renovação</h2><small style="color:var(--muted)">Faça o pagamento e aguarde aprovação.</small></div>
+      <button class="modal-close" onclick="closeRenewPix()">×</button>
+    </div>
+    <div id="renewPixContent"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<script>
+const fixedSessions=['whatsapp1','whatsapp2','whatsapp3'];let selectedRenewPlanId=null;
+const labels={whatsapp1:'WhatsApp 01',whatsapp2:'WhatsApp 02',whatsapp3:'WhatsApp 03'};let groupsCache=[];let selectedGroups=new Set(JSON.parse(localStorage.getItem('selectedGroupsV12')||'[]'));let ads=[];let sessionsData=[];
+const meta={dashboard:['Dashboard','Visão geral da operação e atalhos principais.'],sessions:['WhatsApps','Conecte e monitore as instâncias disponíveis.'],ads:['Anúncios salvos','Crie conteúdos reutilizáveis com texto, imagem ou vídeo.'],list:['Disparo em lista','Escolha conteúdo imediato ou anúncios salvos.'],groups:['Disparo em grupos','Selecione grupos e execute com anúncios configurados.'],billing:['Planos e renovação','Consulte seu plano, chave PIX e solicite renovação.']};
+async function api(u,o={}){
+  const token=localStorage.getItem('nz_token');
+  o.headers=Object.assign({},o.headers||{}, token?{Authorization:'Bearer '+token}:{});
+  try{return await(await fetch(u,o)).json()}catch(e){return{success:false,error:'Servidor não respondeu'}}
+}
+async function checkAccess(){
+  const token=localStorage.getItem('nz_token');
+  if(!token){location.href='/';return}
+  const r=await api('/api/me');
+  if(!r.success){localStorage.removeItem('nz_token');location.href='/';return}
+  if(r.user.role==='admin'){location.href='/admin';return}
+  if(r.expired || r.user.status!=='active'){
+    document.body.innerHTML='<div style="min-height:100vh;display:grid;place-items:center;background:#050816;color:white;font-family:Segoe UI,Arial"><div style="max-width:520px;padding:28px;border:1px solid #243044;border-radius:24px;background:#0f172a"><h1>Assinatura pendente</h1><p style="color:#94a3b8">Sua conta está vencida ou bloqueada. Fale com o administrador para renovar.</p><button onclick="logout()" style="padding:13px 16px;border:0;border-radius:14px;background:#2563eb;color:white;font-weight:900">Voltar ao login</button></div></div>';
+  }
+}
+checkAccess();
+function toast(m){let t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2500)}
+function show(id,d){document.getElementById(id).textContent=typeof d==='string'?d:JSON.stringify(d,null,2)}
+function openPage(n,b){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p-'+n).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');title.textContent=meta[n][0];sub.textContent=meta[n][1];localStorage.setItem('lastPageV12',n);if(n==='ads')loadAds();if(n==='billing')loadBilling()}
+function selectedSessions(scope){
+  const cls = scope==='groups' ? '.groupSendSessionCheck:checked' : scope==='list' ? '.listSessionCheck:checked' : '.sessionCheck:checked';
+  return [...document.querySelectorAll(cls)].map(i=>i.value);
+}
+function cacheSessions(scope){
+  if(scope==='list') localStorage.setItem('selectedListSessionsV15',JSON.stringify(selectedSessions('list')));
+  else if(scope==='groups') localStorage.setItem('selectedGroupSessionsV15',JSON.stringify(selectedSessions('groups')));
+  else localStorage.setItem('selectedSessionsV12',JSON.stringify(selectedSessions()));
+}
+function setDelay(el){document.querySelectorAll('#p-list .delay-card').forEach(x=>x.classList.remove('active'));el.classList.add('active');minDelay.value=el.dataset.min;maxDelay.value=el.dataset.max}
+function setGroupDelay(el){document.querySelectorAll('#p-groups .delay-card').forEach(x=>x.classList.remove('active'));el.classList.add('active');gMinDelay.value=el.dataset.min;gMaxDelay.value=el.dataset.max}
+function logout(){localStorage.removeItem('nz_token');location.href='/'}
+async function loadSessions(){
+  let data=await api('/sessions');
+  sessionsData=data;
+  let by={};data.forEach(s=>by[s.name]=s);
+  let saved=new Set(JSON.parse(localStorage.getItem('selectedSessionsV12')||'[]'));
+  let currentRead=document.querySelector('input[name="groupSession"]:checked')?.value || localStorage.getItem('groupReadSessionV15') || 'whatsapp1';
+  sessionsBox.innerHTML='';
+  groupSessionCards.innerHTML='';
+  fixedSessions.forEach(name=>{
+    let s=by[name]||{name,label:labels[name],connected:false,starting:false,stage:'offline',logs:[]};
+    let cls=s.connected?'ok':s.stage==='qr'?'qr':s.starting?'wait':'bad';
+    let txt=s.connected?'Conectado':s.stage==='qr'?'QR disponível':s.starting?'Conectando':'Desconectado';
+    let progress=(s.starting||s.stage==='qr'||s.stage==='syncing')?'<div class="loader"><span></span></div><div class="help">'+(s.stage==='qr'?'Escaneie o QR Code para concluir a conexão.':'Preparando conexão. Aguarde alguns segundos.')+'</div>':'';
+    let div=document.createElement('div');
+    div.className='session-card '+(s.connected?'connected':s.starting?'starting':'');
+    div.innerHTML=`<div class="session-head"><div><h3>${labels[name]}</h3><span class="status ${cls}">${txt}</span></div></div><label class="checkline"><input class="sessionCheck" type="checkbox" value="${name}" ${saved.has(name)?'checked':''} onchange="cacheSessions()"> habilitar para operação geral</label>${progress}${s.qr?`<img class="qr" src="${s.qr}">`:''}<div class="btnrow"><button class="green" onclick="connectSession('${name}')">${s.starting?'Aguarde...':'Gerar QR Code'}</button><button class="red" onclick="resetSession('${name}')">Redefinir</button></div><pre>${(s.logs||[]).slice(0,3).join('\n')||'Sem registros operacionais.'}</pre>`;
+    sessionsBox.appendChild(div);
+
+    let row=document.createElement('label');
+    row.className='mode-card '+(s.connected?'connected':'');
+    row.innerHTML=`<input type="radio" name="groupSession" value="${name}" ${name===currentRead?'checked':''} onchange="localStorage.setItem('groupReadSessionV15',this.value)"> ${labels[name]} ${s.connected?'— conectado':'— desconectado'}`;
+    groupSessionCards.appendChild(row)
+  });
+  renderSendSessionPickers(data);
+  updateOperationalSummary(data)
+}
+
+function renderSendSessionPickers(data){
+  const by={};data.forEach(s=>by[s.name]=s);
+  const listSaved=new Set(JSON.parse(localStorage.getItem('selectedListSessionsV15')||localStorage.getItem('selectedSessionsV12')||'[]'));
+  const groupSaved=new Set(JSON.parse(localStorage.getItem('selectedGroupSessionsV15')||localStorage.getItem('selectedSessionsV12')||'[]'));
+  function render(boxId, cls, saved, scope){
+    const box=document.getElementById(boxId); if(!box)return;
+    box.innerHTML='';
+    fixedSessions.forEach(name=>{
+      const s=by[name]||{};
+      const connected=!!s.connected;
+      const label=document.createElement('label');
+      label.className='send-session-card '+(connected?'connected':'disabled');
+      label.innerHTML=`<input type="checkbox" class="${cls}" value="${name}" ${saved.has(name)?'checked':''} ${connected?'':'disabled'} onchange="cacheSessions('${scope}')"><div><b>${labels[name]}</b><small>${connected?'Conectado e disponível':'Desconectado'}</small></div>`;
+      box.appendChild(label);
+    });
+  }
+  render('listSessionPicker','listSessionCheck',listSaved,'list');
+  render('groupSendSessionPicker','groupSendSessionCheck',groupSaved,'groups');
+}
+
+
+function updateOperationalSummary(data){
+  const connected=data.filter(s=>s.connected).length;
+  const selected=selectedSessions().length;
+  const sent=data.reduce((a,s)=>a+(s.sentToday||0),0);
+  if(typeof metricConnected!=='undefined') metricConnected.textContent=connected+'/3';
+  if(typeof metricAds!=='undefined') metricAds.textContent=ads.length||0;
+  if(typeof metricGroups!=='undefined') metricGroups.textContent=groupsCache.length||0;
+  if(typeof metricSent!=='undefined') metricSent.textContent=sent;
+  if(typeof sessionsBox!=='undefined'){
+    let summary=document.createElement('div');
+    summary.className='summary-card';
+    summary.innerHTML=`<h3>Resumo operacional</h3><div class="desc">Acompanhe rapidamente o estado das instâncias e siga o fluxo recomendado.</div><div class="summary-row"><span>WhatsApps conectados</span><b>${connected}/3</b></div><div class="summary-row"><span>Selecionados para envio</span><b>${selected}</b></div><div class="summary-row"><span>Anúncios salvos</span><b>${ads.length||0}</b></div><div class="summary-row"><span>Grupos carregados</span><b>${groupsCache.length||0}</b></div><div class="mini-steps"><div><em>1</em> Gerar QR Code</div><div><em>2</em> Escanear no celular</div><div><em>3</em> Aguardar sincronização</div><div><em>4</em> Habilitar para operação</div></div>`;
+    sessionsBox.appendChild(summary);
+  }
+  if(typeof dashboardLogs!=='undefined'){
+    const logs=data.flatMap(s=>(s.logs||[]).slice(0,3).map(l=>({label:labels[s.name]||s.name,log:l}))).slice(0,8);
+    dashboardLogs.innerHTML=logs.length?logs.map(x=>`<div class="timeline-item"><b>${x.label}</b><br>${esc(x.log)}</div>`).join(''):'Sem eventos registrados.';
+  }
+}
+
+async function connectSession(n){let d=await api('/connect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session:n})});if(!d.success)alert(d.error||'Erro');setTimeout(loadSessions,1000)}
+async function resetSession(n){if(!confirm('Redefinir '+labels[n]+'?'))return;let d=await api('/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session:n})});if(!d.success)alert(d.error||'Erro');setTimeout(loadSessions,1000)}
+async function loadAds(){ads=await api('/ads');renderAds();renderSavedPicker();if(typeof metricAds!=='undefined')metricAds.textContent=ads.length||0}
+function renderAds(){adsList.innerHTML=ads.length?'':'Nenhum anúncio salvo.';ads.forEach(ad=>{let div=document.createElement('div');div.className='ad-item';let media=ad.mediaUrl?(ad.mimetype||'').startsWith('image/')?`<img class="ad-thumb" src="${ad.mediaUrl}">`:`<div class="ad-thumb" style="display:grid;place-items:center">Vídeo</div>`:`<div class="ad-thumb" style="display:grid;place-items:center">Texto</div>`;div.innerHTML=`${media}<div class="ad-text"><b>${esc(ad.name)}</b><br><small>${esc(ad.note||'Sem observação')}</small><div class="help" style="margin-top:8px">${esc((ad.message||'').slice(0,140))}</div></div><button class="red" onclick="deleteAd('${ad.id}')">Excluir</button>`;adsList.appendChild(div)})}
+function renderSavedPicker(){
+  const render=(boxId, cls)=>{
+    const box=document.getElementById(boxId);
+    if(!box)return;
+    box.innerHTML=ads.length?'':'Nenhum anúncio salvo.';
+    ads.forEach(ad=>{
+      let row=document.createElement('label');
+      row.className='saved-row';
+      row.innerHTML=`<input type="checkbox" class="${cls}" value="${ad.id}"><div><b>${esc(ad.name)}</b><br><small>${esc(ad.note||'')}</small></div>`;
+      box.appendChild(row);
+    });
+  };
+  render('savedAdsPicker','savedAdCheck');
+  render('gSavedAdsPicker','gSavedAdCheck');
+}
+async function saveAd(){let fd=new FormData();fd.append('name',adName.value);fd.append('message',adMessage.value);fd.append('note',adNote.value);if(adMedia.files[0])fd.append('media',adMedia.files[0]);let d=await api('/ads',{method:'POST',body:fd});if(!d.success)return alert(d.error||'Erro');adName.value='';adMessage.value='';adNote.value='';adMedia.value='';toast('Anúncio salvo');loadAds()}
+async function deleteAd(id){if(!confirm('Excluir anúncio?'))return;await api('/ads/'+id,{method:'DELETE'});loadAds()}
+function toggleAdMode(){let mode=document.querySelector('input[name="adMode"]:checked').value;manualBox.classList.toggle('hidden',mode!=='manual');savedBox.classList.toggle('hidden',mode!=='saved');if(mode==='saved')loadAds()}
+function currentAdMode(){return document.querySelector('input[name="adMode"]:checked').value}
+function selectedSavedAds(){return [...document.querySelectorAll('.savedAdCheck:checked')].map(i=>i.value)}
+
+function toggleGroupAdMode(){let mode=document.querySelector('input[name="gAdMode"]:checked').value;gManualBox.classList.toggle('hidden',mode!=='manual');gSavedBox.classList.toggle('hidden',mode!=='saved');if(mode==='saved')loadAds()}
+function currentGroupAdMode(){return document.querySelector('input[name="gAdMode"]:checked')?.value||'manual'}
+function selectedGroupSavedAds(){return [...document.querySelectorAll('.gSavedAdCheck:checked')].map(i=>i.value)}
+function groupFields(fd){cacheSessions('groups');fd.append('sessions',JSON.stringify(selectedSessions('groups')));fd.append('adMode',currentGroupAdMode());fd.append('selectedAds',JSON.stringify(selectedGroupSavedAds()));fd.append('msg1',gMsg1.value);fd.append('msg2',gMsg2.value);fd.append('msg3',gMsg3.value);fd.append('minDelay',gMinDelay.value);fd.append('maxDelay',gMaxDelay.value);if(gMedia1.files[0])fd.append('media1',gMedia1.files[0]);if(gMedia2.files[0])fd.append('media2',gMedia2.files[0]);if(gMedia3.files[0])fd.append('media3',gMedia3.files[0])}
+async function loadGroups(){let checked=document.querySelector('input[name="groupSession"]:checked');let name=checked?checked.value:(localStorage.getItem('groupReadSessionV15')||'whatsapp1');localStorage.setItem('groupReadSessionV15',name);let g=await api('/groups?session='+encodeURIComponent(name));groupsCache=Array.isArray(g)?g:[];localStorage.setItem('groupsCacheV9',JSON.stringify(groupsCache));renderGroups();toast('Grupos carregados de '+(labels[name]||name))}
+function saveGroups(){localStorage.setItem('selectedGroupsV12',JSON.stringify([...selectedGroups]))}
+function renderGroups(){if(typeof metricGroups!=='undefined')metricGroups.textContent=groupsCache.length||0;let q=(groupSearch.value||'').toLowerCase();let list=groupsCache.filter(g=>(g.name||'').toLowerCase().includes(q));groupsList.innerHTML=list.length?'':'Nenhum grupo localizado.';list.forEach(g=>{let div=document.createElement('div');let ck=selectedGroups.has(g.id);div.className='group-item '+(ck?'selected':'');div.onclick=()=>{ck?selectedGroups.delete(g.id):selectedGroups.add(g.id);saveGroups();renderGroups()};div.innerHTML=`<input type="checkbox" ${ck?'checked':''}><div><b>${esc(g.name)}</b><div class="group-id">${esc(g.id)}</div></div>`;groupsList.appendChild(div)})}
+function selectAllVisibleGroups(){let q=(groupSearch.value||'').toLowerCase();groupsCache.filter(g=>(g.name||'').toLowerCase().includes(q)).forEach(g=>selectedGroups.add(g.id));saveGroups();renderGroups()}
+function clearSelectedGroups(){selectedGroups.clear();saveGroups();renderGroups()}
+function fields(fd){cacheSessions('list');fd.append('sessions',JSON.stringify(selectedSessions('list')));fd.append('adMode',currentAdMode());fd.append('selectedAds',JSON.stringify(selectedSavedAds()));fd.append('msg1',msg1.value);fd.append('msg2',msg2.value);fd.append('msg3',msg3.value);fd.append('minDelay',minDelay.value);fd.append('maxDelay',maxDelay.value);if(media1.files[0])fd.append('media1',media1.files[0]);if(media2.files[0])fd.append('media2',media2.files[0]);if(media3.files[0])fd.append('media3',media3.files[0])}
+
+function normalizePhonePreview(raw){
+  let n=String(raw||'').replace(/\D/g,'');
+  if(!n)return '';
+  if(!n.startsWith('55') && (n.length===10 || n.length===11)) n='55'+n;
+  if(n.startsWith('55') && n.length===12) n='55'+n.slice(2,4)+'9'+n.slice(4);
+  return n;
+}
+function previewContactFile(){
+  const f=contactsFile?.files?.[0];
+  if(!f){contactsPreview.textContent='Nenhum arquivo selecionado.';return}
+  const name=f.name.toLowerCase();
+  if(name.endsWith('.xlsx') || name.endsWith('.xls')){
+    contactsPreview.innerHTML=`Planilha selecionada: <b>${esc(f.name)}</b><br>Ela será lida pelo servidor no momento do envio. Use uma coluna chamada <b>whatsapp</b>, <b>telefone</b> ou <b>numero</b>.`;
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const lines=String(reader.result||'').split(/\r?\n/).filter(Boolean);
+    contactsPreview.innerHTML=`Arquivo selecionado: <b>${esc(f.name)}</b><br>Linhas detectadas: <b>${lines.length}</b><br>Primeiro número normalizado: <b>${esc(normalizePhonePreview(lines[0]||''))}</b>`;
+  };
+  reader.readAsText(f);
+}
+
+async function sendNumbers(){if(!selectedSessions('list').length)return show('numberResult','Selecione pelo menos um WhatsApp conectado para este disparo.');let fd=new FormData();fields(fd);fd.append('targets',targets.value);if(contactsFile?.files?.[0])fd.append('contactsFile',contactsFile.files[0]);show('numberResult','Operação em andamento...');show('numberResult',await api('/campaign-numbers',{method:'POST',body:fd}))}
+async function sendGroups(){if(!selectedSessions('groups').length)return show('groupResult','Selecione pelo menos um WhatsApp conectado para enviar aos grupos.');let fd=new FormData();groupFields(fd);fd.append('groups',JSON.stringify([...selectedGroups]));show('groupResult','Operação em andamento...');show('groupResult',await api('/campaign-groups',{method:'POST',body:fd}))}
+
+async function loadBilling(){
+  const d=await api('/api/billing');
+  if(!d.success){billingInfo.textContent=d.error||'Erro ao carregar assinatura.';return}
+  const u=d.user||{}; const currentPlan=d.plan||u.plan||{}; const st=d.settings||{}; const pays=d.payments||[]; const plans=Array.isArray(d.plans)?d.plans:[];
+  if(!selectedRenewPlanId) selectedRenewPlanId=(currentPlan.id||u.planId||(plans[0]&&plans[0].id));
+  const selectedPlan=plans.find(p=>p.id===selectedRenewPlanId)||currentPlan||{};
+  billingInfo.innerHTML=`<b>Plano atual:</b> ${esc(currentPlan.name||u.planName||'-')}<br><b>Status:</b> ${u.status==='active'?'Ativo':'Bloqueado/Vencido'}<br><b>Vencimento:</b> ${esc(u.expiresAt||u.expires||'-')}<br><b>Valor atual:</b> ${money(currentPlan.price||currentPlan.value||0)}<br><b>Validade do plano atual:</b> ${esc(currentPlan.durationDays||30)} dias`;
+  renewPlans.innerHTML=plans.length?plans.map(p=>`<div class="renew-plan ${p.id===selectedRenewPlanId?'active':''}" onclick="selectRenewPlan('${esc(p.id)}')"><b>${esc(p.name)}</b><div class="price">${money(p.price||0)}</div><small>${esc(p.durationDays||30)} dias • ${esc(p.whatsappLimit||1)} WhatsApp(s)</small></div>`).join(''):'<div class="help">Nenhum plano disponível para renovação.</div>';
+  pixInfo.innerHTML=`<div class="pix-renew-box"><h3>PIX para renovação</h3><div class="pix-renew-price">${money(selectedPlan.price||selectedPlan.value||0)}</div><p><b>Plano escolhido:</b> ${esc(selectedPlan.name||'-')}</p><p><b>Validade:</b> ${esc(selectedPlan.durationDays||30)} dias</p><p><b>Recebedor:</b> ${esc(st.pixName||'NEX-ZAPP')}</p><div class="pix-renew-key"><code id="pixKeyInline">${esc(st.pixKey||'Configure no admin')}</code><button class="green" onclick="copyText('pixKeyInline')">Copiar</button></div><p>${esc(st.instruction||st.pixInstruction||'Após o pagamento envie o comprovante para liberação da conta.')}</p></div>`;
+  paymentsList.innerHTML=pays.length?pays.map(x=>`<tr><td>${esc(x.planName||x.plan||'-')}</td><td>${money(x.value||0)}</td><td>${esc(x.status||'-')}</td><td>${esc((x.createdAt||x.date||'').slice(0,10))}</td></tr>`).join(''):'<tr><td colspan="4">Nenhum pagamento encontrado.</td></tr>';
+}
+function selectRenewPlan(id){selectedRenewPlanId=id;loadBilling()}
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function copyPix(k){navigator.clipboard?.writeText(k);toast('Chave PIX copiada')}
+async function requestRenewal(){
+  billingResult.textContent='Criando solicitação...';
+  const d=await api('/api/billing/request',{method:'POST',body:JSON.stringify({planId:selectedRenewPlanId})});
+  if(!d.success){billingResult.textContent=d.error||'Erro ao solicitar renovação.';return}
+  const st=d.settings||{};
+  const value=money(d.order?.value||0);
+  renewPixContent.innerHTML=`<div class="pix-renew-box">
+    <h3>Solicitação criada</h3>
+    <div class="pix-renew-price">${value}</div>
+    <p><b>Plano:</b> ${esc(d.order?.planName||'-')}</p>
+    <p><b>Recebedor:</b> ${esc(st.pixName||'NEX-ZAPP')}</p>
+    <div class="pix-renew-key"><code id="pixKeyRenew">${esc(st.pixKey||'Configure no admin')}</code><button class="green" onclick="copyText('pixKeyRenew')">Copiar</button></div>
+    <p>${esc(st.instruction||st.pixInstruction||'Após o pagamento envie o comprovante para liberação da conta.')}</p>
+  </div>`;
+  renewPixModal.classList.add('active');
+  billingResult.textContent='Solicitação criada. Faça o PIX e aguarde aprovação do administrador.';
+}
+function closeRenewPix(){renewPixModal.classList.remove('active')}
+function copyText(id){const t=document.getElementById(id)?.textContent||'';navigator.clipboard?.writeText(t);toast('Chave PIX copiada')}
+
+async function refreshAll(){await loadSessions();await loadAds();let c=localStorage.getItem('groupsCacheV9');if(c&&!groupsCache.length){try{groupsCache=JSON.parse(c)||[]}catch{}}renderGroups()}
+function esc(s){return String(s||'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[x]))}
+openPage(localStorage.getItem('lastPageV12')||'dashboard');refreshAll();setInterval(loadSessions,4000)
+</script>
+</body>
+</html>

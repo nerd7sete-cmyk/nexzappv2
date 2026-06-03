@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NEX-ZAPP Revenda</title>
+<style>
+:root{--bg:#050816;--card:#0f172a;--field:#070d18;--line:#243044;--text:#f8fafc;--muted:#94a3b8;--blue:#2563eb;--green:#22c55e;--red:#ef4444;--shadow:0 24px 80px rgba(0,0,0,.42)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at top,#172554 0%,#0b1120 35%,#050816 100%);color:var(--text)}
+button{border:0;border-radius:14px;padding:12px 14px;background:linear-gradient(135deg,var(--blue),#1d4ed8);color:white;font-weight:900;cursor:pointer}button.green{background:linear-gradient(135deg,var(--green),#16a34a)}button.red{background:linear-gradient(135deg,var(--red),#b91c1c)}
+input{width:100%;border:1px solid var(--line);background:var(--field);color:var(--text);border-radius:14px;padding:12px}label{display:block;margin:12px 0 7px;color:#cbd5e1;font-weight:800}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}.box{width:100%;max-width:430px;background:linear-gradient(180deg,#111827,#0f172a);border:1px solid rgba(148,163,184,.16);border-radius:26px;padding:24px;box-shadow:var(--shadow)}
+.app{display:none;min-height:100vh}.wrap{width:min(1180px,calc(100% - 28px));margin:auto;padding:24px 0}.top{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:18px}.brand{display:flex;gap:12px;align-items:center}.logo{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,var(--blue),#020617);display:grid;place-items:center;font-weight:950}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{grid-column:span 12;background:linear-gradient(180deg,#111827,#0f172a);border:1px solid rgba(148,163,184,.16);border-radius:24px;padding:20px;box-shadow:var(--shadow)}.s3{grid-column:span 3}.s4{grid-column:span 4}.s6{grid-column:span 6}
+.stat span{color:var(--muted)}.stat b{display:block;font-size:30px;margin-top:6px}.muted{color:var(--muted);line-height:1.5}.linkbox{display:flex;gap:8px;background:#070d18;border:1px solid var(--line);border-radius:16px;padding:10px;align-items:center}.linkbox code{flex:1;color:#bfdbfe;word-break:break-all}
+table{width:100%;border-collapse:collapse;min-width:680px}th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left}th{color:#cbd5e1;background:#0b1220}.table{overflow:auto;border:1px solid var(--line);border-radius:18px}.msg{margin-top:10px;color:#cbd5e1}.err{color:#fca5a5}
+@media(max-width:850px){.s3,.s4,.s6{grid-column:span 12}.top{display:block}.top button{margin-top:10px}}
+
+.rev-close{position:absolute;right:18px;top:18px;width:40px;height:40px;border-radius:14px;background:#1e293b!important;box-shadow:none!important;font-size:22px;line-height:1;padding:0}
+.box{position:relative}
+
+</style></head>
+<body>
+<div id="loginBox" class="login"><div class="box"><button class="rev-close" onclick="location.href='/'">×</button><h1>Painel Revendedor</h1><p class="muted">Acesse para acompanhar indicações, comissões e saques.</p><label>E-mail</label><input id="email" placeholder="seu@email.com"><label>Senha</label><input id="password" type="password" placeholder="Senha"><button class="green" style="width:100%;margin-top:14px" onclick="login()">Entrar</button><p class="muted">Use a senha que você criou no cadastro de revendedor.</p><div id="loginMsg" class="msg"></div></div></div>
+<div id="app" class="app"><div class="wrap"><div class="top"><div class="brand"><div class="logo">R</div><div><h2 style="margin:0">Revenda NEX-ZAPP</h2><small id="resellerName" class="muted"></small></div></div><button class="red" onclick="logout()">Sair</button></div>
+<div class="grid">
+<div class="card s3 stat"><span>Clientes indicados</span><b id="sClients">0</b></div><div class="card s3 stat"><span>Comissão total</span><b id="sTotal">R$0,00</b></div><div class="card s3 stat"><span>Disponível</span><b id="sAvail">R$0,00</b></div><div class="card s3 stat"><span>Pago</span><b id="sPaid">R$0,00</b></div>
+<div class="card s6"><h3>Meu link de indicação</h3><p class="muted">Compartilhe este link. Quando o cliente comprar por ele, sua comissão aparece aqui após aprovação do admin.</p><div class="linkbox"><code id="myLink"></code><button class="green" onclick="copyLink()">Copiar</button></div></div>
+<div class="card s6"><h3>Solicitar saque</h3><p class="muted">Mínimo R$50,00. O admin faz o PIX manualmente e marca como pago.</p><label>Valor</label><input id="withdrawValue" placeholder="50.00"><label>Chave PIX</label><input id="withdrawPix" placeholder="Sua chave PIX"><button class="green" style="margin-top:12px" onclick="requestWithdraw()">Solicitar saque</button><div id="withdrawMsg" class="msg"></div></div>
+<div class="card"><h3>Clientes e comissões</h3><div class="table"><table><thead><tr><th>Cliente</th><th>Plano</th><th>Venda</th><th>Comissão</th><th>Status</th></tr></thead><tbody id="commRows"></tbody></table></div></div>
+<div class="card"><h3>Saques</h3><div class="table"><table><thead><tr><th>Valor</th><th>PIX</th><th>Status</th><th>Data</th></tr></thead><tbody id="withdrawRows"></tbody></table></div></div>
+</div></div></div>
+<script>
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+async function api(u,o={}){const t=localStorage.getItem('reseller_token');o.headers=Object.assign({'Content-Type':'application/json'},o.headers||{},t?{Authorization:'Bearer '+t}:{});return await fetch(u,o).then(r=>r.json()).catch(()=>({success:false,error:'Servidor não respondeu'}))}
+async function login(){loginMsg.textContent='Entrando...';const r=await api('/api/reseller/login',{method:'POST',body:JSON.stringify({email:email.value,password:password.value})});if(!r.success){loginMsg.className='msg err';loginMsg.textContent=r.error;return}localStorage.setItem('reseller_token',r.token);load()}
+function logout(){localStorage.removeItem('reseller_token');location.href='/revenda'}
+async function load(){const r=await api('/api/reseller/me');if(!r.success){loginBox.style.display='grid';app.style.display='none';return}loginBox.style.display='none';app.style.display='block';const rs=r.reseller;resellerName.textContent=rs.name+' • '+rs.code;withdrawPix.value=rs.pixKey||'';sClients.textContent=r.summary.clients;sTotal.textContent=money(r.summary.total);sAvail.textContent=money(r.summary.available);sPaid.textContent=money(r.summary.paid);myLink.textContent=location.origin+'/?ref='+rs.code;commRows.innerHTML=r.commissions.length?r.commissions.map(c=>`<tr><td>${c.clientName}<br><small>${c.clientEmail}</small></td><td>${c.planName}</td><td>${money(c.saleValue)}</td><td>${money(c.value)}</td><td>${c.status}</td></tr>`).join(''):'<tr><td colspan="5">Nenhuma comissão ainda.</td></tr>';withdrawRows.innerHTML=r.withdrawals.length?r.withdrawals.map(w=>`<tr><td>${money(w.value)}</td><td>${w.pixKey}</td><td>${w.status}</td><td>${String(w.createdAt||'').slice(0,10)}</td></tr>`).join(''):'<tr><td colspan="4">Nenhum saque solicitado.</td></tr>'}
+function copyLink(){navigator.clipboard?.writeText(myLink.textContent);alert('Link copiado.')}
+async function requestWithdraw(){withdrawMsg.textContent='Enviando...';const r=await api('/api/reseller/withdraw',{method:'POST',body:JSON.stringify({value:withdrawValue.value,pixKey:withdrawPix.value})});if(!r.success){withdrawMsg.className='msg err';withdrawMsg.textContent=r.error;return}withdrawMsg.className='msg';withdrawMsg.textContent='Saque solicitado. Aguarde o admin aprovar e pagar.';load()}
+load()
+</script>
+</body></html>

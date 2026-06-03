@@ -1,0 +1,449 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NEX-ZAPP Admin</title>
+<style>
+:root{--bg:#050816;--side:#070b18;--panel:#0f172a;--field:#070d18;--line:#243044;--text:#f8fafc;--muted:#94a3b8;--blue:#2563eb;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--purple:#8b5cf6;--shadow:0 24px 80px rgba(0,0,0,.42)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top,#172554 0%,#0b1120 35%,#050816 100%)}button{border:0;border-radius:14px;padding:12px 14px;background:linear-gradient(135deg,var(--blue),#1d4ed8);color:white;font-weight:900;cursor:pointer;box-shadow:0 12px 28px rgba(37,99,235,.24)}button.green{background:linear-gradient(135deg,var(--green),#16a34a)}button.red{background:linear-gradient(135deg,var(--red),#b91c1c)}button.gray{background:#475569;box-shadow:none}button.ghost{background:transparent;border:1px solid var(--line);box-shadow:none}input,textarea,select{width:100%;border:1px solid var(--line);background:#070d18;color:var(--text);border-radius:14px;padding:12px;outline:none}textarea{min-height:110px}label{display:block;color:#cbd5e1;font-weight:850;margin:12px 0 7px;font-size:13px}.app{min-height:100vh;display:grid;grid-template-columns:292px 1fr}.sidebar{height:100vh;position:sticky;top:0;background:linear-gradient(180deg,rgba(7,11,24,.98),rgba(4,8,18,.98));border-right:1px solid rgba(148,163,184,.14);padding:22px;overflow:auto}.brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}.logo{width:52px;height:52px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#2563eb,#1d4ed8,#020617);font-weight:950}.brand h1{margin:0;font-size:24px}.brand small{color:var(--muted)}.nav{display:grid;gap:9px}.nav button{width:100%;display:flex;align-items:center;gap:11px;justify-content:flex-start;background:transparent;box-shadow:none;border:1px solid transparent;color:#e2e8f0;text-align:left}.nav svg{width:20px;height:20px;stroke:#93c5fd}.nav button.active{background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(29,78,216,.10));border-color:rgba(96,165,250,.40)}.nav-footer{margin-top:24px;border:1px solid var(--line);background:#070d18;border-radius:18px;padding:14px;color:var(--muted);font-size:12px}.license{display:inline-flex;margin-top:8px;padding:6px 10px;border-radius:999px;background:rgba(34,197,94,.14);color:#86efac;font-weight:900}main{padding:26px;max-width:1500px;width:100%;margin:0 auto}.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px;background:linear-gradient(90deg,rgba(29,78,216,.42),rgba(15,23,42,.80));border:1px solid rgba(96,165,250,.18);border-radius:24px;padding:18px}.topbar h2{margin:0;font-size:34px}.topbar p{margin:6px 0 0;color:var(--muted)}.admin-mini{display:flex;align-items:center;gap:12px;background:#070d18;border:1px solid var(--line);border-radius:18px;padding:10px 12px}.avatar{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--blue),#0f172a);display:grid;place-items:center;font-weight:950}.page{display:none}.page.active{display:block}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s12{grid-column:span 12}.card{background:linear-gradient(180deg,rgba(17,24,39,.96),rgba(15,23,42,.90));border:1px solid rgba(148,163,184,.16);border-radius:24px;padding:20px;box-shadow:var(--shadow)}.card h3{margin:0 0 8px}.desc{color:var(--muted);line-height:1.5;font-size:14px;margin-bottom:12px}.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}.stat{background:#070d18;border:1px solid var(--line);border-radius:20px;padding:18px}.stat span{color:var(--muted);font-size:13px}.stat b{display:block;font-size:30px;margin-top:6px}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:18px;background:#070d18;scrollbar-width:none}.table-wrap::-webkit-scrollbar{display:none}table{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}th,td{padding:13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}th{background:#0b1220;color:#cbd5e1;font-size:12px;text-transform:uppercase}.badge{display:inline-flex;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:950}.ok{background:rgba(34,197,94,.14);color:#4ade80}.warn{background:rgba(245,158,11,.14);color:#fbbf24}.bad{background:rgba(239,68,68,.14);color:#f87171}.btnrow{display:flex;gap:8px;flex-wrap:wrap}.btnrow button{flex:1;min-width:110px}.compact button{padding:9px 10px;font-size:12px;min-width:auto}.status-control{position:relative;display:inline-block;min-width:132px;margin-top:6px}.status-current{display:flex;justify-content:space-between;background:#070d18;border:1px solid var(--line);border-radius:14px;padding:10px 12px;cursor:pointer;font-weight:900}.status-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;background:#0b1220;border:1px solid #334155;border-radius:16px;padding:8px;z-index:30}.status-control.open .status-menu{display:grid;gap:6px}.status-option{padding:10px;border-radius:12px;cursor:pointer;font-weight:900}.status-option:hover{background:rgba(37,99,235,.14)}.plan-card{background:#070d18;border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px}.switch{display:flex;gap:8px;align-items:center;color:#cbd5e1;font-weight:850;margin-top:12px}.switch input{width:auto}.event{display:flex;gap:10px;align-items:flex-start;background:#070d18;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px}.event-icon{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:rgba(37,99,235,.16);color:#bfdbfe;font-weight:950}.preview{border:1px solid var(--line);border-radius:24px;background:radial-gradient(circle at top left,rgba(37,99,235,.25),transparent 30%),linear-gradient(180deg,#0b1220,#070d18);padding:22px}.modal-bg{display:none;position:fixed;inset:0;background:rgba(2,6,23,.72);backdrop-filter:blur(10px);z-index:100;align-items:center;justify-content:center;padding:18px}.modal-bg.active{display:flex}.modal{width:100%;max-width:580px;background:linear-gradient(180deg,#111827,#0f172a);border:1px solid rgba(148,163,184,.2);border-radius:28px;padding:22px;box-shadow:0 32px 110px rgba(0,0,0,.55)}.modal-head{display:flex;justify-content:space-between}.close{width:40px;height:40px;padding:0;background:#1e293b}.toast{position:fixed;right:22px;bottom:22px;max-width:360px;background:#070d18;border:1px solid rgba(34,197,94,.28);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);z-index:120;display:none}.toast.show{display:block}.toast b{display:block;color:#86efac;margin-bottom:4px}.mobilebar{display:none}@media(max-width:1050px){.app{display:block}.sidebar{display:none}main{padding:16px}.mobilebar{display:flex;gap:8px;overflow:auto;margin-bottom:14px}.mobilebar button{white-space:nowrap;background:#0f172a;box-shadow:none}.topbar{display:block}.stats{grid-template-columns:repeat(2,1fr)}.s3,.s4,.s5,.s6,.s7,.s8{grid-column:span 12}.admin-mini{margin-top:12px}}@media(max-width:560px){.stats{grid-template-columns:1fr}table{min-width:720px}.btnrow button{min-width:100%}}
+
+/* Filled admin cards */
+.saved-status{display:grid;gap:10px;margin-top:14px}
+.saved-status div{background:#070d18;border:1px solid #243044;border-radius:16px;padding:12px}
+.saved-status small{display:block;color:#94a3b8;font-weight:800;margin-bottom:4px}
+.preview .mini-muted{color:#94a3b8;font-size:13px;line-height:1.4}
+.empty-helper{background:rgba(37,99,235,.08);border:1px solid rgba(96,165,250,.16);border-radius:16px;padding:12px;color:#cbd5e1;font-size:13px;line-height:1.5;margin-top:12px}
+
+
+.saved-status{display:grid;gap:10px;margin-top:14px}
+.saved-status div{background:#070d18;border:1px solid #243044;border-radius:16px;padding:12px}
+.saved-status small{display:block;color:#94a3b8;font-weight:800;margin-bottom:4px}
+.empty-helper{background:rgba(37,99,235,.08);border:1px solid rgba(96,165,250,.16);border-radius:16px;padding:12px;color:#cbd5e1;font-size:13px;line-height:1.5;margin-top:12px}
+.pix-preview-card,.landing-preview-card{background:linear-gradient(180deg,#111827,#0f172a);border:1px solid rgba(96,165,250,.22);border-radius:22px;padding:18px}
+.pix-preview-card .value{font-size:30px;font-weight:950;margin:10px 0}
+.pix-preview-key{display:flex;gap:8px;align-items:center;background:#070d18;border:1px solid #243044;border-radius:14px;padding:10px;margin-top:8px}
+.pix-preview-key code{flex:1;color:#bfdbfe;font-weight:900;word-break:break-all}
+.pix-preview-key button{padding:9px 12px}
+.landing-preview-card h2{font-size:30px;line-height:1.05;margin:0 0 12px}
+.landing-preview-card p{color:#cbd5e1;line-height:1.5}
+@media(max-width:520px){.pix-preview-key{display:block}.pix-preview-key button{width:100%;margin-top:8px}}
+
+
+.reseller-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.reseller-stat{background:#070d18;border:1px solid var(--line);border-radius:20px;padding:16px}
+.reseller-stat span{color:var(--muted);font-size:13px;font-weight:800}
+.reseller-stat b{display:block;font-size:26px;margin-top:6px}
+.reseller-card-mini{display:grid;gap:8px}
+.badge-status{display:inline-flex;align-items:center;border-radius:999px;padding:5px 10px;font-weight:900;font-size:12px}
+.badge-approved{background:rgba(34,197,94,.16);color:#86efac}
+.badge-pending{background:rgba(245,158,11,.16);color:#fcd34d}
+.badge-blocked,.badge-canceled{background:rgba(239,68,68,.16);color:#fca5a5}
+.commission-type{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0 14px}
+.commission-type label{display:flex;align-items:center;gap:8px;background:#070d18;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:0}
+.commission-type input{width:auto}
+@media(max-width:900px){.reseller-stat-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.reseller-stat-grid{grid-template-columns:1fr}}
+
+
+.action-done{display:inline-flex;align-items:center;border-radius:14px;padding:10px 12px;background:rgba(34,197,94,.12);color:#86efac;font-weight:900}
+.order-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+</style></head><body>
+<div class="app"><aside class="sidebar"><div class="brand"><div class="logo">NZ</div><div><h1>NEX-ZAPP</h1><small>Painel Admin</small></div></div><nav class="nav" id="nav"></nav><div class="nav-footer"><b>NEX-ZAPP Admin</b><br>Integrado com JSON<br><span class="license">Dados reais</span></div></aside>
+<main><div class="mobilebar" id="mobilebar"></div><div class="topbar"><div><h2 id="pageTitle">Dashboard Admin</h2><p id="pageSub">Controle geral em tempo real.</p></div><div class="btnrow" style="max-width:330px"><button class="gray" onclick="loadAll()">Atualizar</button><button class="green" onclick="openNewClient()">Novo cliente</button></div></div>
+<section id="p-dashboard" class="page active"><div class="stats"><div class="stat"><span>Clientes ativos</span><b id="sActive">0</b></div><div class="stat"><span>Vencidos/Bloqueados</span><b id="sExpired">0</b></div><div class="stat"><span>Pedidos pendentes</span><b id="sOrders">0</b></div><div class="stat"><span>Pagamentos pagos</span><b id="sPaid">0</b></div><div class="stat"><span>Faturamento mês</span><b id="sMonth">R$0</b></div><div class="stat"><span>Total recebido</span><b id="sTotal">R$0</b></div></div><div class="grid" style="margin-top:18px"><div class="card s7"><h3>Últimos pedidos</h3><div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Plano</th><th>Valor</th><th>Status</th><th>Ação</th></tr></thead><tbody id="dashOrders"></tbody></table></div></div><div class="card s5"><h3>Atividade recente</h3><div id="events"></div></div><div class="card s12"><h3>Clientes</h3><div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Plano</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead><tbody id="dashClients"></tbody></table></div></div></div></section>
+<section id="p-clientes" class="page"><div class="grid"><div class="card s4"><h3>Criar cliente</h3><label>Nome</label><input id="clientName"><label>E-mail</label><input id="clientEmail"><label>WhatsApp</label><input id="clientPhone"><label>Senha</label><input id="clientPass" value="123456"><label>Plano</label><select id="clientPlan"></select><label>Vencimento</label><input id="clientExpire" type="date"><label>Status</label><select id="clientStatus"><option value="active">Ativo</option><option value="blocked">Bloqueado</option><option value="expired">Vencido</option></select><button class="green" style="width:100%;margin-top:14px" onclick="createClientForm()">Criar cliente</button></div><div class="card s8"><h3>Clientes cadastrados</h3><div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Plano</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead><tbody id="clientsTable"></tbody></table></div></div></div></section>
+<section id="p-planos" class="page"><div class="grid"><div class="card s8"><h3>Planos</h3><div id="plansEditor"></div><div class="btnrow"><button class="green" onclick="savePlans()">Salvar planos</button><button onclick="addPlan()">Adicionar plano</button></div></div><div class="card s4"><h3>Prévia</h3><div class="preview"><h2>Plano Pro</h2><p>Valores controlados pelo admin e exibidos na landing.</p><button class="green">Comprar agora</button></div></div></div></section>
+<section id="p-pedidos" class="page"><div class="card"><h3>Pedidos da landing</h3><div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Contato</th><th>Plano</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody id="ordersTable"></tbody></table></div></div></section>
+<section id="p-pagamentos" class="page"><div class="card"><h3>Pagamentos</h3><div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Plano</th><th>Valor</th><th>Status</th><th>Data</th></tr></thead><tbody id="paymentsTable"></tbody></table></div></div></section>
+<section id="p-pix" class="page"><div class="grid"><div class="card s6"><h3>Configuração PIX</h3><label>Chave PIX</label><input id="pixKey"><label>Nome do recebedor</label><input id="pixName"><label>Cidade</label><input id="pixCity"><label>WhatsApp suporte</label><input id="supportPhone"><label>WhatsApp para comprovantes</label><input id="receiptWhatsapp" placeholder="5599999999999"><label>Instrução</label><textarea id="instruction"></textarea><button class="green" style="width:100%;margin-top:14px" onclick="saveSettings()">Salvar PIX</button><div class="empty-helper">Essas informações aparecem no PIX da landing e na renovação do cliente.</div><div id="pixSavedStatus" class="saved-status"></div></div><div class="card s6"><h3>Prévia</h3><div class="pix-preview-card"><h2>Pedido PIX</h2><div class="value">R$ 97,90</div><p><b>Recebedor:</b> <span id="pixNamePrev">NEX-ZAPP</span></p><div><b>Chave PIX</b><div class="pix-preview-key"><code id="pixPrev"></code><button class="green" onclick="navigator.clipboard?.writeText(pixPrev.textContent)">Copiar</button></div></div><p id="instPrev" style="color:#cbd5e1;line-height:1.5;margin-top:12px"></p></div></div></div></section>
+<section id="p-landing" class="page"><div class="grid"><div class="card s6"><h3>Landing Page</h3><label>Título</label><input id="landingTitle"><label>Subtítulo</label><textarea id="landingSubtitle"></textarea><label>Botão principal</label><input id="primaryButton"><label>Botão secundário</label><input id="secondaryButton"><button class="green" style="width:100%;margin-top:14px" onclick="saveLanding()">Salvar landing</button><div class="empty-helper">A prévia ao lado mostra exatamente o conteúdo salvo da página pública.</div><div id="landingSavedStatus" class="saved-status"></div></div><div class="card s6"><h3>Prévia</h3><div class="preview"><h2 id="landPrevTitle"></h2><p id="landPrevSub"></p><button class="green" id="landPrevBtn"></button></div></div></div></section>
+
+
+
+<section id="p-resellers" class="page">
+  <div class="reseller-stat-grid">
+    <div class="reseller-stat"><span>Revendedores ativos</span><b id="rsActive">0</b></div>
+    <div class="reseller-stat"><span>Solicitações pendentes</span><b id="rsPending">0</b></div>
+    <div class="reseller-stat"><span>Comissões geradas</span><b id="rsCommission">R$0,00</b></div>
+    <div class="reseller-stat"><span>Saques pendentes</span><b id="rsWithdraw">R$0,00</b></div>
+  </div>
+
+  <div class="grid">
+    <div class="card s12">
+      <h3>Configuração de comissões</h3>
+      <div class="desc">Escolha se a comissão será porcentagem da venda ou valor fixo por plano.</div>
+      <div class="commission-type">
+        <label><input type="radio" name="commissionType" id="commTypePercent" value="percent" checked> Porcentagem (%)</label>
+        <label><input type="radio" name="commissionType" id="commTypeFixed" value="fixed"> Valor fixo (R$)</label>
+      </div>
+      <div class="grid">
+        <div class="s3"><label>Starter</label><input id="commStarter" type="number" step="0.01" value="10"><small class="desc" id="commStarterHint">10% sobre a venda.</small></div>
+        <div class="s3"><label>Pro</label><input id="commPro" type="number" step="0.01" value="20"><small class="desc" id="commProHint">20% sobre a venda.</small></div>
+        <div class="s3"><label>Enterprise</label><input id="commEnterprise" type="number" step="0.01" value="40"><small class="desc" id="commEnterpriseHint">40% sobre a venda.</small></div>
+        <div class="s3"><label>Saque mínimo</label><input id="commMinWithdraw" type="number" step="0.01" value="50"><small class="desc">Valor mínimo para pedir saque.</small></div>
+      </div>
+      <button class="green" style="margin-top:14px" onclick="saveResellerSettings()">Salvar comissões</button>
+    </div>
+
+    <div class="card s12">
+      <h3>Revendedores cadastrados</h3>
+      <div class="desc">Aprove parceiros pendentes, copie links e bloqueie quando necessário.</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Revendedor</th><th>Resumo</th><th>Código / Link</th><th>Status</th><th>PIX</th><th>Ações</th></tr></thead>
+          <tbody id="resellersTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card s6">
+      <h3>Comissões geradas</h3>
+      <div class="table-wrap"><table><thead><tr><th>Revendedor</th><th>Cliente</th><th>Plano</th><th>Venda</th><th>Comissão</th></tr></thead><tbody id="commissionsTable"></tbody></table></div>
+    </div>
+
+    <div class="card s6">
+      <h3>Saques dos revendedores</h3>
+      <div class="desc">Depois de fazer o PIX manual, marque o saque como pago.</div>
+      <div class="table-wrap"><table><thead><tr><th>Revendedor</th><th>Valor</th><th>PIX</th><th>Status</th><th>Ações</th></tr></thead><tbody id="withdrawalsTable"></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<section id="p-config" class="page"><div class="grid"><div class="card s6"><h3>Backup</h3><p class="desc">Dados salvos em JSON dentro da pasta data.</p><button onclick="downloadBackup()">Baixar backup</button></div><div class="card s6"><h3>Admin</h3><p class="desc">Login atual salvo em data/users.json.</p><button class="red" onclick="logout()">Sair</button></div></div></section>
+</main></div>
+<div class="modal-bg" id="newClientModal"><div class="modal"><div class="modal-head"><div><h3>Novo cliente</h3><p class="desc">Cadastro rápido</p></div><button class="close" onclick="closeNewClient()">×</button></div><div class="grid"><div class="s6"><label>Nome</label><input id="mName"></div><div class="s6"><label>E-mail</label><input id="mEmail"></div><div class="s6"><label>WhatsApp</label><input id="mPhone"></div><div class="s6"><label>Senha</label><input id="mPass" value="123456"></div><div class="s4"><label>Plano</label><select id="mPlan"></select></div><div class="s4"><label>Vencimento</label><input id="mExpire" type="date"></div><div class="s4"><label>Status</label><select id="mStatus"><option value="active">Ativo</option><option value="blocked">Bloqueado</option><option value="expired">Vencido</option></select></div></div><div class="btnrow" style="margin-top:16px"><button class="gray" onclick="closeNewClient()">Cancelar</button><button class="green" onclick="createClientModal()">Criar cliente</button></div></div></div>
+<div class="modal-bg" id="approvalModal"><div class="modal" style="text-align:center"><h2 style="color:#86efac">✓</h2><h3 id="approvalTitle">Concluído</h3><p class="desc" id="approvalMsg"></p><button class="green" onclick="approvalModal.classList.remove('active')">Fechar</button></div></div><div class="toast" id="toast"></div>
+<script>
+function esc(v){return String(v ?? '').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+const token=localStorage.getItem('nz_token');if(!token)location.href='/';
+const icons={
+dashboard:'<svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-3H4v3Z"/></svg>',
+clientes:'<svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path d="M16 11a4 4 0 1 0-8 0m8 0H8m8 0h1a4 4 0 0 1 4 4v2H3v-2a4 4 0 0 1 4-4h1"/></svg>',
+planos:'<svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg>',
+pedidos:'<svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path d="M6 3h12v18H6V3Zm3 5h6m-6 4h6m-6 4h3"/></svg>',
+pagamentos:'<svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path d="M3 7h18v10H3V7Zm3 3h4m8 4h.01"/></svg>',
+pix:'<svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path d="M12 3l4 4-4 4-4-4 4-4Zm0 10l4 4-4 4-4-4 4-4Z"/></svg>',
+landing:'<svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path d="M4 5h16v14H4V5Zm0 4h16"/></svg>',
+resellers:'<svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+config:'<svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-5v3m0 12v3m9-9h-3M6 12H3"/></svg>'
+}
+const menu=[['dashboard','Dashboard'],['clientes','Clientes'],['planos','Planos'],['pedidos','Pedidos Landing'],['pagamentos','Pagamentos'],['pix','PIX'],['landing','Landing Page'],['resellers','Revendedores'],['config','Configurações']];
+nav.innerHTML=menu.map((m,i)=>`<button class="${i?'':'active'}" onclick="openPage('${m[0]}',this)">${icons[m[0]]||''}${m[1]}</button>`).join('')+`<button class="red" onclick="logout()">${icons.config||''}Sair</button>`;
+mobilebar.innerHTML=menu.map(m=>`<button onclick="openPage('${m[0]}')">${m[1]}</button>`).join('');
+let state={users:[],plans:[],orders:[],payments:[],settings:{},landing:{}};
+async function api(u,o={}){o.headers=Object.assign({'Content-Type':'application/json',Authorization:'Bearer '+token},o.headers||{});let r=await fetch(u,o);let j=await r.json().catch(()=>({success:false,error:'Erro'}));if(r.status===401||r.status===403){localStorage.removeItem('nz_token');location.href='/'}return j}
+function makeSummary(){
+  const clients=(state.users||[]).filter(u=>u.role==='client');
+  const paid=(state.payments||[]).filter(p=>p.status==='paid');
+  const month=new Date().toISOString().slice(0,7);
+  return {
+    clientsActive:clients.filter(u=>u.status==='active'&&!expired(u)).length,
+    clientsExpired:clients.filter(u=>u.status!=='active'||expired(u)).length,
+    ordersPending:(state.orders||[]).filter(o=>o.status==='pending').length,
+    paymentsPaid:paid.length,
+    monthRevenue:paid.filter(p=>String(p.paidAt||p.createdAt||'').startsWith(month)).reduce((a,p)=>a+Number(p.value||0),0),
+    totalRevenue:paid.reduce((a,p)=>a+Number(p.value||0),0)
+  }
+}
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}function today(){return new Date().toISOString().slice(0,10)}function expired(u){return u.status!=='active'||String(u.expiresAt||'')<today()}function badge(s){if(s==='active'||s==='paid'||s==='approved')return`<span class="badge ok">${s==='active'?'Ativo':s==='paid'?'Pago':'Aprovado'}</span>`;if(s==='pending')return'<span class="badge warn">Pendente</span>';return`<span class="badge bad">${s==='blocked'?'Bloqueado':s==='expired'?'Vencido':s==='canceled'?'Cancelado':s}</span>`}
+async function loadAll(){
+  let me=await api('/api/me');
+  if(!me.success || me.user?.role!=='admin'){location.href='/app';return}
+  const an=document.getElementById('adminName'); if(an) an.textContent=me.user.name||'Admin';
+  const ae=document.getElementById('adminEmail'); if(ae) ae.textContent=me.user.email||'';
+  let all=await api('/api/admin/all');
+  if(!all.success){
+    all=await api('/api/admin/safe-bootstrap');
+  }
+  if(!all.success){
+    toastMsg('Erro','Não foi possível carregar os dados.');
+    return;
+  }
+  state.users=Array.isArray(all.users)?all.users:[];
+  state.plans=Array.isArray(all.plans)?all.plans:[];
+  state.orders=Array.isArray(all.orders)?all.orders:[];
+  state.payments=Array.isArray(all.payments)?all.payments:[];
+  state.settings=all.settings||{};
+  state.landing=all.landing||{};
+  let sum=await api('/api/admin/summary');
+  render((sum&&sum.summary)?sum.summary:makeSummary());
+}
+function openPage(n,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p-'+n).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');pageTitle.textContent={dashboard:'Dashboard Admin',clientes:'Clientes',planos:'Planos',pedidos:'Pedidos da Landing',pagamentos:'Pagamentos',pix:'Configuração PIX',landing:'Landing Page',resellers:'Revendedores',config:'Configurações'}[n]||'Admin';if(n==='resellers')loadResellersAdmin();}
+function render(s){
+  s=s||makeSummary();
+  sActive.textContent=s.clientsActive||0;
+  sExpired.textContent=s.clientsExpired||0;
+  sOrders.textContent=s.ordersPending||0;
+  sPaid.textContent=s.paymentsPaid||0;
+  sMonth.textContent=money(s.monthRevenue||0);
+  sTotal.textContent=money(s.totalRevenue||0);
+  renderPlans();
+  renderSettings();
+  renderUsers();
+  renderOrders();
+  renderPayments();
+  renderEvents();
+}
+function renderUsers(){
+  let clients=(state.users||[]).filter(u=>u.role==='client');
+  let rows=clients.map(u=>`<tr><td><b>${u.name}</b><br><small>${u.email}<br>${u.phone||''}</small></td><td>${planName(u.planId)}</td><td><input type="date" value="${u.expiresAt||''}" onchange="updateUser('${u.id}',{expiresAt:this.value})"></td><td>${badge(expired(u)?(u.status==='blocked'?'blocked':'expired'):'active')}<div class="status-control" id="st-${u.id}"><div class="status-current" onclick="toggleStatus('${u.id}')">${u.status==='active'?'Ativo':u.status==='blocked'?'Bloqueado':'Vencido'} <span>⌄</span></div><div class="status-menu"><div class="status-option" onclick="updateUser('${u.id}',{status:'active'})">Ativo</div><div class="status-option" onclick="updateUser('${u.id}',{status:'blocked'})">Bloqueado</div><div class="status-option" onclick="updateUser('${u.id}',{status:'expired'})">Vencido</div></div></div></td><td><div class="btnrow compact"><button onclick="renew('${u.id}')">Renovar</button><button class="gray" onclick="editUser('${u.id}')">Editar</button><button class="red" onclick="delUser('${u.id}')">Excluir</button></div></td></tr>`).join('');
+  if(!rows) rows='<tr><td colspan="5"><div class="desc">Nenhum cliente cadastrado ainda. Crie manualmente ou aprove um pedido da landing.</div></td></tr>';
+  clientsTable.innerHTML=rows;
+  dashClients.innerHTML=rows;
+}
+function planName(id){return (state.plans||[]).find(p=>p.id===id)?.name||id}
+function planOptions(sel=''){
+  const plans=(state.plans&&state.plans.length)?state.plans:[
+    {id:'starter',name:'Starter',price:49.90},
+    {id:'pro',name:'Pro',price:97.90},
+    {id:'enterprise',name:'Enterprise',price:197.90}
+  ];
+  return plans.map(p=>`<option value="${p.id}" ${p.id===sel?'selected':''}>${p.name} - ${money(p.price||0)}</option>`).join('')
+}
+function renderOrders(){
+  const orders = Array.isArray(state.orders) ? state.orders : [];
+  const pendingOrders = orders.filter(o => String(o.status || 'pending').toLowerCase() === 'pending');
+  if(typeof sOrders !== 'undefined') sOrders.textContent = pendingOrders.length;
+  if(typeof stOrders !== 'undefined') stOrders.textContent = pendingOrders.length;
+
+  const action = (o) => {
+    const st = String(o.status || 'pending').toLowerCase();
+    const oid = String(o.id || '').replace(/'/g,'');
+    if(st === 'approved') return `<span class="action-done">Aprovado</span>`;
+    if(st === 'canceled' || st === 'cancelled') return `<span class="action-done" style="background:rgba(239,68,68,.12);color:#fca5a5">Recusado</span>`;
+    return `<div class="order-actions"><button class="green" onclick="approveOrder('${oid}')">Aprovar</button><button class="red" onclick="cancelOrder('${oid}')">Recusar</button></div>`;
+  };
+
+  if(typeof ordersTable !== 'undefined'){
+    ordersTable.innerHTML = pendingOrders.length ? pendingOrders.map(o=>`
+      <tr>
+        <td><b>${esc(o.name||'-')}</b><br><small>${esc(o.email||'-')}<br>${esc(o.phone||'-')}</small></td>
+        <td>${esc(o.planName||o.planId||'-')}</td>
+        <td>${money(o.value||0)}</td>
+        <td>${badge(o.status||'pending')}</td>
+        <td>${action(o)}</td>
+      </tr>
+    `).join('') : '<tr><td colspan="5"><div class="desc">Nenhum pedido pendente no momento.</div></td></tr>';
+  }
+
+  if(typeof dashOrders !== 'undefined'){
+    dashOrders.innerHTML = orders.length ? orders.slice(0,5).map(o=>`
+      <tr>
+        <td><b>${esc(o.name||'-')}</b><br><small>${esc(o.email||'-')}</small></td>
+        <td>${esc(o.planName||o.planId||'-')}</td>
+        <td>${money(o.value||0)}</td>
+        <td>${badge(o.status||'pending')}</td>
+        <td>${action(o)}</td>
+      </tr>
+    `).join('') : '<tr><td colspan="5"><div class="desc">Nenhum pedido recebido.</div></td></tr>';
+  }
+}
+function renderPayments(){
+  const payments=state.payments||[];
+  paymentsTable.innerHTML=payments.map(p=>`<tr><td><b>${p.name}</b><br><small>${p.userEmail||''}</small></td><td>${p.planName}</td><td>${money(p.value)}</td><td>${badge(p.status)}</td><td>${String(p.paidAt||p.createdAt||'').slice(0,10)}</td></tr>`).join('')||'<tr><td colspan="5"><div class="desc">Nenhum pagamento registrado.</div></td></tr>';
+}
+function renderPlans(){
+  if(!state.plans || !state.plans.length){
+    state.plans=[
+      {id:'starter',name:'Starter',price:49.90,whatsappLimit:1,sendLimit:500,groups:false,ads:true,active:true,featured:false,description:'Ideal para começar com uma instância.',durationDays:30},
+      {id:'pro',name:'Pro',price:97.90,whatsappLimit:3,sendLimit:9999,groups:true,ads:true,active:true,featured:true,description:'Plano completo para operação comercial.',durationDays:60},
+      {id:'enterprise',name:'Enterprise',price:197.90,whatsappLimit:10,sendLimit:99999,groups:true,ads:true,active:true,featured:false,description:'Para equipes e operações maiores.',durationDays:90}
+    ];
+  }
+  plansEditor.innerHTML=state.plans.map(p=>`<div class="plan-card"><div class="grid"><div class="s3"><label>Nome</label><input value="${p.name}" onchange="pedit('${p.id}','name',this.value)"></div><div class="s3"><label>Valor</label><input type="number" step=".01" value="${p.price}" onchange="pedit('${p.id}','price',Number(this.value))"></div><div class="s3"><label>WhatsApps</label><input type="number" value="${p.whatsappLimit}" onchange="pedit('${p.id}','whatsappLimit',Number(this.value))"></div><div class="s3"><label>Limite envios</label><input type="number" value="${p.sendLimit}" onchange="pedit('${p.id}','sendLimit',Number(this.value))"></div><div class="s3"><label>Validade (dias)</label><input type="number" value="${p.durationDays||30}" onchange="pedit('${p.id}','durationDays',Number(this.value))"></div><div class="s12"><label>Descrição</label><input value="${p.description||''}" onchange="pedit('${p.id}','description',this.value)"></div><div class="s3"><label class="switch"><input type="checkbox" ${p.groups?'checked':''} onchange="pedit('${p.id}','groups',this.checked)"> Grupos</label></div><div class="s3"><label class="switch"><input type="checkbox" ${p.featured?'checked':''} onchange="pedit('${p.id}','featured',this.checked)"> Destaque</label></div><div class="s3"><label class="switch"><input type="checkbox" ${p.active?'checked':''} onchange="pedit('${p.id}','active',this.checked)"> Ativo</label></div></div></div>`).join('');
+  clientPlan.innerHTML=planOptions('pro');
+  mPlan.innerHTML=planOptions('pro');
+  clientPlan.onchange=setClientExpireByPlan;
+  mPlan.onchange=setModalExpireByPlan;
+  if(!clientExpire.value) setClientExpireByPlan();
+}
+function renderSettings(){
+  const defaults={pixKey:'black7original@gmail.com',pixName:'NEX-ZAPP',pixCity:'SAO PAULO',supportPhone:'5599999999999',receiptWhatsapp:'5599999999999',instruction:'Envie o comprovante pelo WhatsApp para liberação mais rápida. Caso não envie, aguarde até 30 minutos após a confirmação do pagamento.'};
+  const landDefaults={title:'Transforme seu WhatsApp em uma central de campanhas',subtitle:'Conecte múltiplas instâncias, gerencie grupos, listas e campanhas em um único painel.',primaryButton:'Comprar Agora',secondaryButton:'Entrar Agora'};
+  const st=Object.assign({},defaults,state.settings||{});
+  const ld=Object.assign({},landDefaults,state.landing||{});
+  pixKey.value=st.pixKey;pixName.value=st.pixName;pixCity.value=st.pixCity;supportPhone.value=st.supportPhone;if(typeof receiptWhatsapp!=='undefined')receiptWhatsapp.value=st.receiptWhatsapp||st.supportPhone||'';instruction.value=st.instruction;
+  pixPrev.textContent=st.pixKey;
+  if(typeof pixNamePrev!=='undefined') pixNamePrev.textContent=st.pixName;
+  instPrev.textContent=st.instruction;
+  landingTitle.value=ld.title;landingSubtitle.value=ld.subtitle;primaryButton.value=ld.primaryButton;secondaryButton.value=ld.secondaryButton;
+  landPrevTitle.textContent=ld.title;landPrevSub.textContent=ld.subtitle;landPrevBtn.textContent=ld.primaryButton;
+  if(typeof pixSavedStatus!=='undefined'){
+    pixSavedStatus.innerHTML=`<div><small>Chave salva</small><b>${st.pixKey}</b></div><div><small>Recebedor</small><b>${st.pixName}</b></div><div><small>WhatsApp suporte</small><b>${st.supportPhone}</b></div><div><small>Instrução ativa</small><b>${st.instruction}</b></div>`;
+  }
+  if(typeof landingSavedStatus!=='undefined'){
+    landingSavedStatus.innerHTML=`<div><small>Título salvo</small><b>${ld.title}</b></div><div><small>Subtítulo salvo</small><b>${ld.subtitle}</b></div><div><small>Botões</small><b>${ld.primaryButton} / ${ld.secondaryButton}</b></div>`;
+  }
+}
+function renderEvents(){events.innerHTML=state.payments.slice(0,4).map(p=>`<div class="event"><div class="event-icon">PX</div><div><b>Pagamento ${p.status}</b><br><span>${p.name} • ${money(p.value)}</span></div></div>`).join('')||'<p class="desc">Sem eventos ainda.</p>'}
+
+function getPlanDuration(id){let p=state.plans.find(x=>x.id===id);return Number(p?.durationDays||30)}
+function dateByPlan(id){return new Date(Date.now()+getPlanDuration(id)*864e5).toISOString().slice(0,10)}
+function setClientExpireByPlan(){if(typeof clientExpire!=='undefined'&&clientPlan?.value)clientExpire.value=dateByPlan(clientPlan.value)}
+function setModalExpireByPlan(){if(typeof mExpire!=='undefined'&&mPlan?.value)mExpire.value=dateByPlan(mPlan.value)}
+
+function toggleStatus(id){document.querySelectorAll('.status-control').forEach(el=>{if(el.id!=='st-'+id)el.classList.remove('open')});document.getElementById('st-'+id).classList.toggle('open')}
+async function updateUser(id,data){await api('/api/admin/users/'+id,{method:'PUT',body:JSON.stringify(data)});toastMsg('Cliente atualizado','Dados salvos.');loadAll()}
+async function renew(id){let u=state.users.find(x=>x.id===id);let p=state.plans.find(x=>x.id===u?.planId);let days=Number(p?.durationDays||30);await api('/api/admin/users/'+id+'/renew',{method:'POST',body:JSON.stringify({planId:u?.planId,days})});showApproval('Renovação concluída','Cliente renovado por '+days+' dias conforme o plano.');loadAll()}
+function editUser(id){let u=state.users.find(x=>x.id===id);openNewClient();mName.value=u.name;mEmail.value=u.email;mPhone.value=u.phone||'';mPlan.value=u.planId;mExpire.value=u.expiresAt;mStatus.value=u.status;mPass.value=u.password||'';newClientModal.dataset.edit=id}
+async function delUser(id){if(confirm('Excluir cliente?')){await api('/api/admin/users/'+id,{method:'DELETE'});toastMsg('Cliente excluído','Cadastro removido.');loadAll()}}
+function openNewClient(){newClientModal.classList.add('active');newClientModal.dataset.edit='';setModalExpireByPlan();}function closeNewClient(){newClientModal.classList.remove('active')}
+async function createClientForm(){await createClient({name:clientName.value,email:clientEmail.value,phone:clientPhone.value,password:clientPass.value,planId:clientPlan.value,expiresAt:clientExpire.value,status:clientStatus.value})}
+async function createClientModal(){let id=newClientModal.dataset.edit;let data={name:mName.value,email:mEmail.value,phone:mPhone.value,password:mPass.value,planId:mPlan.value,expiresAt:mExpire.value,status:mStatus.value};if(id){await updateUser(id,data);closeNewClient();return}await createClient(data);closeNewClient()}
+async function createClient(data){let r=await api('/api/admin/users',{method:'POST',body:JSON.stringify(data)});if(!r.success)return toastMsg('Erro',r.error||'Cliente não foi salvo.');showApproval('Cliente salvo','Login criado e gravado no arquivo data/users.json.');loadAll()}
+function pedit(id,k,v){let p=state.plans.find(x=>x.id===id);p[k]=v}
+async function savePlans(){for(let p of state.plans){if(String(p.id).startsWith('new-')) await api('/api/admin/plans',{method:'POST',body:JSON.stringify(p)}); else await api('/api/admin/plans/'+p.id,{method:'PUT',body:JSON.stringify(p)})}toastMsg('Planos salvos','Landing e cliente atualizados.');loadAll()}
+function addPlan(){state.plans.push({id:'new-'+Date.now(),name:'Novo plano',price:0,whatsappLimit:1,sendLimit:500,groups:false,ads:true,active:true,featured:false,description:'',durationDays:30});renderPlans()}
+async function approve(id){let r=await api('/api/admin/orders/'+id+'/approve',{method:'POST'});showApproval('Pedido aprovado','Cliente criado/liberado e pagamento registrado.');loadAll()}
+async function cancelOrder(id){
+  const r = await api('/api/admin/orders/'+encodeURIComponent(id)+'/cancel',{method:'POST'});
+  if(!r.success) return toastMsg('Erro', r.error || 'Não foi possível recusar.');
+  toastMsg('Pedido recusado','Pedido atualizado.');
+  await loadAll();
+  renderOrders();
+}
+async function saveLanding(){let r=await api('/api/admin/landing',{method:'PUT',body:JSON.stringify({title:landingTitle.value,subtitle:landingSubtitle.value,primaryButton:primaryButton.value,secondaryButton:secondaryButton.value})});if(!r.success)return toastMsg('Erro',r.error||'Não salvou');showApproval('Landing salva','Página pública atualizada com sucesso.');loadAll()}
+function showApproval(t,m){approvalTitle.textContent=t;approvalMsg.textContent=m;approvalModal.classList.add('active')}function toastMsg(t,m){toast.innerHTML=`<b>${t}</b><span>${m}</span>`;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),3000)}function logout(){localStorage.removeItem('nz_token');location.href='/'}function downloadBackup(){let blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nex-zapp-backup.json';a.click()}
+document.addEventListener('click',e=>{if(!e.target.closest('.status-control'))document.querySelectorAll('.status-control').forEach(x=>x.classList.remove('open'))});loadAll();setTimeout(()=>{setClientExpireByPlan();setModalExpireByPlan();},500);
+
+/* V17 corrigido: fallback seguro sem quebrar layout */
+async function safeAdminReload(){
+  try{
+    const r = await fetch('/api/admin/safe-bootstrap', {headers:{Authorization:'Bearer '+(localStorage.getItem('nz_token')||'')}});
+    const d = await r.json();
+    if(!d.success) return;
+    if(typeof state !== 'undefined'){
+      state.users = Array.isArray(d.users) ? d.users : [];
+      state.plans = Array.isArray(d.plans) ? d.plans : [];
+      state.orders = Array.isArray(d.orders) ? d.orders : [];
+      state.payments = Array.isArray(d.payments) ? d.payments : [];
+      state.settings = d.settings || {};
+      state.landing = d.landing || {};
+    }
+    if(typeof render === 'function') render(makeSummary());
+    fillAdminFallbacks();
+  }catch(e){console.warn('safe reload',e)}
+}
+function fillAdminFallbacks(){
+  const st = Object.assign({
+    pixKey:'black7original@gmail.com',
+    pixName:'NEX-ZAPP',
+    pixCity:'SAO PAULO',
+    supportPhone:'5599999999999',
+    instruction:'Envie o comprovante pelo WhatsApp para liberação mais rápida. Caso não envie, aguarde até 30 minutos após a confirmação do pagamento.'
+  }, (typeof state!=='undefined' && state.settings) ? state.settings : {});
+  const ld = Object.assign({
+    title:'Transforme seu WhatsApp em uma central de campanhas',
+    subtitle:'Conecte múltiplas instâncias, gerencie grupos, listas e campanhas em um único painel.',
+    primaryButton:'Comprar Agora',
+    secondaryButton:'Entrar Agora'
+  }, (typeof state!=='undefined' && state.landing) ? state.landing : {});
+
+  const setVal=(id,val)=>{const el=document.getElementById(id); if(el && !el.value) el.value=val;}
+  setVal('pixKey',st.pixKey); setVal('pixName',st.pixName); setVal('pixCity',st.pixCity); setVal('supportPhone',st.supportPhone); setVal('instruction',st.instruction);
+  setVal('landingTitle',ld.title); setVal('landingSubtitle',ld.subtitle); setVal('primaryButton',ld.primaryButton); setVal('secondaryButton',ld.secondaryButton);
+
+  const pixPrev=document.getElementById('pixPrev'); if(pixPrev && !pixPrev.textContent) pixPrev.textContent=st.pixKey;
+  const instPrev=document.getElementById('instPrev'); if(instPrev && !instPrev.textContent) instPrev.textContent=st.instruction;
+  const landPrevTitle=document.getElementById('landPrevTitle'); if(landPrevTitle && !landPrevTitle.textContent) landPrevTitle.textContent=ld.title;
+  const landPrevSub=document.getElementById('landPrevSub'); if(landPrevSub && !landPrevSub.textContent) landPrevSub.textContent=ld.subtitle;
+  const landPrevBtn=document.getElementById('landPrevBtn'); if(landPrevBtn && !landPrevBtn.textContent) landPrevBtn.textContent=ld.primaryButton;
+
+  const planOptions = ((typeof state!=='undefined' && Array.isArray(state.plans) && state.plans.length) ? state.plans : [
+    {id:'starter',name:'Starter',price:49.90},
+    {id:'pro',name:'Pro',price:97.90},
+    {id:'enterprise',name:'Enterprise',price:197.90}
+  ]).map(p=>`<option value="${p.id}">${p.name} - R$ ${Number(p.price||0).toFixed(2).replace('.',',')}</option>`).join('');
+  ['clientPlan','modalClientPlan'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el && (!el.children.length || !el.textContent.trim())){
+      el.innerHTML=planOptions;
+      if([...el.options].some(o=>o.value==='pro')) el.value='pro';
+    }
+  });
+}
+window.addEventListener('load',()=>setTimeout(safeAdminReload,400));
+
+
+
+
+function resellerBadge(status){
+  const s=status||'pending';
+  const label=s==='approved'?'Ativo':s==='blocked'?'Bloqueado':s==='paid'?'Pago':s==='canceled'?'Cancelado':'Pendente';
+  return `<span class="badge-status badge-${s}">${label}</span>`;
+}
+function updateCommissionHints(){
+  const type=document.querySelector('input[name="commissionType"]:checked')?.value||'percent';
+  const suffix=type==='fixed'?' em valor fixo por venda.':'% sobre a venda.';
+  if(typeof commStarterHint!=='undefined')commStarterHint.textContent=commStarter.value+suffix;
+  if(typeof commProHint!=='undefined')commProHint.textContent=commPro.value+suffix;
+  if(typeof commEnterpriseHint!=='undefined')commEnterpriseHint.textContent=commEnterprise.value+suffix;
+}
+async function loadResellersAdmin(){
+  const d=await api('/api/admin/resellers');
+  if(!d.success)return;
+  const set=d.settings||{type:'percent',starter:10,pro:20,enterprise:40,minWithdraw:50};
+  if(typeof commStarter!=='undefined'){
+    commStarter.value=set.starter;commPro.value=set.pro;commEnterprise.value=set.enterprise;commMinWithdraw.value=set.minWithdraw;
+    if(set.type==='fixed')commTypeFixed.checked=true;else commTypePercent.checked=true;
+    [commStarter,commPro,commEnterprise,commTypeFixed,commTypePercent].forEach(el=>el.oninput=updateCommissionHints);
+    updateCommissionHints();
+  }
+  const stats=d.stats||{};
+  if(typeof rsActive!=='undefined'){
+    rsActive.textContent=stats.active||0;
+    rsPending.textContent=stats.pending||0;
+    rsCommission.textContent=money(stats.commissionTotal||0);
+    rsWithdraw.textContent=money(stats.withdrawPending||0);
+  }
+  const commissions=d.commissions||[];
+  const withdrawals=d.withdrawals||[];
+  if(typeof resellersTable!=='undefined')resellersTable.innerHTML=(d.resellers||[]).length?(d.resellers||[]).map(r=>{
+    const link=location.origin+'/?ref='+(r.code||'');
+    const myComms=commissions.filter(c=>c.resellerId===r.id);
+    const myWithdrawals=withdrawals.filter(w=>w.resellerId===r.id);
+    const total=myComms.reduce((a,c)=>a+Number(c.value||0),0);
+    const paid=myWithdrawals.filter(w=>w.status==='paid').reduce((a,w)=>a+Number(w.value||0),0);
+    const pending=myWithdrawals.filter(w=>w.status==='pending').reduce((a,w)=>a+Number(w.value||0),0);
+    const available=Math.max(0,total-paid-pending);
+    const actions = r.status==='approved'
+      ? `<button class="red" onclick="setResellerStatus('${r.id}','blocked')">Bloquear</button><button onclick="navigator.clipboard?.writeText('${link}')">Copiar link</button>`
+      : r.status==='blocked'
+        ? `<button class="green" onclick="setResellerStatus('${r.id}','approved')">Liberar</button><button onclick="navigator.clipboard?.writeText('${link}')">Copiar link</button>`
+        : `<button class="green" onclick="setResellerStatus('${r.id}','approved')">Aprovar</button><button class="red" onclick="setResellerStatus('${r.id}','blocked')">Recusar</button>`;
+    return `<tr>
+      <td><b>${r.name}</b><br><small>${r.email}<br>${r.phone||''}</small></td>
+      <td><div class="reseller-summary"><span>Indicações: <b>${myComms.length}</b></span><span>Comissão total: <b>${money(total)}</b></span><span>Disponível: <b>${money(available)}</b></span><span>Pago: <b>${money(paid)}</b></span></div></td>
+      <td><b>${r.code||'-'}</b><br><small>${link}</small></td>
+      <td>${resellerBadge(r.status)}</td>
+      <td>${r.pixKey||''}</td>
+      <td><div class="btnrow compact">${actions}</div></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="6">Nenhum revendedor cadastrado.</td></tr>';
+  if(typeof commissionsTable!=='undefined')commissionsTable.innerHTML=commissions.length?commissions.map(c=>`<tr><td>${c.resellerName}</td><td>${c.clientName}<br><small>${c.clientEmail}</small></td><td>${c.planName}</td><td>${money(c.saleValue)}</td><td>${money(c.value)}</td></tr>`).join(''):'<tr><td colspan="5">Nenhuma comissão gerada.</td></tr>';
+  if(typeof withdrawalsTable!=='undefined')withdrawalsTable.innerHTML=withdrawals.length?withdrawals.map(w=>{
+    const action=w.status==='pending'?`<button class="green" onclick="setWithdrawalStatus('${w.id}','paid')">Marcar pago</button><button class="red" onclick="setWithdrawalStatus('${w.id}','canceled')">Cancelar</button>`:'<small>Finalizado</small>';
+    return `<tr><td>${w.resellerName}<br><small>${w.resellerEmail}</small></td><td>${money(w.value)}</td><td>${w.pixKey}</td><td>${resellerBadge(w.status)}</td><td><div class="btnrow compact">${action}</div></td></tr>`;
+  }).join(''):'<tr><td colspan="5">Nenhum saque solicitado.</td></tr>';
+}
+async function saveResellerSettings(){
+  const type=document.querySelector('input[name="commissionType"]:checked')?.value||'percent';
+  await api('/api/admin/reseller-settings',{method:'PUT',body:JSON.stringify({type,starter:commStarter.value,pro:commPro.value,enterprise:commEnterprise.value,minWithdraw:commMinWithdraw.value})});
+  alert('Comissões salvas.');
+  loadResellersAdmin();
+}
+async function setResellerStatus(id,status){
+  await api('/api/admin/resellers/'+id+'/status',{method:'POST',body:JSON.stringify({status})});
+  loadResellersAdmin();
+}
+async function setWithdrawalStatus(id,status){
+  await api('/api/admin/withdrawals/'+id+'/status',{method:'POST',body:JSON.stringify({status})});
+  loadResellersAdmin();
+}
+
+async function approveOrder(id){
+  const r = await api('/api/admin/orders/'+encodeURIComponent(id)+'/approve',{method:'POST'});
+  if(!r.success) return toastMsg('Erro', r.error || 'Não foi possível aprovar.');
+  showApproval('Pedido aprovado','Cliente liberado e pagamento registrado.');
+  await loadAll();
+  renderOrders();
+}
+</script></body></html>
