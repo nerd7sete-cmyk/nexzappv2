@@ -73,3 +73,21 @@ Depois podemos adicionar:
 - Lista de grupos mais organizada.
 - Relatório final profissional com tipo, WhatsApp, destinos, enviados, falhas e horário.
 - Histórico de últimos disparos.
+
+
+## V4 - Lista Corrigida e Menu Persistente
+
+- Menu persistente do Telegram no botão ao lado do microfone.
+- Disparo em lista refeito:
+  - aceita números por linha, vírgula ou ponto e vírgula;
+  - valida números antes do envio;
+  - mostra válidos e inválidos;
+  - envia para `55...@s.whatsapp.net`.
+- Ajuste para o WhatsApp ficar mais discreto:
+  - `markOnlineOnConnect:false`
+  - `syncFullHistory:false`
+  - `shouldSyncHistoryMessage:false`
+  - `sendPresenceUpdate('unavailable')`
+- Mantém QR antigo apagando quando gerar novo/conectar.
+- Mantém seleção de grupos salva.
+- Vídeo continua bloqueado apenas quando o cliente tentar enviar.

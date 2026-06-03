@@ -1,7 +1,7 @@
 {
   "name": "nex-zapp-telegram-whatsapp-bot",
-  "version": "3.0.0",
-  "description": "NEX-ZAPP Bot Telegram V3 painel profissional",
+  "version": "4.0.0",
+  "description": "NEX-ZAPP Bot Telegram V4 lista corrigida e menu persistente",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js"

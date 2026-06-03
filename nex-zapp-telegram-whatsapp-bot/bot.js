@@ -115,7 +115,8 @@ async function connectWhatsApp(name, notifyChatId=null) {
     markOnlineOnConnect: false,
     connectTimeoutMs: 60000,
     keepAliveIntervalMs: 25000,
-    shouldSyncHistoryMessage: () => false
+    shouldSyncHistoryMessage: () => false,
+    emitOwnEvents: false
   })
 
   s.sock = sock
@@ -155,6 +156,7 @@ async function connectWhatsApp(name, notifyChatId=null) {
       s.reconnectAttempts = 0
       if (s.reconnectTimer) clearTimeout(s.reconnectTimer)
       try { await sock.sendPresenceUpdate('unavailable') } catch {}
+      try { await sock.readMessages([]) } catch {}
       log(name, 'Conectado.')
       if (notifyChatId) {
         const key = notifyChatId + ':' + name
@@ -225,6 +227,17 @@ function normalizeBR(raw) {
   return [...set]
 }
 
+function parseListText(text) {
+  return String(text || '')
+    .split(/\r?\n|,|;/)
+    .map(x => x.trim())
+    .filter(Boolean)
+    .map(line => {
+      const phone = line.split(/\s+/)[0]
+      return { raw: line, phone, nums: normalizeBR(phone) }
+    })
+}
+
 function applyVars(text, vars) {
   let out = String(text || '')
   out = out.replace(/\{([^{}|]+)\}/g, (m, k) => vars[k] ?? m)
@@ -265,6 +278,14 @@ function mainMenu() {
     [Markup.button.callback('Status', 'status'), Markup.button.callback('Planos/Renovar', 'plans')],
     [Markup.button.callback('Últimos disparos', 'history')]
   ])
+}
+function persistentKeyboard() {
+  return Markup.keyboard([
+    ['Conectar WhatsApp', 'Disparo em Lista'],
+    ['Disparo em Grupos', 'Status'],
+    ['Planos/Renovar', 'Últimos disparos'],
+    ['Cancelar']
+  ]).resize()
 }
 function cancelMenu() { return Markup.inlineKeyboard([[Markup.button.callback('Cancelar', 'cancel')]]) }
 function adMediaMenu() {
@@ -321,24 +342,33 @@ async function registerUser(ctx) {
   }
 }
 
+async function showMenu(ctx, text=null) {
+  await ctx.reply(text || `${APP_NAME}\n\nPainel Telegram conectado ao WhatsApp.\nEscolha uma opção:`, {
+    ...mainMenu(),
+    ...persistentKeyboard()
+  })
+}
+
 bot.start(async ctx => {
   await registerUser(ctx)
-  await ctx.reply(`${APP_NAME}\n\nPainel Telegram conectado ao WhatsApp.\nEscolha uma opção:`, mainMenu())
+  await showMenu(ctx)
 })
 
 bot.action('menu', async ctx => {
   await ctx.answerCbQuery()
   delete flows[ctx.from.id]
-  await ctx.editMessageText(`${APP_NAME}\n\nEscolha uma opção:`, mainMenu()).catch(() => ctx.reply(`${APP_NAME}\n\nEscolha uma opção:`, mainMenu()))
+  await showMenu(ctx)
 })
 bot.action('cancel', async ctx => {
   await ctx.answerCbQuery()
   delete flows[ctx.from.id]
-  await ctx.reply('Operação cancelada.', mainMenu())
+  await ctx.reply('Operação cancelada.', persistentKeyboard())
+  await showMenu(ctx)
 })
 bot.action('status', async ctx => {
   await ctx.answerCbQuery()
-  await ctx.reply(statusText(), mainMenu())
+  await ctx.reply(statusText(), persistentKeyboard())
+  await ctx.reply('Escolha uma opção:', mainMenu())
 })
 bot.action('history', async ctx => {
   await ctx.answerCbQuery()
@@ -349,7 +379,7 @@ bot.action('history', async ctx => {
 })
 bot.action('wa_menu', async ctx => {
   await ctx.answerCbQuery()
-  await ctx.editMessageText('Escolha qual WhatsApp deseja conectar:', waMenu()).catch(() => ctx.reply('Escolha qual WhatsApp deseja conectar:', waMenu()))
+  await ctx.reply('Escolha qual WhatsApp deseja conectar:', waMenu())
 })
 bot.action(/^wa_(whatsapp\d)$/, async ctx => {
   await ctx.answerCbQuery()
@@ -358,25 +388,25 @@ bot.action(/^wa_(whatsapp\d)$/, async ctx => {
   connectWhatsApp(name, ctx.chat.id).catch(e => ctx.reply('Erro ao conectar: ' + e.message))
 })
 
-bot.action('list_start', async ctx => {
-  await ctx.answerCbQuery()
+async function startList(ctx) {
   flows[ctx.from.id] = { type: 'list', step: 'session', ads: [], targets: [] }
   await ctx.reply('Escolha o WhatsApp que fará o disparo em lista:', sessionMenu('listwa'))
-})
+}
+async function startGroups(ctx) {
+  flows[ctx.from.id] = { type: 'groups', step: 'session', ads: [] }
+  await ctx.reply('Escolha o WhatsApp para carregar os grupos:', sessionMenu('groupwa'))
+}
+bot.action('list_start', async ctx => { await ctx.answerCbQuery(); await startList(ctx) })
 bot.action(/^listwa_(whatsapp\d)$/, async ctx => {
   await ctx.answerCbQuery()
   const f = flows[ctx.from.id] = { type: 'list', ads: [], targets: [], session: ctx.match[1], step: 'targets' }
   await ctx.reply(
-    `WhatsApp escolhido: ${waDisplay(f.session)}\n\nEnvie a lista de contatos agora.\n\nPode colar um número por linha:\n11999999999\n11988887777\n\nDepois disso vou pedir Anúncio A/B/C.`,
+    `WhatsApp escolhido: ${waDisplay(f.session)}\n\nEnvie a lista de contatos agora.\n\nFormatos aceitos:\n11999999999\n55 11 99999-9999\n11999999999,11988887777\n\nDepois disso vou pedir Anúncio A/B/C.`,
     cancelMenu()
   )
 })
 
-bot.action('groups_start', async ctx => {
-  await ctx.answerCbQuery()
-  flows[ctx.from.id] = { type: 'groups', step: 'session', ads: [] }
-  await ctx.reply('Escolha o WhatsApp para carregar os grupos:', sessionMenu('groupwa'))
-})
+bot.action('groups_start', async ctx => { await ctx.answerCbQuery(); await startGroups(ctx) })
 bot.action(/^groupwa_(whatsapp\d)$/, async ctx => {
   await ctx.answerCbQuery()
   const session = ctx.match[1]
@@ -452,11 +482,19 @@ bot.action('ad_finish', async ctx => {
   await confirmCampaign(ctx, f)
 })
 
+bot.hears('Conectar WhatsApp', ctx => ctx.reply('Escolha qual WhatsApp deseja conectar:', waMenu()))
+bot.hears('Disparo em Lista', ctx => startList(ctx))
+bot.hears('Disparo em Grupos', ctx => startGroups(ctx))
+bot.hears('Status', async ctx => { await ctx.reply(statusText(), persistentKeyboard()); await ctx.reply('Escolha uma opção:', mainMenu()) })
+bot.hears('Planos/Renovar', async ctx => showPlans(ctx))
+bot.hears('Últimos disparos', async ctx => showHistoryText(ctx))
+bot.hears('Cancelar', async ctx => { delete flows[ctx.from.id]; await ctx.reply('Operação cancelada.', persistentKeyboard()) })
+
 bot.on('text', async ctx => {
   await registerUser(ctx)
   const f = flows[ctx.from.id]
   if (!f) {
-    await ctx.reply('Escolha uma opção:', mainMenu())
+    await showMenu(ctx, 'Escolha uma opção:')
     return
   }
 
@@ -464,17 +502,19 @@ bot.on('text', async ctx => {
 
   if (text.toUpperCase() === 'CANCELAR') {
     delete flows[ctx.from.id]
-    await ctx.reply('Operação cancelada.', mainMenu())
+    await ctx.reply('Operação cancelada.', persistentKeyboard())
     return
   }
 
   if (f.type === 'list') {
     if (f.step === 'targets') {
-      f.targets = text.split(/\r?\n|,/).map(x => x.trim()).filter(Boolean)
-      if (!f.targets.length) return ctx.reply('Lista vazia. Envie números, um por linha.')
+      const parsed = parseListText(text)
+      f.targets = parsed.filter(x => x.nums.length)
+      f.invalidTargets = parsed.filter(x => !x.nums.length).map(x => x.raw)
+      if (!f.targets.length) return ctx.reply('Não encontrei nenhum número válido. Envie números com DDD, um por linha.')
       f.step = 'ad_text'
       f.currentAd = 0
-      await ctx.reply(`Lista recebida: ${f.targets.length} contatos.\n\nEnvie o texto do Anúncio A.\n\nVariáveis: {telefone}, {data}\nVariação: {Oi|Olá|Fala}`, cancelMenu())
+      await ctx.reply(`Lista recebida.\n\nVálidos: ${f.targets.length}\nInválidos: ${f.invalidTargets.length}\n\nEnvie o texto do Anúncio A.\n\nVariáveis: {telefone}, {data}\nVariação: {Oi|Olá|Fala}`, cancelMenu())
       return
     }
 
@@ -576,7 +616,8 @@ async function confirmCampaign(ctx, f) {
   const total = f.type === 'list' ? (f.targets || []).length : (f.selectedGroups || []).length
   if (!total) return ctx.reply('Nenhum destino encontrado. Cancele e comece novamente.', mainMenu())
   const preview = f.ads.map((a,i)=>`Anúncio ${labelFor(i)}: ${a.text ? 'texto' : ''}${a.filePath ? (a.text ? ' + mídia' : 'mídia') : ''}`).join('\n')
-  await ctx.reply(`Confirmar disparo?\n\nTipo: ${f.type === 'list' ? 'Lista' : 'Grupos'}\nDestinos: ${total}\nAnúncios: ${f.ads.length}\nWhatsApp: ${waDisplay(f.session)}\n\n${preview}`, confirmMenu())
+  const extra = f.type === 'list' && f.invalidTargets?.length ? `\nInválidos ignorados: ${f.invalidTargets.length}` : ''
+  await ctx.reply(`Confirmar disparo?\n\nTipo: ${f.type === 'list' ? 'Lista' : 'Grupos'}\nDestinos: ${total}${extra}\nAnúncios: ${f.ads.length}\nWhatsApp: ${waDisplay(f.session)}\n\n${preview}`, confirmMenu())
 }
 
 bot.action('confirm_send', async ctx => {
@@ -594,8 +635,8 @@ bot.action('confirm_send', async ctx => {
 
   if (f.type === 'list') {
     for (let i=0;i<f.targets.length;i++) {
-      const nums = normalizeBR(f.targets[i])
-      if (!nums.length) { failed++; errors.push(f.targets[i]+': número inválido'); continue }
+      const nums = f.targets[i].nums || normalizeBR(f.targets[i].phone || f.targets[i])
+      if (!nums.length) { failed++; errors.push((f.targets[i].raw || f.targets[i])+': número inválido'); continue }
       const ad = f.ads[i % f.ads.length]
       try {
         await sendToTarget(f.session, nums[0]+'@s.whatsapp.net', ad, { telefone: nums[0], data: new Date().toLocaleDateString('pt-BR') })
@@ -638,15 +679,22 @@ bot.action('confirm_send', async ctx => {
   )
 })
 
-bot.action('plans', async ctx => {
-  await ctx.answerCbQuery()
+async function showPlans(ctx) {
   const st = read(files.settings, {})
   const plans = st.plans || []
   await ctx.reply('Planos disponíveis:\n\n' + plans.map(p=>`${p.name}: R$ ${p.price} - ${p.days} dias`).join('\n') + `\n\nPIX: ${st.pixKey}\nSuporte: ${st.supportWhatsapp}`, mainMenu())
-})
+}
+bot.action('plans', async ctx => { await ctx.answerCbQuery(); await showPlans(ctx) })
+
+async function showHistoryText(ctx) {
+  const campaigns = read(files.campaigns, []).slice(0, 8)
+  if (!campaigns.length) return ctx.reply('Nenhum disparo registrado ainda.', mainMenu())
+  const txt = campaigns.map(c => `${c.type === 'groups' ? 'Grupos' : 'Lista'} | ${waDisplay(c.session)} | Enviados ${c.sent} | Falhas ${c.failed} | ${new Date(c.createdAt).toLocaleString('pt-BR')}`).join('\n')
+  await ctx.reply('Últimos disparos:\n\n' + txt, mainMenu())
+}
 
 bot.catch(err => console.error(err))
-bot.launch().then(()=>console.log(APP_NAME+' Telegram bot V3 rodando.'))
+bot.launch().then(()=>console.log(APP_NAME+' Telegram bot V4 rodando.'))
 
 process.once('SIGINT', () => bot.stop('SIGINT'))
 process.once('SIGTERM', () => bot.stop('SIGTERM'))
