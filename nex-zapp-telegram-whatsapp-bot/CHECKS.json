@@ -1,0 +1,8 @@
+{
+  "bot_js_syntax": true,
+  "has_telegram": true,
+  "has_baileys": true,
+  "has_video_fallback": true,
+  "has_groups": true,
+  "has_list": true
+}
