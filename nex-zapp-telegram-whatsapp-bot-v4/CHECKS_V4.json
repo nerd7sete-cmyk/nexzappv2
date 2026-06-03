@@ -1,0 +1,8 @@
+{
+  "syntax_ok": true,
+  "persistent_keyboard": true,
+  "list_parser": true,
+  "notification_adjust": true,
+  "groups_cache": true,
+  "video_blocked": true
+}

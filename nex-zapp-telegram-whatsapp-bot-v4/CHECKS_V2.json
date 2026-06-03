@@ -1,0 +1,7 @@
+{
+  "syntax_ok": true,
+  "has_buttons_skip": true,
+  "has_confirm_send": true,
+  "has_list_flow": true,
+  "has_video_fallback": true
+}

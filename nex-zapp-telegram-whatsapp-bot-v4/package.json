@@ -1,0 +1,20 @@
+{
+  "name": "nex-zapp-telegram-whatsapp-bot",
+  "version": "4.0.0",
+  "description": "NEX-ZAPP Bot Telegram V4 lista corrigida e menu persistente",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "telegraf": "^4.16.3",
+    "@whiskeysockets/baileys": "^6.7.18",
+    "@hapi/boom": "^10.0.1",
+    "qrcode": "^1.5.4",
+    "pino": "^9.4.0",
+    "dotenv": "^16.4.5",
+    "multer": "^1.4.5-lts.1",
+    "mime-types": "^2.1.35",
+    "xlsx": "^0.18.5"
+  }
+}
