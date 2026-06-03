@@ -1,0 +1,1 @@
+module.exports={apps:[{name:'nexzapp',script:'server.js',instances:1,exec_mode:'fork',watch:false,env:{NODE_ENV:'production',PORT:4000,DOMAIN:'nexzapp.com.br'}}]}
