@@ -420,20 +420,28 @@ app.post('/ads', requireLogin, upload.single('media'), (req,res)=>{
 app.delete('/ads/:id', requireLogin, (req,res)=>{ const ads=read(files.ads,[]); const ad=ads.find(a=>a.id===req.params.id); if(ad&&ad.mediaPath)try{fs.unlinkSync(ad.mediaPath)}catch{}; write(files.ads, ads.filter(a=>a.id!==req.params.id || (a.userEmail!==req.user.email && req.user.role!=='admin'))); res.json({success:true}) })
 
 function buildCampaignAds(req, filesUpload){
-  const saved=read(files.ads,[])
-  let savedIds=[]; try{ savedIds=JSON.parse(req.body.savedAds||'[]') }catch{}
-  const picked=saved.filter(a=>savedIds.includes(a.id) && (a.userEmail===req.user.email || req.user.role==='admin'))
+  // Clean V2: sem anúncios salvos. Usa somente Anúncio A/B/C criados na hora.
   let manual=[]
   for(let i=1;i<=3;i++){
-    const msg = req.body['msg'+i] ?? req.body['Msg'+i] ?? req.body['gMsg'+i] ?? req.body['gmsg'+i] ?? ''
-    const f=(filesUpload||[]).find(x=>x.fieldname==='media'+i || x.fieldname==='Media'+i || x.fieldname==='gMedia'+i || x.fieldname==='gmedia'+i)
+    const msg = req.body['msg'+i] ?? req.body['gMsg'+i] ?? req.body['gmsg'+i] ?? ''
+    const f=(filesUpload||[]).find(x=>
+      x.fieldname==='media'+i ||
+      x.fieldname==='gMedia'+i ||
+      x.fieldname==='gmedia'+i
+    )
     if(String(msg).trim()||f){
-      manual.push({id:'manual'+i,name:'Manual '+i,message:String(msg||''),mediaPath:f?.path||'',mediaName:f?.originalname||'',mimetype:f?.mimetype||mime.lookup(f?.originalname||'')||''})
+      manual.push({
+        id:'manual'+i,
+        name:'Anúncio '+String.fromCharCode(64+i),
+        message:String(msg||''),
+        mediaPath:f?.path||'',
+        mediaName:f?.originalname||'',
+        mimetype:f?.mimetype||mime.lookup(f?.originalname||'')||''
+      })
     }
   }
-  const mode=req.body.adMode||req.body.gAdMode||req.body.gadMode||'mix'
-  let ads=mode==='saved'?picked:mode==='manual'?manual:[...manual,...picked]
-  return ads.length?shuffle(ads):[{id:'default',message:req.body.message||'',mediaPath:''}]
+  if(!manual.length) throw new Error('Preencha pelo menos o Anúncio A com texto, foto, vídeo ou documento.')
+  return manual
 }
 async function sendToTarget(sessionName, jid, payload){
   const s=sess(sessionName); if(!s.connected||!s.sock) throw new Error(display(sessionName)+' não conectado')
@@ -441,7 +449,11 @@ async function sendToTarget(sessionName, jid, payload){
     await s.sock.sendMessage(jid, payload)
   }catch(e){
     if(payload && payload.video){
-      const doc={document: payload.video, mimetype: payload.mimetype || 'video/mp4', fileName: 'video.' + ((payload.mimetype||'video/mp4').split('/')[1] || 'mp4')}
+      const doc={
+        document: payload.video,
+        mimetype: payload.mimetype || 'video/mp4',
+        fileName: 'video.' + ((payload.mimetype||'video/mp4').split('/')[1] || 'mp4')
+      }
       if(payload.caption) doc.caption=payload.caption
       await s.sock.sendMessage(jid, doc)
     }else{

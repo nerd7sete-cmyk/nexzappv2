@@ -1,7 +1,7 @@
 {
-  "name": "nex-zapp-clean-final",
-  "version": "1.0.0",
-  "description": "NEX-ZAPP Clean Final - estrutura limpa com painel cliente, admin, revenda, WhatsApp, PIX e campanhas",
+  "name": "nex-zapp-clean-v2-sem-anuncios-salvos",
+  "version": "2.0.0",
+  "description": "NEX-ZAPP Clean V2 - sem anúncios salvos, campanhas A/B/C na hora com vídeo",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

@@ -115,3 +115,20 @@ Correções:
 - Botões Conectar/Reiniciar/Desconectar agora chamam backend correto.
 - Aba WhatsApps mostra status e QR Code.
 - Painel cliente mantém layout limpo da V8.
+
+
+## NEX-ZAPP Clean V2 - Sem Anúncios Salvos
+
+Esta versão remove completamente a função de anúncios salvos.
+
+Agora o fluxo é:
+- Disparo em lista com Anúncio A, B e C criados na hora.
+- Disparo em grupos com Anúncio A, B e C criados na hora.
+- Cada anúncio pode ter texto, foto, vídeo ou documento.
+- O sistema alterna automaticamente entre A/B/C.
+- Se preencher apenas o Anúncio A, envia só o A.
+- Vídeo é enviado como vídeo.
+- Se o WhatsApp recusar o vídeo, envia como documento automaticamente.
+- Grupos continuam separados por WhatsApp.
+- Cache de grupos mantido.
+- PIX, revenda, admin e cliente mantidos.

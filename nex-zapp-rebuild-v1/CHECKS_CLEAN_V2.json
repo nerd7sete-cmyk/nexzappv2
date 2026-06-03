@@ -1,0 +1,9 @@
+{
+  "server_ok": true,
+  "no_ads_menu": true,
+  "no_saved_ui": false,
+  "send_numbers": true,
+  "send_groups": true,
+  "video_payload": true,
+  "video_fallback": true
+}
