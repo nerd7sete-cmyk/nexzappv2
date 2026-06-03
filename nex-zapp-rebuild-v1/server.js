@@ -223,6 +223,74 @@ app.get('/api/me', requireLogin, (req,res)=>{
   res.json({success:true,user:publicUser(req.user),plan,expired})
 })
 
+
+// ===== ROTAS DO PAINEL CLIENTE / WHATSAPP =====
+app.get('/sessions', requireLogin, (req,res)=>{
+  const names=['whatsapp1','whatsapp2','whatsapp3']
+  res.json(names.map(n=>{
+    const s=sess(n)
+    return {
+      name:n,
+      label:display(n),
+      connected:!!s.connected,
+      starting:!!s.starting,
+      stage:s.stage||'offline',
+      qr:s.qr||null,
+      sentToday:s.sentToday||0,
+      lastSeen:s.lastSeen||null,
+      logs:s.logs||[]
+    }
+  }))
+})
+
+app.post('/connect', requireLogin, async(req,res)=>{
+  try{
+    const name=safeName(req.body.session||req.body.name||'whatsapp1')
+    const s=sess(name)
+    s.manualStop=false
+    connectWhatsApp(name).catch(e=>log(name,'Erro ao conectar: '+e.message))
+    res.json({success:true,message:'Conexão iniciada.',session:name})
+  }catch(e){res.json({success:false,error:e.message})}
+})
+
+app.post('/reset', requireLogin, async(req,res)=>{
+  try{
+    const name=safeName(req.body.session||req.body.name||'whatsapp1')
+    const s=sess(name)
+    s.manualStop=true
+    if(s.reconnectTimer) clearTimeout(s.reconnectTimer)
+    try{ if(s.sock) await s.sock.logout() }catch{}
+    try{ if(s.sock) s.sock.end?.() }catch{}
+    try{ fs.rmSync(authPath(name),{recursive:true,force:true}) }catch{}
+    sessions[name]={name:name,label:display(name),sock:null,qr:null,connected:false,starting:false,stage:'offline',sentToday:s.sentToday||0,lastSeen:null,logs:[...((s.logs||[]).slice(0,20))],reconnectTimer:null,reconnectAttempts:0,manualStop:true}
+    log(name,'Sessão desconectada e removida.')
+    res.json({success:true,message:'Sessão removida.',session:name})
+  }catch(e){res.json({success:false,error:e.message})}
+})
+
+app.get('/groups/:session', requireLogin, async(req,res)=>{
+  try{
+    const name=safeName(req.params.session)
+    const s=sess(name)
+    if(!s.connected || !s.sock) return res.json({success:false,error:display(name)+' não está conectado.'})
+    const all=await s.sock.groupFetchAllParticipating()
+    const groups=Object.values(all||{}).map(g=>({
+      id:g.id,
+      jid:g.id,
+      name:g.subject||g.name||g.id,
+      participants:Array.isArray(g.participants)?g.participants.length:(g.size||0),
+      session:name,
+      sessionLabel:display(name)
+    })).sort((a,b)=>String(a.name).localeCompare(String(b.name)))
+    res.json({success:true,groups})
+  }catch(e){res.json({success:false,error:e.message})}
+})
+
+app.get('/ads', requireLogin, (req,res)=>{
+  const ads=read(files.ads,[]).filter(a=>a.userEmail===req.user.email || req.user.role==='admin')
+  res.json(ads)
+})
+
 app.get('/api/public', (_,res)=>res.json({success:true, plans:read(files.plans,[]).filter(p=>p.active!==false), settings:read(files.settings,{}), landing:read(files.landing,{})}))
 app.post('/api/order',(req,res)=>{
   const plans=read(files.plans,[])
@@ -336,6 +404,19 @@ app.post('/api/admin/resellers/:id/status', requireAdmin, (req,res)=>{
   }
   res.json({success:true,reseller:r[i]})
 })
+
+app.post('/ads', requireLogin, upload.single('media'), (req,res)=>{
+  try{
+    const message = String(req.body.message || '').trim()
+    const name = String(req.body.name || 'Anúncio').trim()
+    const note = String(req.body.note || '').trim()
+    if(!message && !req.file) return res.json({success:false,error:'Preencha o texto ou envie uma foto/vídeo/documento.'})
+    const ads=read(files.ads,[])
+    const ad={id:uid('ad'),userEmail:req.user.email,name:name||'Anúncio',message,note,mediaPath:req.file?.path||'',mediaUrl:req.file?'/uploads/'+path.basename(req.file.path):'',mediaName:req.file?.originalname||'',mimetype:req.file?.mimetype||mime.lookup(req.file?.originalname||'')||'',createdAt:now()}
+    ads.unshift(ad); write(files.ads,ads); res.json({success:true,ad})
+  }catch(e){res.json({success:false,error:e.message})}
+})
+
 app.delete('/ads/:id', requireLogin, (req,res)=>{ const ads=read(files.ads,[]); const ad=ads.find(a=>a.id===req.params.id); if(ad&&ad.mediaPath)try{fs.unlinkSync(ad.mediaPath)}catch{}; write(files.ads, ads.filter(a=>a.id!==req.params.id || (a.userEmail!==req.user.email && req.user.role!=='admin'))); res.json({success:true}) })
 
 function buildCampaignAds(req, filesUpload){

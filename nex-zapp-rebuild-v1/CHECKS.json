@@ -1,0 +1,10 @@
+{
+  "server_syntax_ok": true,
+  "sessions_route": true,
+  "connect_route": true,
+  "reset_route": true,
+  "groups_route": true,
+  "ads_route": true,
+  "client_menus": true,
+  "svg_icons": true
+}

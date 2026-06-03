@@ -101,3 +101,17 @@ Correções:
 - Seleção de grupos salva no cache por WhatsApp.
 - Renovação com modal PIX e WhatsApp do comprovante configurado pelo admin.
 - Vídeo com fallback como documento.
+
+## Rebuild V8.1 - Correção das Rotas do Painel Cliente
+
+- Adicionadas rotas faltantes:
+  - GET /sessions
+  - POST /connect
+  - POST /reset
+  - GET /groups/:session
+  - GET /ads
+  - POST /ads
+  - DELETE /ads/:id
+- Botões Conectar/Reiniciar/Desconectar agora chamam backend correto.
+- Aba WhatsApps mostra status e QR Code.
+- Painel cliente mantém layout limpo da V8.

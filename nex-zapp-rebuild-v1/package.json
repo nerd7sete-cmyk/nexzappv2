@@ -1,11 +1,10 @@
 {
-  "name": "nex-zapp-rebuild-v1",
-  "version": "8.0.0",
-  "description": "NEX-ZAPP Rebuild V8 - cliente limpo e funcional",
+  "name": "nex-zapp-clean-final",
+  "version": "1.0.0",
+  "description": "NEX-ZAPP Clean Final - estrutura limpa com painel cliente, admin, revenda, WhatsApp, PIX e campanhas",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "prod": "NODE_ENV=production node server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.18",
