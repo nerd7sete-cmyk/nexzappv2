@@ -76,6 +76,30 @@
 .media-note{background:rgba(37,99,235,.10);border:1px solid rgba(96,165,250,.22);border-radius:18px;padding:12px;margin:10px 0;color:#cbd5e1;line-height:1.45}
 .dark-clean-note{background:rgba(2,6,23,.42);border:1px solid rgba(148,163,184,.14);border-radius:18px;padding:12px}
 
+
+/* V6.1 layout repair */
+#p-dashboard .stats{grid-template-columns:repeat(4,minmax(180px,1fr))}
+#p-dashboard .grid{align-items:stretch}
+#p-sessions .session-grid{display:grid!important;grid-template-columns:repeat(3,minmax(260px,1fr))!important;gap:16px!important}
+#p-sessions .session-card{min-height:420px;display:flex;flex-direction:column}
+#p-sessions .session-actions{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#p-sessions .clean-pre{max-height:90px;overflow:auto}
+#p-ads .grid,#p-list .grid,#p-groups .grid,#p-billing .grid{align-items:start}
+#p-ads .card,#p-list .card,#p-groups .card,#p-billing .card{min-width:0}
+#p-groups .group-list{max-height:430px;overflow:auto}
+#p-groups .send-card{min-height:70px}
+#p-billing .picker{display:grid;gap:10px}
+#p-billing .pix-value{font-size:34px;font-weight:950}
+@media(max-width:1050px){
+  #p-sessions .session-grid{grid-template-columns:1fr!important}
+  #p-dashboard .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(min-width:1051px){
+  .app main{overflow-x:hidden}
+  #p-dashboard .s6{grid-column:span 6}
+  #p-dashboard .s12{grid-column:span 12}
+}
+
 </style></head><body><div class="app"><aside class="sidebar"><div class="brand"><div class="logo">NZ</div><div><h1>NEX-ZAPP</h1><small>Cliente</small></div></div><nav class="nav" id="nav"></nav></aside><main><div class="mobilebar" id="mobilebar"></div><div class="top"><div><h2 id="title">Dashboard</h2><p class="desc" id="sub">Central operacional.</p></div><div class="btnrow"><button class="gray" onclick="refreshAll()">Atualizar</button><button class="red" onclick="logout()">Sair</button></div></div>
 <section id="p-dashboard" class="page active"><div class="stats"><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="message"></div><span>WhatsApps Online</span></div><b id="mConn">0/3</b><div class="progress-line"><span id="waProgress" style="width:0%"></span></div></div><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="megaphone"></div><span>Anúncios Ativos</span></div><b id="mAds">0</b></div><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="users"></div><span>Grupos Carregados</span></div><b id="mGroups">0</b></div><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="send"></div><span>Envios Hoje</span></div><b id="mSent">0</b></div></div><div class="grid" style="margin-top:16px"><div class="card s6"><h3>Plano</h3><div id="planBox" class="desc">Carregando...</div></div><div class="card s6"><h3>Atalhos</h3><div class="btnrow"><button onclick="openPage('sessions')">Conectar WhatsApp</button><button class="purple" onclick="openPage('ads')">Criar anúncio</button><button class="green" onclick="openPage('list')">Disparo lista</button><button class="green" onclick="openPage('groups')">Disparo grupos</button></div></div></div></section>
 <section id="p-sessions" class="page"><div class="hero-card"><h3>Conexões WhatsApp</h3><p>Conecte até 3 sessões. Quando o status ficar verde, a instância está pronta para disparos de lista e grupos.</p><div class="progress-line"><span id="waProgress2" style="width:0%"></span></div></div><div class="explain-box"><span data-ico="shield"></span><div><b>Como funciona</b><br>Ao clicar em conectar, o sistema inicializa a sessão, gera o QR Code e aguarda a leitura pelo celular. Depois de autenticado, o card muda para conectado.</div></div><div id="sessionsBox" class="session-grid" style="margin-top:16px"></div></section>
@@ -163,6 +187,7 @@ async function loadAds(){ads=await api('/ads');mAds.textContent=ads.length;rende
     return `<div class="ad-item"><b>${esc(a.name)}</b> <span class="badge">${type}</span><br><small>${esc(a.note||'')}</small><div class="desc">${esc((a.message||'').slice(0,160))}</div>${media}${a.mediaUrl?`<a href="${a.mediaUrl}" target="_blank">Visualizar mídia</a>`:''}<div class="btnrow" style="margin-top:8px"><button onclick="duplicateAd('${a.id}')">Duplicar</button><button class="red" onclick="delAd('${a.id}')">Excluir</button></div></div>`
   }).join('')||'<div class="desc">Nenhum anúncio salvo ainda.</div>'
 }
+
 async function saveAd(){
   if(!String(adMessage.value||'').trim() && !adMedia.files[0]){
     toast('Preencha a mensagem ou selecione uma foto/vídeo/documento.')
@@ -186,7 +211,6 @@ async function duplicateAd(id){
   fd.append('name',(a.name||'Anúncio')+' - cópia')
   fd.append('message',a.message||'')
   fd.append('note',a.note||'')
-  // Cópia duplica texto. Para duplicar mídia antiga, use o arquivo novamente.
   let r=await api('/ads',{method:'POST',body:fd})
   toast(r.success?'Anúncio duplicado':'Não foi possível duplicar')
   loadAds()

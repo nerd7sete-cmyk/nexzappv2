@@ -152,24 +152,20 @@ function mediaPayload(item, msg){
     if(!text) throw new Error('Mensagem vazia. Preencha o texto ou envie uma mídia.')
     return {text}
   }
-
   if(!fs.existsSync(item.mediaPath)) throw new Error('Arquivo de mídia não encontrado no servidor.')
   const type=item.mimetype || mime.lookup(item.mediaPath) || 'application/octet-stream'
   const buffer = fs.readFileSync(item.mediaPath)
   const fileName = item.mediaName || path.basename(item.mediaPath) || 'arquivo'
-
   if(type.startsWith('image/')){
     const payload = {image: buffer, mimetype:type}
     if(text) payload.caption = text
     return payload
   }
-
   if(type.startsWith('video/')){
     const payload = {video: buffer, mimetype:type}
     if(text) payload.caption = text
     return payload
   }
-
   const payload = {document: buffer, mimetype:type, fileName}
   if(text) payload.caption = text
   return payload
@@ -411,8 +407,6 @@ async function sendToTarget(sessionName, jid, payload){
       }
       if(payload.caption) doc.caption=payload.caption
       await s.sock.sendMessage(jid, doc)
-    }else if(payload && (payload.image || payload.document)){
-      throw new Error('Falha ao enviar mídia: '+(e.message||'formato não aceito pelo WhatsApp.'))
     }else{
       throw e
     }
