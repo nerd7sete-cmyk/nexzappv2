@@ -304,7 +304,7 @@ function renderSettings(){
   landingTitle.value=ld.title;landingSubtitle.value=ld.subtitle;primaryButton.value=ld.primaryButton;secondaryButton.value=ld.secondaryButton;
   landPrevTitle.textContent=ld.title;landPrevSub.textContent=ld.subtitle;landPrevBtn.textContent=ld.primaryButton;
   if(typeof pixSavedStatus!=='undefined'){
-    pixSavedStatus.innerHTML=`<div><small>Chave salva</small><b>${st.pixKey}</b></div><div><small>Recebedor</small><b>${st.pixName}</b></div><div><small>WhatsApp suporte</small><b>${st.supportPhone}</b></div><div><small>Instrução ativa</small><b>${st.instruction}</b></div>`;
+    pixSavedStatus.innerHTML=`<div><small>Chave salva</small><b>${st.pixKey}</b></div><div><small>Recebedor</small><b>${st.pixName}</b></div><div><small>WhatsApp suporte</small><b>${st.supportPhone}</b></div><div><small>WhatsApp comprovantes</small><b>${st.receiptWhatsapp||st.supportPhone}</b></div><div><small>Instrução ativa</small><b>${st.instruction}</b></div>`;
   }
   if(typeof landingSavedStatus!=='undefined'){
     landingSavedStatus.innerHTML=`<div><small>Título salvo</small><b>${ld.title}</b></div><div><small>Subtítulo salvo</small><b>${ld.subtitle}</b></div><div><small>Botões</small><b>${ld.primaryButton} / ${ld.secondaryButton}</b></div>`;
@@ -327,16 +327,35 @@ async function createClientForm(){await createClient({name:clientName.value,emai
 async function createClientModal(){let id=newClientModal.dataset.edit;let data={name:mName.value,email:mEmail.value,phone:mPhone.value,password:mPass.value,planId:mPlan.value,expiresAt:mExpire.value,status:mStatus.value};if(id){await updateUser(id,data);closeNewClient();return}await createClient(data);closeNewClient()}
 async function createClient(data){let r=await api('/api/admin/users',{method:'POST',body:JSON.stringify(data)});if(!r.success)return toastMsg('Erro',r.error||'Cliente não foi salvo.');showApproval('Cliente salvo','Login criado e gravado no arquivo data/users.json.');loadAll()}
 function pedit(id,k,v){let p=state.plans.find(x=>x.id===id);p[k]=v}
-async function savePlans(){for(let p of state.plans){if(String(p.id).startsWith('new-')) await api('/api/admin/plans',{method:'POST',body:JSON.stringify(p)}); else await api('/api/admin/plans/'+p.id,{method:'PUT',body:JSON.stringify(p)})}toastMsg('Planos salvos','Landing e cliente atualizados.');loadAll()}
-function addPlan(){state.plans.push({id:'new-'+Date.now(),name:'Novo plano',price:0,whatsappLimit:1,sendLimit:500,groups:false,ads:true,active:true,featured:false,description:'',durationDays:30});renderPlans()}
-async function approve(id){let r=await api('/api/admin/orders/'+id+'/approve',{method:'POST'});showApproval('Pedido aprovado','Cliente criado/liberado e pagamento registrado.');loadAll()}
-async function cancelOrder(id){
-  const r = await api('/api/admin/orders/'+encodeURIComponent(id)+'/cancel',{method:'POST'});
-  if(!r.success) return toastMsg('Erro', r.error || 'Não foi possível recusar.');
-  toastMsg('Pedido recusado','Pedido atualizado.');
+async function savePlans(){
+  const clean=state.plans.map(p=>Object.assign({},p,{id:String(p.id).startsWith('new-')?'plan-'+Date.now()+Math.random().toString(16).slice(2):p.id}));
+  let r=await api('/api/admin/plans',{method:'PUT',body:JSON.stringify({plans:clean})});
+  if(!r.success){
+    for(let p of state.plans){
+      if(String(p.id).startsWith('new-')) await api('/api/admin/plans',{method:'POST',body:JSON.stringify(p)});
+      else await api('/api/admin/plans/'+p.id,{method:'PUT',body:JSON.stringify(p)})
+    }
+  }
+  toastMsg('Planos salvos','Valores e validade foram gravados.');
   await loadAll();
-  renderOrders();
 }
+async function saveSettings(){
+  const body={
+    pixKey:pixKey.value,
+    pixName:pixName.value,
+    pixCity:pixCity.value,
+    supportPhone:String(supportPhone.value||'').replace(/\D/g,''),
+    receiptWhatsapp:String((typeof receiptWhatsapp!=='undefined'?receiptWhatsapp.value:supportPhone.value)||'').replace(/\D/g,''),
+    instruction:instruction.value
+  };
+  let r=await api('/api/admin/settings',{method:'PUT',body:JSON.stringify(body)});
+  if(!r.success)return toastMsg('Erro',r.error||'Não salvou');
+  state.settings=r.settings||body;
+  renderSettings();
+  showApproval('PIX salvo','Chave PIX, recebedor e WhatsApp para comprovantes foram salvos.');
+  await loadAll();
+}
+
 async function saveLanding(){let r=await api('/api/admin/landing',{method:'PUT',body:JSON.stringify({title:landingTitle.value,subtitle:landingSubtitle.value,primaryButton:primaryButton.value,secondaryButton:secondaryButton.value})});if(!r.success)return toastMsg('Erro',r.error||'Não salvou');showApproval('Landing salva','Página pública atualizada com sucesso.');loadAll()}
 function showApproval(t,m){approvalTitle.textContent=t;approvalMsg.textContent=m;approvalModal.classList.add('active')}function toastMsg(t,m){toast.innerHTML=`<b>${t}</b><span>${m}</span>`;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),3000)}function logout(){localStorage.removeItem('nz_token');location.href='/'}function downloadBackup(){let blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nex-zapp-backup.json';a.click()}
 document.addEventListener('click',e=>{if(!e.target.closest('.status-control'))document.querySelectorAll('.status-control').forEach(x=>x.classList.remove('open'))});loadAll();setTimeout(()=>{setClientExpireByPlan();setModalExpireByPlan();},500);

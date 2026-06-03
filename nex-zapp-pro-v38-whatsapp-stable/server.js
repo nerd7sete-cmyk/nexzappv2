@@ -49,6 +49,24 @@ if (!fs.existsSync(ADS_FILE)) fs.writeFileSync(ADS_FILE, '[]')
 function ensureJson(file, data) {
   if (!fs.existsSync(file)) fs.writeFileSync(file, JSON.stringify(data, null, 2))
 }
+
+function migrateOldDadosToData() {
+  try {
+    const oldRoot = path.join(__dirname, 'dados')
+    if (!fs.existsSync(oldRoot)) return
+    if (!fs.existsSync(DATA_ROOT)) fs.mkdirSync(DATA_ROOT, { recursive: true })
+    for (const file of fs.readdirSync(oldRoot)) {
+      if (!file.endsWith('.json')) continue
+      const from = path.join(oldRoot, file)
+      const to = path.join(DATA_ROOT, file)
+      if (!fs.existsSync(to)) fs.copyFileSync(from, to)
+    }
+  } catch (e) {
+    console.warn('Falha ao migrar dados antigos:', e.message)
+  }
+}
+migrateOldDadosToData()
+
 ensureJson(PLANS_FILE, [
   { id: 'starter', name: 'Starter', price: 49.90, whatsappLimit: 1, sendLimit: 500, groups: false, ads: true, active: true, featured: false, description: 'Ideal para começar com uma instância.', durationDays: 30 },
   { id: 'pro', name: 'Pro', price: 97.90, whatsappLimit: 3, sendLimit: 9999, groups: true, ads: true, active: true, featured: true, description: 'Plano completo para operação comercial.', durationDays: 60 },
@@ -654,9 +672,10 @@ app.get('/api/public/plans', (req, res) => res.json({ success: true, plans: read
 app.get('/api/public/landing', (req, res) => res.json({ success: true, landing: readJson(LANDING_FILE, {}), settings: readJson(SETTINGS_FILE, {}) }))
 
 app.post('/api/login', (req, res) => {
-  const { email, password } = req.body || {}
+  const email = String((req.body || {}).email || '').trim().toLowerCase()
+  const password = String((req.body || {}).password || '').trim()
   const users = readJson(USERS_FILE, [])
-  const user = users.find(u => String(u.email).toLowerCase() === String(email || '').toLowerCase() && String(u.password) === String(password || ''))
+  const user = users.find(u => String(u.email || '').trim().toLowerCase() === email && String(u.password || '').trim() === password)
   if (!user) return res.json({ success: false, error: 'E-mail ou senha incorretos.' })
   const token = uid('token')
   authTokens[token] = user.email
@@ -677,6 +696,9 @@ app.post('/api/order', (req, res) => {
   const validation = validateLeadData(req.body || {})
   if (!validation.ok) return res.json({ success:false, error: validation.error })
 
+  const orderPassword = String(req.body.password || '').trim()
+  if (orderPassword && orderPassword.length < 6) return res.json({ success:false, error:'A senha precisa ter pelo menos 6 caracteres.' })
+
   const durationDays = Number(plan.durationDays || plan.validityDays || plan.days || plan.duration || 30)
 
   const settings = readJson(SETTINGS_FILE, {
@@ -694,7 +716,7 @@ app.post('/api/order', (req, res) => {
     id: uid('order'),
     name: String(req.body.name || '').trim(),
     payerName: String(req.body.payerName || req.body.name || '').trim(),
-    password: String(req.body.password || '').trim(),
+    password: orderPassword,
     email: String(req.body.email || '').trim().toLowerCase(),
     phone: validation.phone,
     planId: plan.id,
@@ -747,6 +769,28 @@ app.get('/api/admin/summary', requireAdmin, (req, res) => {
     }
   })
 })
+
+app.get('/api/admin/diagnostic', requireAdmin, (req, res) => {
+  res.json({
+    success:true,
+    dataRoot: DATA_ROOT,
+    files:{
+      settings: SETTINGS_FILE,
+      plans: PLANS_FILE,
+      users: USERS_FILE,
+      orders: ORDERS_FILE,
+      landing: LANDING_FILE
+    },
+    exists:{
+      settings: fs.existsSync(SETTINGS_FILE),
+      plans: fs.existsSync(PLANS_FILE),
+      users: fs.existsSync(USERS_FILE),
+      orders: fs.existsSync(ORDERS_FILE),
+      landing: fs.existsSync(LANDING_FILE)
+    }
+  })
+})
+
 app.get('/api/admin/all', requireAdmin, (req, res) => {
   const settingsDefault = {
     pixKey: 'black7original@gmail.com',
@@ -768,7 +812,8 @@ app.get('/api/admin/safe-bootstrap', requireAdmin, (req, res) => {
     pixName: 'NEX-ZAPP',
     pixCity: 'SAO PAULO',
     supportPhone: '5599999999999',
-    instruction: 'Após o pagamento envie o comprovante para liberação da conta.'
+    receiptWhatsapp: '5599999999999',
+    instruction: 'Envie o comprovante pelo WhatsApp para liberação mais rápida. Caso não envie, aguarde até 30 minutos após a confirmação do pagamento.'
   }
   const landingDefault = {
     title: 'Transforme seu WhatsApp em uma central de campanhas',
@@ -776,13 +821,11 @@ app.get('/api/admin/safe-bootstrap', requireAdmin, (req, res) => {
     primaryButton: 'Comprar Agora',
     secondaryButton: 'Entrar Agora'
   }
-  const users = readJson(USERS_FILE, [])
-  const plans = readJson(PLANS_FILE, [])
-  const orders = readJson(ORDERS_FILE, [])
-  const payments = readJson(PAYMENTS_FILE, [])
   const settings = { ...settingsDefault, ...readJson(SETTINGS_FILE, {}) }
+  settings.supportPhone = String(settings.supportPhone || '').replace(/\D/g, '')
+  settings.receiptWhatsapp = String(settings.receiptWhatsapp || settings.supportPhone || '').replace(/\D/g, '')
   const landing = { ...landingDefault, ...readJson(LANDING_FILE, {}) }
-  res.json({ success:true, users, plans, orders, payments, settings, landing })
+  res.json({ success:true, settings, landing, plans: readJson(PLANS_FILE, []) })
 })
 
 app.post('/api/admin/users', requireAdmin, (req, res) => {
@@ -835,6 +878,27 @@ app.post('/api/admin/users/:id/renew', requireAdmin, (req, res) => {
   writeJson(PAYMENTS_FILE, payments)
   res.json({ success: true, user: publicUser(users[idx]), payment })
 })
+
+app.put('/api/admin/plans', requireAdmin, (req, res) => {
+  const plans = Array.isArray(req.body?.plans) ? req.body.plans : Array.isArray(req.body) ? req.body : []
+  if (!plans.length) return res.json({ success:false, error:'Nenhum plano enviado.' })
+  const normalized = plans.map(p => ({
+    id: String(p.id || uid('plan')).replace(/^new-/, 'plan-'),
+    name: String(p.name || 'Plano').trim(),
+    price: Number(p.price || 0),
+    whatsappLimit: Number(p.whatsappLimit || 1),
+    sendLimit: Number(p.sendLimit || 500),
+    durationDays: Number(p.durationDays || 30),
+    groups: !!p.groups,
+    ads: p.ads !== false,
+    active: p.active !== false,
+    featured: !!p.featured,
+    description: String(p.description || '').trim()
+  }))
+  writeJson(PLANS_FILE, normalized)
+  res.json({ success:true, plans: normalized })
+})
+
 app.put('/api/admin/plans/:id', requireAdmin, (req, res) => {
   const plans = readJson(PLANS_FILE, [])
   const idx = plans.findIndex(p => p.id === req.params.id)
@@ -915,6 +979,7 @@ app.post('/api/admin/orders/:id/approve', requireAdmin, (req, res) => {
   const plan = plans.find(p => String(p.id).toLowerCase() === String(order.planId).toLowerCase()) || plans.find(p => String(p.id).toLowerCase() === 'pro') || plans[0]
   const durationDays = Number(order.durationDays || plan?.durationDays || plan?.validityDays || plan?.days || 30)
   const expiresAt = new Date(Date.now() + durationDays * 86400000).toISOString().slice(0,10)
+  const chosenPassword = String(order.password || req.body?.password || '').trim()
 
   let user = users.find(u => String(u.email).toLowerCase() === String(order.email).toLowerCase())
   if (!user) {
@@ -923,11 +988,12 @@ app.post('/api/admin/orders/:id/approve', requireAdmin, (req, res) => {
       name: order.name,
       email: order.email,
       phone: order.phone,
-      password: String(req.body?.password || order.password || '123456'),
+      password: chosenPassword || '123456',
       planId: order.planId,
       planName: order.planName,
       expiresAt,
       status: 'active',
+      role: 'client',
       createdAt: new Date().toISOString()
     }
     users.unshift(user)
@@ -938,6 +1004,8 @@ app.post('/api/admin/orders/:id/approve', requireAdmin, (req, res) => {
     user.planName = order.planName
     user.expiresAt = expiresAt
     user.status = 'active'
+    user.role = user.role || 'client'
+    if (chosenPassword) user.password = chosenPassword
   }
 
   order.status = 'approved'
@@ -987,15 +1055,16 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
     instruction: 'Envie o comprovante pelo WhatsApp para liberação mais rápida. Caso não envie, aguarde até 30 minutos após a confirmação do pagamento.'
   }
   const cur = readJson(SETTINGS_FILE, {})
-  const support = String(req.body.supportPhone || cur.supportPhone || defaults.supportPhone).replace(/\D/g, '')
-  const receipt = String(req.body.receiptWhatsapp || cur.receiptWhatsapp || support || defaults.receiptWhatsapp).replace(/\D/g, '')
+  const body = req.body || {}
+  const support = String(body.supportPhone ?? cur.supportPhone ?? defaults.supportPhone).replace(/\D/g, '')
+  const receipt = String(body.receiptWhatsapp ?? cur.receiptWhatsapp ?? support ?? defaults.receiptWhatsapp).replace(/\D/g, '')
   const settings = {
-    pixKey: String(req.body.pixKey || cur.pixKey || defaults.pixKey).trim(),
-    pixName: String(req.body.pixName || cur.pixName || defaults.pixName).trim(),
-    pixCity: String(req.body.pixCity || cur.pixCity || defaults.pixCity).trim(),
+    pixKey: String(body.pixKey ?? cur.pixKey ?? defaults.pixKey).trim(),
+    pixName: String(body.pixName ?? cur.pixName ?? defaults.pixName).trim(),
+    pixCity: String(body.pixCity ?? cur.pixCity ?? defaults.pixCity).trim(),
     supportPhone: support,
     receiptWhatsapp: receipt,
-    instruction: String(req.body.instruction || cur.instruction || defaults.instruction).trim()
+    instruction: String(body.instruction ?? cur.instruction ?? defaults.instruction).trim()
   }
   writeJson(SETTINGS_FILE, settings)
   res.json({ success: true, settings })

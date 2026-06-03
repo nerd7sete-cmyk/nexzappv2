@@ -130,3 +130,19 @@ Não foi alterado:
 - Fluxo de pedidos.
 - Salvamento de PIX/configurações.
 - Landing/revenda/pagamentos.
+
+
+## V40 Funcionando Tudo
+
+Correções aplicadas:
+- Login do cliente aceita senha sem espaços acidentais.
+- Senha escolhida na landing é salva no pedido.
+- Ao aprovar pedido, novo cliente usa a senha escolhida.
+- Se cliente já existir, a senha é atualizada para a senha escolhida no pedido.
+- Landing tem confirmar senha e mínimo de 6 caracteres.
+- PIX/configurações salvam em `data/settings.json`.
+- WhatsApp para comprovantes salva e recarrega.
+- Planos/valores salvam em `data/plans.json`.
+- Landing salva em `data/landing.json`.
+- Adicionado diagnóstico `/api/admin/diagnostic` para conferir pasta real de dados.
+- Mantida base V39/V36 com mobile e WhatsApp estável.

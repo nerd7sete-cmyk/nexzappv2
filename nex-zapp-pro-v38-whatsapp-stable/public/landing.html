@@ -107,7 +107,7 @@ footer{text-align:center;color:var(--muted);padding:30px}
 
 </main><footer>NEX-ZAPP • Plataforma profissional</footer>
 <div class="modal-bg" id="loginModal"><div class="modal"><div class="modal-head"><div><h2>Entrar agora</h2><small style="color:var(--muted)">Acesse sua conta</small></div><button class="close" onclick="closeLogin()">×</button></div><label>E-mail</label><input id="loginEmail" placeholder="seu@email.com"><label>Senha</label><input id="loginPass" type="password" placeholder="Sua senha"><button class="green" style="width:100%;margin-top:14px" onclick="login()">Entrar</button><div id="loginMsg" class="msg"></div></div></div>
-<div class="modal-bg" id="buyModal"><div class="modal"><div class="modal-head"><div><h2>Comprar agora</h2><small id="buyPlanText" style="color:var(--muted)">Plano</small></div><button class="close" onclick="closeBuy()">×</button></div><label>Nome</label><input id="buyName" placeholder="Seu nome"><label>Nome do pagador</label><input id="buyPayerName" placeholder="Nome de quem vai pagar o PIX"><div id="errName" class="field-error"></div><div id="errName" class="field-error"></div><label>E-mail</label><input id="buyEmail" placeholder="cliente@email.com"><label>Senha de acesso</label><input id="buyPassword" type="password" placeholder="Crie sua senha"><div id="errEmail" class="field-error"></div><div id="errEmail" class="field-error"></div><label>WhatsApp</label><input id="buyPhone" placeholder="5599999999999"><div id="errPhone" class="field-error"></div><div id="errPhone" class="field-error"></div><button class="green" style="width:100%;margin-top:14px" onclick="order()">Gerar pedido PIX</button><div id="buyMsg" class="msg"></div></div></div>
+<div class="modal-bg" id="buyModal"><div class="modal"><div class="modal-head"><div><h2>Comprar agora</h2><small id="buyPlanText" style="color:var(--muted)">Plano</small></div><button class="close" onclick="closeBuy()">×</button></div><label>Nome</label><input id="buyName" placeholder="Seu nome"><label>Nome do pagador</label><input id="buyPayerName" placeholder="Nome de quem vai pagar o PIX"><div id="errName" class="field-error"></div><div id="errName" class="field-error"></div><label>E-mail</label><input id="buyEmail" placeholder="cliente@email.com"><label>Senha de acesso</label><input id="buyPassword" type="password" placeholder="Crie sua senha"><label>Confirmar senha</label><input id="buyPassword2" type="password" placeholder="Repita sua senha"><div id="errEmail" class="field-error"></div><div id="errEmail" class="field-error"></div><label>WhatsApp</label><input id="buyPhone" placeholder="5599999999999"><div id="errPhone" class="field-error"></div><div id="errPhone" class="field-error"></div><button class="green" style="width:100%;margin-top:14px" onclick="order()">Gerar pedido PIX</button><div id="buyMsg" class="msg"></div></div></div>
 
 <div id="pixResultModal" class="pix-modal-bg">
   <div class="pix-modal-card">
@@ -155,9 +155,15 @@ function validateBuy(){
 }
 async function order(){
   if(!validateBuy()) return;
+  if(typeof buyPassword!=='undefined'){
+    const p=String(buyPassword.value||'').trim();
+    const p2=String((typeof buyPassword2!=='undefined'?buyPassword2.value:buyPassword.value)||'').trim();
+    if(p.length<6){buyMsg.className='msg err';buyMsg.textContent='Crie uma senha com pelo menos 6 caracteres.';return}
+    if(p!==p2){buyMsg.className='msg err';buyMsg.textContent='As senhas não conferem.';return}
+  }
   buyMsg.className='msg';
   buyMsg.textContent='Gerando pedido...';
-  let r=await fetch('/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:buyName.value,email:buyEmail.value,phone:buyPhone.value,password:(typeof buyPassword!=='undefined'?buyPassword.value:''),planId:chosen,payerName:(typeof buyPayerName!=='undefined'?buyPayerName.value:buyName.value),ref:localStorage.getItem('nz_ref')||''})}).then(r=>r.json());
+  let r=await fetch('/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:buyName.value,email:buyEmail.value,phone:buyPhone.value,password:(typeof buyPassword!=='undefined'?String(buyPassword.value||'').trim():''),planId:chosen,payerName:(typeof buyPayerName!=='undefined'?buyPayerName.value:buyName.value),ref:localStorage.getItem('nz_ref')||''})}).then(r=>r.json());
   if(!r.success){buyMsg.className='msg err';buyMsg.textContent=r.error;return}
   const value=Number(r.order.value).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   const pix=(r.settings&&r.settings.pixKey)||'Configure no admin';
