@@ -279,11 +279,6 @@ function makeSession(name) {
       stage: 'offline',
       lastSeen: null,
       sentToday: 0,
-      reconnectTimer: null,
-      reconnectAttempts: 0,
-      reconnecting: false,
-      manuallyStopped: false,
-      lastDisconnectCode: null,
       logs: []
     }
   }
@@ -309,7 +304,6 @@ function resetStateOnly(name) {
   s.connected = false
   s.starting = false
   s.stage = 'offline'
-  s.reconnecting = false
 }
 
 
@@ -317,60 +311,30 @@ function scheduleReconnect(name, code) {
   const s = makeSession(name)
   if (s.manuallyStopped) return
   if (s.reconnectTimer) clearTimeout(s.reconnectTimer)
-
   s.connected = false
   s.starting = false
-  s.reconnecting = true
   s.stage = code === 515 ? 'syncing' : 'reconnecting'
-  s.lastDisconnectCode = code || null
-  s.reconnectAttempts = Math.min((s.reconnectAttempts || 0) + 1, 10)
-
-  const delay = Math.min(45000, 2000 * s.reconnectAttempts)
-  log(name, `Reconexão automática em ${Math.round(delay / 1000)}s...`)
-
-  s.reconnectTimer = setTimeout(async () => {
-    try {
-      const current = makeSession(name)
-      current.reconnectTimer = null
-      current.reconnecting = false
-      current.starting = false
-      current.sock = null
-      await connectWhatsApp(name)
-    } catch (err) {
-      log(name, 'Falha na reconexão: ' + err.message)
-      scheduleReconnect(name, code)
-    }
+  s.reconnectAttempts = Math.min((s.reconnectAttempts || 0) + 1, 8)
+  const delay = Math.min(30000, 2000 * s.reconnectAttempts)
+  log(name, `Reconexão automática em ${Math.round(delay/1000)}s...`)
+  s.reconnectTimer = setTimeout(() => {
+    s.reconnectTimer = null
+    s.sock = null
+    connectWhatsApp(name).catch(err => log(name, 'Falha ao reconectar: ' + err.message))
   }, delay)
 }
-
-function markConnected(name) {
-  const s = makeSession(name)
-  s.connected = true
-  s.starting = false
-  s.reconnecting = false
-  s.qr = null
-  s.stage = 'connected'
-  s.lastSeen = new Date().toLocaleString()
-  s.lastDisconnectCode = null
-  s.reconnectAttempts = 0
-  if (s.reconnectTimer) {
-    clearTimeout(s.reconnectTimer)
-    s.reconnectTimer = null
-  }
-}
-
 
 async function connectWhatsApp(name) {
   name = safeName(name)
   const s = makeSession(name)
   s.manuallyStopped = false
 
-  if (s.starting || s.reconnecting) {
+  if (s.starting) {
     log(name, 'Conexão já está em andamento. Aguarde.')
     return
   }
 
-  if (s.connected && s.sock) {
+  if (s.connected) {
     log(name, 'Conta já conectada.')
     return
   }
@@ -391,7 +355,7 @@ async function connectWhatsApp(name) {
     logger: P({ level: 'silent' }),
     browser: ['Ubuntu', 'Chrome', '22.04'],
     syncFullHistory: false,
-    markOnlineOnConnect: false,
+    markOnlineOnConnect: false, // mantém a instância sem marcar presença online automaticamente
     generateHighQualityLinkPreview: false,
     connectTimeoutMs: 60000,
     defaultQueryTimeoutMs: 60000,
@@ -419,7 +383,13 @@ async function connectWhatsApp(name) {
     }
 
     if (connection === 'open') {
-      markConnected(name)
+      s.connected = true
+      s.starting = false
+      s.qr = null
+      s.stage = 'connected'
+      s.lastSeen = new Date().toLocaleString()
+      s.reconnectAttempts = 0
+      if (s.reconnectTimer) { clearTimeout(s.reconnectTimer); s.reconnectTimer = null }
       log(name, 'Conta conectada com sucesso.')
     }
 
@@ -431,12 +401,18 @@ async function connectWhatsApp(name) {
       const code = error instanceof Boom ? error.output.statusCode : error?.output?.statusCode
       log(name, 'Conexão encerrada. Código: ' + (code || 'sem código'))
 
+      if (code === 515) {
+        s.stage = 'syncing'
+        log(name, 'Sincronizando sessão. Reiniciando conexão...')
+        resetStateOnly(name)
+        setTimeout(() => connectWhatsApp(name).catch(err => log(name, 'Falha ao reiniciar: ' + err.message)), 1500)
+        return
+      }
+
       if (code === DisconnectReason.loggedOut || code === 401 || code === 405) {
         try { fs.rmSync(sessionPath(name), { recursive: true, force: true }) } catch {}
         resetStateOnly(name)
         s.stage = 'error'
-        s.reconnectAttempts = 0
-        s.reconnecting = false
         log(name, 'Sessão removida. Gere um novo QR Code.')
         return
       }
@@ -1166,18 +1142,17 @@ app.post('/api/admin/withdrawals/:id/status', requireAdmin, (req, res) => {
 app.use(['/sessions','/connect','/reset','/groups','/ads','/campaign-numbers','/campaign-groups'], requireActiveClient)
 
 
-// Watchdog de estabilidade: se existir sessão salva e ela cair, tenta reconectar.
+// V39 watchdog simples de estabilidade do WhatsApp
 setInterval(() => {
   for (const name of ['whatsapp1','whatsapp2','whatsapp3']) {
     const s = makeSession(name)
     const hasAuth = fs.existsSync(sessionPath(name))
     if (hasAuth && !s.connected && !s.starting && !s.reconnectTimer && s.stage !== 'qr' && s.stage !== 'error') {
-      log(name, 'Watchdog detectou sessão parada. Reconectando...')
-      scheduleReconnect(name, s.lastDisconnectCode || 0)
+      log(name, 'Watchdog reconectando sessão salva...')
+      scheduleReconnect(name, 0)
     }
   }
 }, 60000)
-
 
 app.get('/sessions', (req, res) => {
   const names = new Set(['whatsapp1', 'whatsapp2', 'whatsapp3', ...Object.keys(sessions)])
@@ -1212,9 +1187,6 @@ app.post('/reset', async (req, res) => {
   try {
     const name = safeName(req.body.session)
     const s = makeSession(name)
-  s.manuallyStopped = true
-  if (s.reconnectTimer) { clearTimeout(s.reconnectTimer); s.reconnectTimer = null }
-
     try { if (s.sock) await s.sock.logout() } catch {}
     try { fs.rmSync(sessionPath(name), { recursive: true, force: true }) } catch {}
     resetStateOnly(name)

@@ -114,23 +114,19 @@ cliente@nexzapp.local
 - Scripts `start` e `prod` ajustados.
 
 
-## V37 Mobile First + WhatsApp Stability
+## V39 Base V36 Corrigida
 
-- Admin mobile sem menu lateral e sem menu superior horizontal: usa barra inferior estilo app.
-- Painel cliente mobile com barra inferior fixa.
-- Cards do mobile compactados.
-- Tabelas viram cards no celular para não cortar conteúdo.
-- Corrigido zoom no iPhone ao tocar em inputs/selects/textareas.
-- Disparo em grupos mantém criação de anúncio na hora e agora pode salvar o anúncio temporário na biblioteca.
-- Atualização de status do WhatsApp menos agressiva no painel.
-- Backend tenta reconectar automaticamente sessões com queda temporária.
+Base usada: V36 funcionando.
 
+Aplicado somente:
+- Correção mobile no admin e cliente.
+- Correção de zoom no iPhone.
+- Barra inferior mobile compacta.
+- Tabelas viram cards no celular.
+- Ajuste de estabilidade/reconexão WhatsApp.
+- Polling do painel menos agressivo.
 
-## V38 WhatsApp Stable
-
-- Reconexão automática com backoff progressivo.
-- Watchdog a cada 60s para reativar sessões salvas que caírem.
-- Evita múltiplas conexões duplicadas na mesma instância.
-- Mantém `manuallyStopped` para reset não reconectar sozinho.
-- Adiciona keepAlive e timeouts maiores no Baileys.
-- Frontend mostra `Reconectando` e consulta status menos agressivamente.
+Não foi alterado:
+- Fluxo de pedidos.
+- Salvamento de PIX/configurações.
+- Landing/revenda/pagamentos.
