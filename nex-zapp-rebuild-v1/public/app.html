@@ -1,367 +1,156 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>NEX-ZAPP Cliente</title><style>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>NEX-ZAPP Cliente</title>
+<style>
 :root{--bg:#050816;--panel:#0f172a;--panel2:#111827;--field:#070d18;--line:#243044;--text:#f8fafc;--muted:#94a3b8;--blue:#2563eb;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--purple:#8b5cf6;--shadow:0 24px 80px rgba(0,0,0,.42)}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at top,#172554 0%,#0b1120 38%,#050816 100%);color:var(--text)}a{color:inherit}button{border:0;border-radius:14px;padding:12px 14px;background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 12px 28px rgba(37,99,235,.22)}button.green{background:linear-gradient(135deg,var(--green),#16a34a)}button.red{background:linear-gradient(135deg,var(--red),#b91c1c)}button.gray{background:#475569;box-shadow:none}button.purple{background:linear-gradient(135deg,var(--purple),#6d28d9)}input,textarea,select{width:100%;border:1px solid var(--line);background:#070d18;color:var(--text);border-radius:14px;padding:12px;outline:none;font-size:16px}textarea{min-height:110px}label{display:block;color:#cbd5e1;font-weight:850;margin:12px 0 7px;font-size:13px}.card{background:linear-gradient(180deg,rgba(17,24,39,.96),rgba(15,23,42,.9));border:1px solid rgba(148,163,184,.16);border-radius:24px;padding:18px;box-shadow:var(--shadow)}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s12{grid-column:span 12}.desc{color:var(--muted);line-height:1.5}.btnrow{display:flex;gap:10px;flex-wrap:wrap}.btnrow button{flex:1}.badge{display:inline-flex;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900;background:rgba(148,163,184,.12);color:#cbd5e1}.badge.pending{background:rgba(245,158,11,.14);color:#fbbf24}.badge.approved,.badge.active,.badge.paid{background:rgba(34,197,94,.14);color:#86efac}.badge.canceled,.badge.blocked{background:rgba(239,68,68,.14);color:#fca5a5}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:12px;border-bottom:1px solid rgba(148,163,184,.12);text-align:left;vertical-align:top}th{color:#cbd5e1;font-size:12px;text-transform:uppercase}.app{min-height:100vh;display:grid;grid-template-columns:280px 1fr}.sidebar{height:100vh;position:sticky;top:0;background:rgba(7,11,24,.96);border-right:1px solid rgba(148,163,184,.14);padding:22px}.brand{display:flex;gap:12px;align-items:center;margin-bottom:22px}.logo{width:50px;height:50px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#2563eb,#0f172a);font-weight:950}.brand h1{margin:0;font-size:23px}.brand small{color:var(--muted)}.nav{display:grid;gap:8px}.nav button{width:100%;justify-content:flex-start;text-align:left;background:transparent;box-shadow:none;border:1px solid transparent}.nav button.active{background:rgba(37,99,235,.18);border-color:rgba(96,165,250,.35)}main{padding:24px;max-width:1500px;width:100%;margin:0 auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.top h2{margin:0;font-size:34px}.page{display:none}.page.active{display:block}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.stat{padding:16px;border-radius:20px;background:#070d18;border:1px solid var(--line)}.stat span{color:var(--muted);font-weight:800}.stat b{display:block;font-size:30px;margin-top:6px}.mobilebar{display:none}.toast{position:fixed;right:18px;bottom:18px;z-index:999;background:#070d18;border:1px solid rgba(34,197,94,.28);border-radius:18px;padding:14px 16px;display:none;box-shadow:var(--shadow)}.toast.show{display:block}.modal-bg{display:none;position:fixed;inset:0;z-index:990;background:rgba(2,6,23,.72);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:18px}.modal-bg.active{display:flex}.modal{width:100%;max-width:560px;max-height:92vh;overflow:auto;background:#111827;border:1px solid var(--line);border-radius:26px;padding:20px}.password-wrap{position:relative}.password-wrap input{padding-right:48px}.eye-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;padding:0;background:rgba(148,163,184,.18)!important;box-shadow:none}.hidden{display:none!important}
-@media(max-width:1050px){body{padding-bottom:86px;overflow-x:hidden}.app{display:block}.sidebar{display:none}main{padding:12px}.mobilebar{display:flex;position:fixed;left:10px;right:10px;bottom:8px;z-index:900;background:rgba(7,13,24,.94);border:1px solid rgba(148,163,184,.18);border-radius:24px;padding:8px;gap:6px;overflow:auto;box-shadow:0 16px 45px rgba(0,0,0,.5);backdrop-filter:blur(12px)}.mobilebar button{flex:1 0 72px;min-width:72px;background:transparent!important;box-shadow:none!important;font-size:11px!important;padding:9px 7px!important;border-radius:17px}.mobilebar button.active{background:linear-gradient(135deg,rgba(37,99,235,.42),rgba(29,78,216,.18))!important}.top{display:block}.top h2{font-size:29px}.top .btnrow{margin-top:12px}.grid{gap:12px}.s3,.s4,.s5,.s6,.s7,.s8{grid-column:span 12}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.stat{padding:13px;min-height:88px}.stat b{font-size:25px}.card{padding:14px;border-radius:22px}.table-wrap{overflow:visible}table,thead,tbody,tr,th,td{display:block;width:100%}thead{display:none}table{min-width:0}tr{background:#070d18;border:1px solid var(--line);border-radius:18px;margin-bottom:10px;padding:12px;display:grid;gap:8px}td{border:0;padding:0}td:before{content:attr(data-label);display:block;color:var(--muted);font-size:11px;font-weight:900;text-transform:uppercase;margin-bottom:3px}}
-.session-grid,.send-grid,.delay-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.session-card.connected,.send-card.connected{border-color:rgba(34,197,94,.6)}.status.ok{color:#86efac}.status.bad{color:#fca5a5}.status.wait{color:#fbbf24}.qr{max-width:220px;width:100%;display:block;margin:12px auto;border-radius:18px}pre{white-space:pre-wrap;background:#070d18;border:1px solid var(--line);border-radius:16px;padding:12px;color:#cbd5e1;max-height:260px;overflow:auto}.ad-list,.picker,.group-list{display:grid;gap:10px;max-height:420px;overflow:auto}.ad-item,.group-item,.send-card,.delay-card{background:#070d18;border:1px solid var(--line);border-radius:18px;padding:12px}.group-item.selected{border-color:#60a5fa;background:rgba(37,99,235,.18)}.thumb{width:82px;height:64px;border-radius:14px;object-fit:cover;background:#0f172a}@media(max-width:1050px){.session-grid,.send-grid,.delay-grid{grid-template-columns:1fr}}
-/* NEX-ZAPP Rebuild V2 Premium UI */
-.icon{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
-.nav button{display:flex;align-items:center;gap:10px}
-.mobilebar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
-.mobilebar .icon{width:18px;height:18px}
-.card,.stat,.session-card,.send-card,.ad-item,.group-item,.delay-card{transition:.22s ease;position:relative}
-.card:hover,.stat:hover,.session-card:hover,.send-card:hover,.ad-item:hover,.group-item:hover,.delay-card:hover{transform:translateY(-2px);border-color:rgba(96,165,250,.35)}
-.stat{overflow:hidden}
-.stat:before{content:"";position:absolute;right:-22px;top:-22px;width:92px;height:92px;border-radius:999px;background:rgba(37,99,235,.13)}
-.stat-head{display:flex;align-items:center;gap:10px;color:#cbd5e1;font-weight:900}
-.stat-icon{width:42px;height:42px;border-radius:16px;background:rgba(37,99,235,.16);border:1px solid rgba(96,165,250,.24);display:grid;place-items:center;color:#93c5fd}
-.hero-card{background:linear-gradient(135deg,rgba(37,99,235,.33),rgba(15,23,42,.9));border:1px solid rgba(96,165,250,.22);border-radius:28px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow)}
-.hero-card h3{margin:0;font-size:28px}
-.hero-card p{color:#cbd5e1;margin:8px 0 0;line-height:1.5}
-.progress-line{height:10px;background:#070d18;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:12px}
-.progress-line span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#2563eb);border-radius:999px}
-.session-grid{grid-template-columns:repeat(3,minmax(260px,1fr))!important}
-.session-card{padding:18px;border-radius:26px;background:linear-gradient(180deg,rgba(15,23,42,.98),rgba(7,13,24,.94));border:1px solid rgba(148,163,184,.18);box-shadow:0 18px 55px rgba(0,0,0,.32);overflow:hidden}
-.session-card:before{content:"";position:absolute;inset:-1px;background:radial-gradient(circle at top right,rgba(37,99,235,.18),transparent 42%);pointer-events:none}
-.session-card.connected{border-color:rgba(34,197,94,.45)}
-.session-card.waiting{border-color:rgba(245,158,11,.5)}
-.session-card.offline{border-color:rgba(239,68,68,.28)}
-.session-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.session-main{display:flex;align-items:center;gap:12px}
-.session-icon{width:54px;height:54px;border-radius:20px;display:grid;place-items:center;background:rgba(37,99,235,.18);border:1px solid rgba(96,165,250,.24);color:#93c5fd}
-.session-card.connected .session-icon{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.3);color:#86efac}
-.session-card.waiting .session-icon{background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.3);color:#fbbf24}
-.session-card h3{margin:0;font-size:22px}
-.session-status{display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:7px 10px;border-radius:999px;background:rgba(148,163,184,.12);font-weight:950;font-size:13px}
-.dot{width:8px;height:8px;border-radius:50%;background:#94a3b8;box-shadow:0 0 0 4px rgba(148,163,184,.12)}
-.session-card.connected .dot{background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.14)}
-.session-card.waiting .dot{background:#f59e0b;box-shadow:0 0 0 4px rgba(245,158,11,.14)}
-.session-card.offline .dot{background:#ef4444;box-shadow:0 0 0 4px rgba(239,68,68,.14)}
-.connect-steps{display:grid;gap:8px;margin:14px 0;padding:12px;background:rgba(2,6,23,.38);border:1px solid rgba(148,163,184,.12);border-radius:18px}
-.step{display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:13px;font-weight:800}
-.step.active{color:#fbbf24}.step.done{color:#86efac}
-.loader-ring{width:18px;height:18px;border:3px solid rgba(148,163,184,.25);border-top-color:#60a5fa;border-radius:50%;animation:nzspin .8s linear infinite}
-@keyframes nzspin{to{transform:rotate(360deg)}}
-.session-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.info-chip{background:rgba(7,13,24,.78);border:1px solid rgba(148,163,184,.12);border-radius:16px;padding:10px}
-.info-chip small{display:block;color:#94a3b8;font-weight:850;font-size:11px;text-transform:uppercase}
-.info-chip b{display:block;margin-top:3px}
-.session-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.session-actions button{padding:10px;font-size:13px}
-.qr-panel{margin-top:12px;padding:12px;border:1px dashed rgba(96,165,250,.35);border-radius:18px;text-align:center;background:rgba(37,99,235,.08)}
-.qr-panel p{margin:6px 0;color:#cbd5e1}
-.explain-box{display:flex;gap:12px;align-items:flex-start;background:rgba(37,99,235,.10);border:1px solid rgba(96,165,250,.22);border-radius:18px;padding:12px;margin-top:12px;color:#cbd5e1}
-.explain-box .icon{color:#93c5fd;flex:0 0 auto}
-.clean-pre{font-size:12px;margin-top:12px}
-.send-card{display:flex;gap:10px;align-items:center}
-.send-card input{width:auto}
-.send-card .send-ico{width:34px;height:34px;border-radius:13px;background:rgba(37,99,235,.13);display:grid;place-items:center;color:#93c5fd;flex:0 0 auto}
-.send-card.connected .send-ico{background:rgba(34,197,94,.13);color:#86efac}
-@media(max-width:1050px){.session-grid{grid-template-columns:1fr!important}.hero-card{padding:16px}.hero-card h3{font-size:23px}.session-info{grid-template-columns:1fr}}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at top,#111827 0%,#020617 45%,#000 100%);color:var(--text);overflow-x:hidden}
+button{border:0;border-radius:14px;padding:12px 14px;background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 12px 28px rgba(37,99,235,.22)}
+button.green{background:linear-gradient(135deg,var(--green),#16a34a)}button.red{background:linear-gradient(135deg,var(--red),#b91c1c)}button.gray{background:#475569;box-shadow:none}button.purple{background:linear-gradient(135deg,var(--purple),#6d28d9)}
+input,textarea,select{width:100%;border:1px solid var(--line);background:#070d18;color:var(--text);border-radius:14px;padding:12px;outline:none;font-size:16px}textarea{min-height:125px}label{display:block;color:#cbd5e1;font-weight:850;margin:12px 0 7px;font-size:13px}
+.card{background:linear-gradient(180deg,rgba(17,24,39,.96),rgba(15,23,42,.9));border:1px solid rgba(148,163,184,.16);border-radius:24px;padding:18px;box-shadow:var(--shadow);min-width:0}.card h3{margin-top:0}
+.desc{color:var(--muted);line-height:1.5}.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s12{grid-column:span 12}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap}.btnrow button{flex:1;min-width:120px}.badge{display:inline-flex;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900;background:rgba(148,163,184,.12);color:#cbd5e1}.badge.ok{background:rgba(34,197,94,.14);color:#86efac}.badge.wait{background:rgba(245,158,11,.14);color:#fbbf24}.badge.bad{background:rgba(239,68,68,.14);color:#fca5a5}
+.app{min-height:100vh;display:grid;grid-template-columns:280px minmax(0,1fr)}.sidebar{height:100vh;position:sticky;top:0;background:rgba(7,11,24,.96);border-right:1px solid rgba(148,163,184,.14);padding:22px}.brand{display:flex;gap:12px;align-items:center;margin-bottom:22px}.logo{width:50px;height:50px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#2563eb,#0f172a);font-weight:950}.brand h1{margin:0;font-size:23px}.brand small{color:var(--muted)}
+.nav{display:grid;gap:8px}.nav button{width:100%;justify-content:flex-start;text-align:left;background:transparent;box-shadow:none;border:1px solid transparent;display:flex;align-items:center;gap:10px}.nav button.active{background:rgba(37,99,235,.18);border-color:rgba(96,165,250,.35)}
+main{padding:24px;max-width:none;width:100%;min-width:0;overflow-x:hidden}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.top h2{margin:0;font-size:34px}.page{display:none}.page.active{display:block}
+.icon{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}.mobilebar{display:none}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.stat{padding:16px;border-radius:20px;background:#070d18;border:1px solid var(--line);min-height:120px}.stat span{color:var(--muted);font-weight:800}.stat b{display:block;font-size:30px;margin-top:6px}.stat-head{display:flex;align-items:center;gap:10px;color:#cbd5e1;font-weight:900}.stat-icon{width:42px;height:42px;border-radius:16px;background:rgba(37,99,235,.16);border:1px solid rgba(96,165,250,.24);display:grid;place-items:center;color:#93c5fd}
+.session-grid{display:grid;grid-template-columns:repeat(3,minmax(250px,1fr));gap:16px}.session-card{padding:18px;border-radius:26px;background:linear-gradient(180deg,rgba(15,23,42,.98),rgba(7,13,24,.94));border:1px solid rgba(148,163,184,.18);box-shadow:0 18px 55px rgba(0,0,0,.32);display:flex;flex-direction:column;gap:10px}.session-card.connected{border-color:rgba(34,197,94,.45)}.session-card.waiting{border-color:rgba(245,158,11,.5)}.session-card.offline{border-color:rgba(239,68,68,.28)}
+.session-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.session-main{display:flex;align-items:center;gap:12px}.session-icon{width:54px;height:54px;border-radius:20px;display:grid;place-items:center;background:rgba(37,99,235,.18);border:1px solid rgba(96,165,250,.24);color:#93c5fd}.session-card.connected .session-icon{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.3);color:#86efac}.session-card h3{margin:0;font-size:21px}.session-status{display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:7px 10px;border-radius:999px;background:rgba(148,163,184,.12);font-weight:950;font-size:13px}.dot{width:8px;height:8px;border-radius:50%;background:#94a3b8}.connected .dot{background:#22c55e}.waiting .dot{background:#f59e0b}.offline .dot{background:#ef4444}
+.session-info{display:grid;grid-template-columns:1fr 1fr;gap:10px}.info-chip{background:rgba(7,13,24,.78);border:1px solid rgba(148,163,184,.12);border-radius:16px;padding:10px}.info-chip small{display:block;color:#94a3b8;font-weight:850;font-size:11px;text-transform:uppercase}.info-chip b{display:block;margin-top:3px}.session-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.session-actions button{padding:10px;font-size:13px}.qr{max-width:220px;width:100%;display:block;margin:12px auto;border-radius:18px}.qr-panel{margin-top:12px;padding:12px;border:1px dashed rgba(96,165,250,.35);border-radius:18px;text-align:center;background:rgba(37,99,235,.08)}pre{white-space:pre-wrap;background:#070d18;border:1px solid var(--line);border-radius:16px;padding:12px;color:#cbd5e1;max-height:260px;overflow:auto}.clean-pre{max-height:90px;font-size:12px}
+.send-grid,.session-read-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.send-card,.ad-item,.group-item,.delay-card{background:#070d18;border:1px solid var(--line);border-radius:18px;padding:12px}.send-card{display:flex;gap:10px;align-items:center}.send-card input{width:auto}.send-card.connected{border-color:rgba(34,197,94,.45)}.group-list,.ad-list,.picker{display:grid;gap:10px;max-height:430px;overflow:auto}.group-item.selected{border-color:#60a5fa;background:rgba(37,99,235,.18)}.group-owner{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:6px 9px;border-radius:999px;background:rgba(37,99,235,.14);border:1px solid rgba(96,165,250,.22);font-size:12px;font-weight:900;color:#bfdbfe}.help-card,.media-note,.dark-clean-note{background:rgba(37,99,235,.10);border:1px solid rgba(96,165,250,.22);border-radius:18px;padding:12px;color:#cbd5e1;line-height:1.45}.preview-box{background:#06120b;border:1px solid rgba(34,197,94,.25);border-radius:18px;padding:12px;margin-top:10px}.vars{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.var-chip{border:1px solid rgba(148,163,184,.18);background:#070d18;border-radius:999px;padding:8px 10px;font-size:12px;font-weight:900;color:#cbd5e1;cursor:pointer}
+.modal-bg{display:none;position:fixed;inset:0;z-index:990;background:rgba(2,6,23,.72);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:18px}.modal-bg.active{display:flex}.modal{width:100%;max-width:560px;max-height:92vh;overflow:auto;background:#111827;border:1px solid var(--line);border-radius:26px;padding:20px}.pix-value{font-size:34px;font-weight:950}.pix-key{background:#070d18;border:1px solid var(--line);border-radius:14px;padding:10px;word-break:break-all}.toast{position:fixed;right:18px;bottom:18px;z-index:999;background:#070d18;border:1px solid rgba(34,197,94,.28);border-radius:18px;padding:14px 16px;display:none;box-shadow:var(--shadow)}.toast.show{display:block}
+.hidden{display:none!important}
+@media(max-width:1050px){body{padding-bottom:86px}.app{display:block}.sidebar{display:none}main{padding:12px}.mobilebar{display:flex;position:fixed;left:10px;right:10px;bottom:8px;z-index:900;background:rgba(7,13,24,.94);border:1px solid rgba(148,163,184,.18);border-radius:24px;padding:8px;gap:6px;overflow:auto;box-shadow:0 16px 45px rgba(0,0,0,.5);backdrop-filter:blur(12px)}.mobilebar button{flex:1 0 72px;min-width:72px;background:transparent!important;box-shadow:none!important;font-size:11px!important;padding:9px 7px!important;border-radius:17px;display:flex;flex-direction:column;align-items:center;gap:3px}.mobilebar button.active{background:linear-gradient(135deg,rgba(37,99,235,.42),rgba(29,78,216,.18))!important}.top{display:block}.top h2{font-size:29px}.top .btnrow{margin-top:12px}.grid{grid-template-columns:1fr}.s3,.s4,.s5,.s6,.s7,.s8,.s12{grid-column:span 1}.stats{grid-template-columns:repeat(2,1fr)}.session-grid,.send-grid,.session-read-grid{grid-template-columns:1fr}.card{padding:14px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar"><div class="brand"><div class="logo">NZ</div><div><h1>NEX-ZAPP</h1><small>Cliente</small></div></div><nav class="nav" id="nav"></nav></aside>
+<main>
+<div class="mobilebar" id="mobilebar"></div>
+<div class="top"><div><h2 id="title">Início</h2><p class="desc">Painel de campanhas e conexões.</p></div><div class="btnrow"><button class="gray" onclick="refreshAll()">Atualizar</button><button class="red" onclick="logout()">Sair</button></div></div>
 
+<section id="p-dashboard" class="page active">
+  <div class="stats">
+    <div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="message"></div><span>WhatsApps Online</span></div><b id="mConn">0/3</b></div>
+    <div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="megaphone"></div><span>Anúncios</span></div><b id="mAds">0</b></div>
+    <div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="users"></div><span>Grupos</span></div><b id="mGroups">0</b></div>
+    <div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="send"></div><span>Envios hoje</span></div><b id="mSent">0</b></div>
+  </div>
+  <div class="grid" style="margin-top:16px">
+    <div class="card s6"><h3>Meu plano</h3><div id="planBox" class="desc">Carregando...</div></div>
+    <div class="card s6"><h3>Atalhos</h3><div class="btnrow"><button onclick="openPage('sessions')">Conectar WhatsApp</button><button class="purple" onclick="openPage('ads')">Criar anúncio</button><button class="green" onclick="openPage('list')">Disparo lista</button><button class="green" onclick="openPage('groups')">Disparo grupos</button></div></div>
+  </div>
+</section>
 
-/* V3 explanation helpers */
-.help-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}
-.help-card{background:rgba(37,99,235,.10);border:1px solid rgba(96,165,250,.22);border-radius:18px;padding:12px;color:#cbd5e1}
-.help-card b{display:flex;align-items:center;gap:8px;color:#fff;margin-bottom:6px}
-.vars{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.var-chip{border:1px solid rgba(148,163,184,.18);background:#070d18;border-radius:999px;padding:8px 10px;font-size:12px;font-weight:900;color:#cbd5e1;cursor:pointer}
-.var-chip:hover{border-color:#60a5fa;color:#fff}
-.preview-box{background:#06120b;border:1px solid rgba(34,197,94,.25);border-radius:18px;padding:12px;margin-top:10px}
-.preview-box small{color:#94a3b8}
-@media(max-width:900px){.help-grid{grid-template-columns:1fr}}
+<section id="p-sessions" class="page">
+  <div class="card"><h3>Conexões WhatsApp</h3><p class="desc">Conecte até 3 sessões. Quando o status ficar verde, a instância está pronta para disparos.</p></div>
+  <div id="sessionsBox" class="session-grid" style="margin-top:16px"></div>
+</section>
 
+<section id="p-ads" class="page">
+  <div class="grid">
+    <div class="card s5"><h3>Novo anúncio salvo</h3><div class="help-card">Salve campanhas com texto, foto, vídeo ou documento. Depois selecione vários anúncios no disparo para alternar automaticamente.</div><label>Nome</label><input id="adName"><label>Mensagem</label><textarea id="adMessage" placeholder="{Oi|Olá} {nome}, tudo bem?"></textarea><label>Observação</label><input id="adNote"><label>Foto, vídeo ou documento</label><input id="adMedia" type="file"><button class="green" style="width:100%;margin-top:14px" onclick="saveAd()">Salvar anúncio</button></div>
+    <div class="card s7"><h3>Biblioteca</h3><div id="adsList" class="ad-list"></div></div>
+  </div>
+</section>
 
-/* V5 group owner + media helpers */
-.group-owner{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:6px 9px;border-radius:999px;background:rgba(37,99,235,.14);border:1px solid rgba(96,165,250,.22);font-size:12px;font-weight:900;color:#bfdbfe}
-.media-note{background:rgba(37,99,235,.10);border:1px solid rgba(96,165,250,.22);border-radius:18px;padding:12px;margin:10px 0;color:#cbd5e1;line-height:1.45}
-.dark-clean-note{background:rgba(2,6,23,.42);border:1px solid rgba(148,163,184,.14);border-radius:18px;padding:12px}
+<section id="p-list" class="page">
+  <div class="grid">
+    <div class="card s12"><h3>WhatsApps para envio</h3><div id="listSessionPicker" class="send-grid"></div></div>
+    <div class="card s5"><h3>Contatos</h3><div class="help-card"><b>Como importar contatos</b><div class="desc">Cole um número por linha. Pode ser com ou sem 55. O sistema corrige automaticamente e também tenta com/sem o 9.</div><div class="preview-box"><small>Exemplo simples:</small><br>11999999999<br>11988887777<br>21977776666</div></div><textarea id="targets"></textarea><label>Subir planilha/lista</label><input id="listFile" type="file" accept=".xlsx,.xls,.csv,.txt"></div>
+    <div class="card s7"><h3>Campanhas</h3><div class="media-note"><b>Formatos de vídeo aceitos:</b> MP4, MOV, AVI, MKV, WEBM, M4V e 3GP. Se o WhatsApp não aceitar como vídeo, o sistema tenta enviar como documento.</div><div class="vars"><span class="var-chip" onclick="navigator.clipboard.writeText('{nome}')">{nome}</span><span class="var-chip" onclick="navigator.clipboard.writeText('{telefone}')">{telefone}</span><span class="var-chip" onclick="navigator.clipboard.writeText('{pedido}')">{pedido}</span><span class="var-chip" onclick="navigator.clipboard.writeText('{empresa}')">{empresa}</span><span class="var-chip" onclick="navigator.clipboard.writeText('{data}')">{data}</span><span class="var-chip" onclick="navigator.clipboard.writeText('{Oi|Olá|Fala}')">{Oi|Olá|Fala}</span></div><div class="btnrow"><label><input type="radio" name="adMode" value="manual" checked onchange="toggleAdMode()"> Criar agora</label><label><input type="radio" name="adMode" value="saved" onchange="toggleAdMode()"> Salvos</label><label><input type="radio" name="adMode" value="mix" onchange="toggleAdMode()"> Misturar</label></div><div id="manualBox"><div class="grid" style="margin-top:12px"><div class="card s4"><h3>Anúncio A</h3><textarea id="msg1"></textarea><input id="media1" type="file"></div><div class="card s4"><h3>Anúncio B</h3><textarea id="msg2"></textarea><input id="media2" type="file"></div><div class="card s4"><h3>Anúncio C</h3><textarea id="msg3"></textarea><input id="media3" type="file"></div></div></div><div id="savedBox" class="hidden"><h3>Anúncios salvos</h3><div id="savedAdsPicker" class="picker"></div></div></div>
+    <div class="card s12"><h3>Cadência</h3><div class="btnrow"><button onclick="setDelay(4000,9000)">Rápido</button><button onclick="setDelay(9000,18000)">Equilibrado</button><button onclick="setDelay(20000,45000)">Conservador</button></div><input id="minDelay" type="hidden" value="9000"><input id="maxDelay" type="hidden" value="18000"><button class="green" style="width:100%;margin-top:14px" onclick="sendNumbers()">Iniciar disparo em lista</button><pre id="numberResult">Aguardando operação.</pre></div>
+  </div>
+</section>
 
+<section id="p-groups" class="page">
+  <div class="card"><h3>Disparo em grupos</h3><p class="desc">Escolha o WhatsApp, carregue os grupos dele e selecione os destinos. O sistema envia apenas pelo WhatsApp responsável.</p></div>
+  <div class="grid" style="margin-top:16px">
+    <div class="card s5"><h3>Ler grupos de</h3><div id="groupSessionCards" class="session-read-grid"></div><button class="gray" style="width:100%;margin-top:12px" onclick="loadGroups()">Carregar grupos</button><label>Filtro</label><input id="groupSearch" oninput="renderGroups()" placeholder="Pesquisar grupo"></div>
+    <div class="card s7"><h3>Grupos do WhatsApp selecionado</h3><div class="btnrow"><button onclick="selectAllGroups()">Selecionar todos</button><button class="red" onclick="selectedGroups.clear();saveGroupSelectionCache();renderGroups()">Limpar</button></div><div id="groupsList" class="group-list">Carregue os grupos.</div></div>
+    <div class="card s12"><h3>Campanhas para grupos</h3><div class="media-note">Os grupos serão enviados pelo WhatsApp responsável. Vídeos em formatos diferentes serão tentados como vídeo e depois como documento.</div><div class="btnrow"><label><input type="radio" name="gAdMode" value="manual" checked onchange="toggleGroupAdMode()"> Criar conteúdo agora</label><label><input type="radio" name="gAdMode" value="saved" onchange="toggleGroupAdMode()"> Salvos</label><label><input type="radio" name="gAdMode" value="mix" onchange="toggleGroupAdMode()"> Misturar</label></div><div id="gManualBox"><button class="purple" onclick="saveGroupManualAsAds()">Salvar conteúdo como anúncio</button><div class="grid" style="margin-top:12px"><div class="card s4"><h3>Anúncio A</h3><textarea id="gMsg1"></textarea><input id="gMedia1" type="file"></div><div class="card s4"><h3>Anúncio B</h3><textarea id="gMsg2"></textarea><input id="gMedia2" type="file"></div><div class="card s4"><h3>Anúncio C</h3><textarea id="gMsg3"></textarea><input id="gMedia3" type="file"></div></div></div><div id="gSavedBox" class="hidden"><h3>Anúncios salvos</h3><div id="gSavedAdsPicker" class="picker"></div></div></div>
+    <div class="card s12"><h3>Cadência grupos</h3><div class="btnrow"><button onclick="setGDelay(5000,9000)">Rápido</button><button onclick="setGDelay(9000,18000)">Equilibrado</button><button onclick="setGDelay(20000,45000)">Conservador</button></div><input id="gMinDelay" type="hidden" value="9000"><input id="gMaxDelay" type="hidden" value="18000"><button class="green" style="width:100%;margin-top:14px" onclick="sendGroups()">Iniciar disparo em grupos</button><pre id="groupResult">Aguardando operação.</pre></div>
+  </div>
+</section>
 
-/* V6.1 layout repair */
-#p-dashboard .stats{grid-template-columns:repeat(4,minmax(180px,1fr))}
-#p-dashboard .grid{align-items:stretch}
-#p-sessions .session-grid{display:grid!important;grid-template-columns:repeat(3,minmax(260px,1fr))!important;gap:16px!important}
-#p-sessions .session-card{min-height:420px;display:flex;flex-direction:column}
-#p-sessions .session-actions{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-#p-sessions .clean-pre{max-height:90px;overflow:auto}
-#p-ads .grid,#p-list .grid,#p-groups .grid,#p-billing .grid{align-items:start}
-#p-ads .card,#p-list .card,#p-groups .card,#p-billing .card{min-width:0}
-#p-groups .group-list{max-height:430px;overflow:auto}
-#p-groups .send-card{min-height:70px}
-#p-billing .picker{display:grid;gap:10px}
-#p-billing .pix-value{font-size:34px;font-weight:950}
-@media(max-width:1050px){
-  #p-sessions .session-grid{grid-template-columns:1fr!important}
-  #p-dashboard .stats{grid-template-columns:repeat(2,1fr)}
-}
-@media(min-width:1051px){
-  .app main{overflow-x:hidden}
-  #p-dashboard .s6{grid-column:span 6}
-  #p-dashboard .s12{grid-column:span 12}
-}
-
-</style></head><body><div class="app"><aside class="sidebar"><div class="brand"><div class="logo">NZ</div><div><h1>NEX-ZAPP</h1><small>Cliente</small></div></div><nav class="nav" id="nav"></nav></aside><main><div class="mobilebar" id="mobilebar"></div><div class="top"><div><h2 id="title">Dashboard</h2><p class="desc" id="sub">Central operacional.</p></div><div class="btnrow"><button class="gray" onclick="refreshAll()">Atualizar</button><button class="red" onclick="logout()">Sair</button></div></div>
-<section id="p-dashboard" class="page active"><div class="stats"><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="message"></div><span>WhatsApps Online</span></div><b id="mConn">0/3</b><div class="progress-line"><span id="waProgress" style="width:0%"></span></div></div><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="megaphone"></div><span>Anúncios Ativos</span></div><b id="mAds">0</b></div><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="users"></div><span>Grupos Carregados</span></div><b id="mGroups">0</b></div><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="send"></div><span>Envios Hoje</span></div><b id="mSent">0</b></div></div><div class="grid" style="margin-top:16px"><div class="card s6"><h3>Plano</h3><div id="planBox" class="desc">Carregando...</div></div><div class="card s6"><h3>Atalhos</h3><div class="btnrow"><button onclick="openPage('sessions')">Conectar WhatsApp</button><button class="purple" onclick="openPage('ads')">Criar anúncio</button><button class="green" onclick="openPage('list')">Disparo lista</button><button class="green" onclick="openPage('groups')">Disparo grupos</button></div></div></div></section>
-<section id="p-sessions" class="page"><div class="hero-card"><h3>Conexões WhatsApp</h3><p>Conecte até 3 sessões. Quando o status ficar verde, a instância está pronta para disparos de lista e grupos.</p><div class="progress-line"><span id="waProgress2" style="width:0%"></span></div></div><div class="explain-box"><span data-ico="shield"></span><div><b>Como funciona</b><br>Ao clicar em conectar, o sistema inicializa a sessão, gera o QR Code e aguarda a leitura pelo celular. Depois de autenticado, o card muda para conectado.</div></div><div id="sessionsBox" class="session-grid" style="margin-top:16px"></div></section>
-<section id="p-ads" class="page"><div class="grid"><div class="card s5"><h3>Novo anúncio salvo</h3><div class="help-card"><b><span data-ico="megaphone"></span> Biblioteca de anúncios</b>
-Salve campanhas prontas com texto, foto, vídeo ou documento. Depois você pode selecionar vários anúncios no disparo e o sistema alterna entre eles.</div><label>Nome</label><input id="adName"><label>Mensagem</label><textarea id="adMessage" placeholder="{Oi|Olá} {nome}, tudo bem?"></textarea><label>Observação</label><input id="adNote"><label>Foto, vídeo ou documento</label><input id="adMedia" type="file"><button class="green" style="width:100%;margin-top:14px" onclick="saveAd()">Salvar anúncio</button></div><div class="card s7"><h3>Biblioteca</h3><div id="adsList" class="ad-list"></div></div></div></section>
-<section id="p-list" class="page"><div class="grid"><div class="card s12"><h3>WhatsApps para envio</h3><div id="listSessionPicker" class="send-grid"></div></div><div class="card s5"><h3>Contatos</h3><div class="help-card"><b><span data-ico="list"></span> Como importar contatos</b>
-<div class="desc">Cole um número por linha. Pode ser com ou sem 55. O sistema corrige automaticamente e também tenta com/sem o 9.</div>
-<div class="preview-box"><small>Exemplo simples:</small><br>11999999999<br>11988887777<br>21977776666</div></div><textarea id="targets"></textarea><label>Subir planilha/lista</label><input id="listFile" type="file" accept=".xlsx,.xls,.csv,.txt"></div><div class="card s7"><h3>Campanhas</h3><div class="media-note"><b>Formatos de vídeo aceitos:</b> MP4, MOV, AVI, MKV, WEBM, M4V e 3GP. Se o WhatsApp não aceitar como vídeo, o sistema tenta enviar como documento com legenda.</div><div class="help-grid">
-<div class="help-card"><b><span data-ico="megaphone"></span> Criar agora</b>Use até 3 anúncios diferentes, cada um com texto, foto ou vídeo.</div>
-<div class="help-card"><b><span data-ico="activity"></span> Alternância</b>O sistema alterna os anúncios automaticamente durante o disparo.</div>
-<div class="help-card"><b><span data-ico="file"></span> Variáveis</b>Use variáveis e spintax para variar a mensagem.</div>
-</div><div class="vars">
-<span class="var-chip" onclick="navigator.clipboard.writeText('{nome}')">{nome}</span>
-<span class="var-chip" onclick="navigator.clipboard.writeText('{telefone}')">{telefone}</span>
-<span class="var-chip" onclick="navigator.clipboard.writeText('{pedido}')">{pedido}</span>
-<span class="var-chip" onclick="navigator.clipboard.writeText('{plano}')">{plano}</span>
-<span class="var-chip" onclick="navigator.clipboard.writeText('{empresa}')">{empresa}</span>
-<span class="var-chip" onclick="navigator.clipboard.writeText('{data}')">{data}</span>
-<span class="var-chip" onclick="navigator.clipboard.writeText('{Oi|Olá|Fala}')">{Oi|Olá|Fala}</span>
-</div><div class="btnrow"><label><input type="radio" name="adMode" value="manual" checked onchange="toggleAdMode()"> Criar agora</label><label><input type="radio" name="adMode" value="saved" onchange="toggleAdMode()"> Salvos</label><label><input type="radio" name="adMode" value="mix" onchange="toggleAdMode()"> Misturar</label></div><div id="manualBox"><div class="grid"><div class="card s4"><h3>Anúncio A</h3><textarea id="msg1" placeholder="{Oi|Olá} {nome}"></textarea><input id="media1" type="file"></div><div class="card s4"><h3>Anúncio B</h3><textarea id="msg2"></textarea><input id="media2" type="file"></div><div class="card s4"><h3>Anúncio C</h3><textarea id="msg3"></textarea><input id="media3" type="file"></div></div></div><div id="savedBox" class="hidden"><h3>Escolha anúncios salvos</h3><div id="savedAdsPicker" class="picker"></div></div></div><div class="card s12"><h3>Cadência</h3><div class="delay-grid"><div class="delay-card" onclick="setDelay(4000,9000)">Rápido<br><small>4 a 9s</small></div><div class="delay-card" onclick="setDelay(9000,18000)">Equilibrado<br><small>9 a 18s</small></div><div class="delay-card" onclick="setDelay(20000,45000)">Conservador<br><small>20 a 45s</small></div></div><input id="minDelay" type="hidden" value="9000"><input id="maxDelay" type="hidden" value="18000"><button class="green" style="width:100%;margin-top:14px" onclick="sendNumbers()">Iniciar disparo em lista</button><pre id="numberResult">Aguardando operação...\n\nDica: use números com ou sem 55. O sistema tenta ajustar automaticamente.</pre></div></div></section>
-<section id="p-groups" class="page"><div class="hero-card"><h3>Disparo em grupos</h3><p>Carregue os grupos por WhatsApp. Cada grupo fica vinculado ao número que o carregou, então grupos do WhatsApp 01 são enviados somente pelo WhatsApp 01.</p></div><div class="grid"><div class="card s5"><h3>Carregar grupos</h3><label>Instância para leitura</label><div id="groupSessionCards"></div><button class="gray" style="width:100%;margin-top:12px" onclick="loadGroups()">Carregar grupos</button><label>Filtro</label><input id="groupSearch" oninput="renderGroups()" placeholder="Pesquisar grupo"></div><div class="card s7"><h3>Grupos</h3><div class="btnrow"><button onclick="selectAllGroups()">Selecionar todos</button><button class="red" onclick="selectedGroups.clear();saveGroupSelectionCache();renderGroups()">Limpar</button></div><div id="groupsList" class="group-list">Carregue os grupos.</div></div><div class="card s12"><h3>WhatsApps para grupos</h3><div id="groupSendSessionPicker" class="send-grid"></div></div><div class="card s12"><h3>Campanhas para grupos</h3><div class="media-note"><b>Importante:</b> os grupos serão enviados pelo WhatsApp responsável. Vídeos em formatos diferentes serão tentados como vídeo e depois como documento.</div><div class="help-grid">
-<div class="help-card"><b><span data-ico="megaphone"></span> 3 conteúdos na hora</b>Preencha Anúncio A, B e C com textos/mídias diferentes.</div>
-<div class="help-card"><b><span data-ico="image"></span> Foto e vídeo</b>Envie imagem, vídeo ou documento com legenda.</div>
-<div class="help-card"><b><span data-ico="send"></span> Rotação automática</b>O sistema alterna os conteúdos entre os grupos selecionados.</div>
-</div><div class="btnrow"><label><input type="radio" name="gAdMode" value="manual" checked onchange="toggleGroupAdMode()"> Criar conteúdo agora</label><label><input type="radio" name="gAdMode" value="saved" onchange="toggleGroupAdMode()"> Salvos</label><label><input type="radio" name="gAdMode" value="mix" onchange="toggleGroupAdMode()"> Misturar</label></div><div id="gManualBox"><button class="purple" onclick="saveGroupManualAsAds()">Salvar conteúdo como anúncio</button><div class="grid" style="margin-top:12px"><div class="card s4"><h3>Anúncio A</h3><textarea id="gMsg1"></textarea><input id="gMedia1" type="file"></div><div class="card s4"><h3>Anúncio B</h3><textarea id="gMsg2"></textarea><input id="gMedia2" type="file"></div><div class="card s4"><h3>Anúncio C</h3><textarea id="gMsg3"></textarea><input id="gMedia3" type="file"></div></div></div><div id="gSavedBox" class="hidden"><div id="gSavedAdsPicker" class="picker"></div></div></div><div class="card s12"><h3>Cadência grupos</h3><div class="delay-grid"><div class="delay-card" onclick="setGDelay(5000,9000)">Rápido</div><div class="delay-card" onclick="setGDelay(9000,18000)">Equilibrado</div><div class="delay-card" onclick="setGDelay(20000,45000)">Conservador</div></div><input id="gMinDelay" type="hidden" value="9000"><input id="gMaxDelay" type="hidden" value="18000"><button class="green" style="width:100%;margin-top:14px" onclick="sendGroups()">Iniciar disparo em grupos</button><pre id="groupResult">Aguardando operação...</pre></div></div></section>
-<section id="p-billing" class="page"><div class="grid"><div class="card s5"><h3>Minha assinatura</h3><div id="billingInfo" class="dark-clean-note"></div></div><div class="card s7"><h3>Renovar plano</h3><p class="desc">Escolha um plano e clique em Renovar. O PIX abrirá em uma janela com chave, valor e botão de comprovante.</p><div id="renewPlans" class="picker"></div><button class="green" style="width:100%;margin-top:14px" onclick="requestRenewal()">Renovar agora</button><pre id="billingResult">Selecione um plano para renovar.</pre></div></div></section>
-</main></div><div id="renewModal" class="modal-bg"><div class="modal"><h2>Renovação PIX</h2><div id="renewModalContent"></div><div class="btnrow" style="margin-top:14px"><button class="gray" onclick="renewModal.classList.remove('active')">Fechar</button></div></div></div><div id="toast" class="toast"></div><script>
-
-function icon(name, cls='icon'){
-  const icons={
-    home:'<path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/>',
-    message:'<path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>',
-    megaphone:'<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
-    list:'<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>',
-    users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-    wallet:'<path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v14a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>',
-    send:'<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
-    qrcode:'<rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/>',
-    refresh:'<path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M16 8h5V3"/>',
-    power:'<path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/>',
-    shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/>',
-    activity:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
-    clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
-    check:'<path d="M20 6 9 17l-5-5"/>',
-    x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
-    image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.5-3.5a2 2 0 0 0-3 0L5 21"/>',
-    video:'<path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
-    file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>'
-  };
-  const body=icons[name]||icons.activity;
-  return `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
-}
-
-
+<section id="p-billing" class="page">
+  <div class="grid">
+    <div class="card s5"><h3>Minha assinatura</h3><div id="billingInfo" class="dark-clean-note"></div></div>
+    <div class="card s7"><h3>Renovar plano</h3><p class="desc">Escolha um plano e clique em Renovar. O PIX abrirá em uma janela com chave, valor e botão de comprovante.</p><div id="renewPlans" class="picker"></div><button class="green" style="width:100%;margin-top:14px" onclick="requestRenewal()">Renovar agora</button><pre id="billingResult">Selecione um plano para renovar.</pre></div>
+  </div>
+</section>
+</main>
+</div>
+<div id="renewModal" class="modal-bg"><div class="modal"><h2>Renovação PIX</h2><div id="renewModalContent"></div><div class="btnrow" style="margin-top:14px"><button class="gray" onclick="renewModal.classList.remove('active')">Fechar</button></div></div></div>
+<div id="toast" class="toast"></div>
+<script>
 function qs(s){return document.querySelector(s)}function qsa(s){return [...document.querySelectorAll(s)]}
 function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
 function esc(s){return String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[x]))}
-function badge(s){return `<span class="badge ${String(s||'').toLowerCase()}">${esc(s||'-')}</span>`}
-function toast(t){let el=qs('#toast');if(!el)return alert(t);el.innerHTML=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)}
 function token(){return localStorage.getItem('nz_token')||''}
+function toast(t){let el=qs('#toast');if(!el)return alert(t);el.innerHTML=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)}
 async function api(u,o={}){o.headers=Object.assign({},o.headers||{}, token()?{Authorization:'Bearer '+token()}:{});let r=await fetch(u,o);let j=await r.json().catch(()=>({success:false,error:'Erro'}));if(r.status===401){localStorage.removeItem('nz_token');location.href='/'}return j}
-function setupEyes(){qsa('input[type=password]').forEach(input=>{if(input.dataset.eye)return;input.dataset.eye=1;let w=document.createElement('div');w.className='password-wrap';input.parentNode.insertBefore(w,input);w.appendChild(input);let b=document.createElement('button');b.type='button';b.className='eye-btn';b.textContent='👁';b.onclick=()=>{input.type=input.type==='password'?'text':'password';b.textContent=input.type==='password'?'👁':'🙈'};w.appendChild(b)})}
-function labels(){qsa('.table-wrap table').forEach(t=>{let h=qsa('thead th').map(x=>x.textContent.trim());t.querySelectorAll('tbody tr').forEach(tr=>[...tr.children].forEach((td,i)=>td.setAttribute('data-label',h[i]||'')))})}
-document.addEventListener('DOMContentLoaded',()=>{setupEyes();setInterval(labels,1000)})
+function icon(name, cls='icon'){const icons={home:'<path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/>',message:'<path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>',megaphone:'<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',list:'<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>',users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',wallet:'<path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v14a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>',send:'<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',qrcode:'<rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/>',refresh:'<path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/>',power:'<path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/>',activity:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'};return `<svg class="${cls}" viewBox="0 0 24 24">${icons[name]||icons.activity}</svg>`}
+function hydrateIcons(){document.querySelectorAll('[data-ico]').forEach(el=>{el.innerHTML=icon(el.dataset.ico)})}
 
-const menu=[['dashboard','Início','home'],['sessions','WhatsApps','message'],['ads','Anúncios','megaphone'],['list','Lista','list'],['groups','Grupos','users'],['billing','Planos','wallet']];nav.innerHTML=menu.map((m,i)=>`<button class="${i?'':'active'}" onclick="openPage('${m[0]}',this)">${icon(m[2])}<span>${m[1]}</span></button>`).join('');mobilebar.innerHTML=menu.map((m,i)=>`<button class="${i?'':'active'}" onclick="openPage('${m[0]}',this)">${icon(m[2])}<span>${m[1]}</span></button>`).join('');
-let sessionsData=[],ads=[],groupsCache=[],selectedGroups=new Map(),selectedRenewPlanId=null,currentGroupSession='';
-function openPage(n,b){qsa('.page').forEach(p=>p.classList.remove('active'));qs('#p-'+n).classList.add('active');qsa('.nav button,.mobilebar button').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');qsa(`button[onclick*="${n}"]`).forEach(x=>x.classList.add('active'));title.textContent=(menu.find(m=>m[0]===n)||['',n])[1];if(n==='ads')loadAds();if(n==='billing')loadBilling();labels()}
+const menu=[['dashboard','Início','home'],['sessions','WhatsApps','message'],['ads','Anúncios','megaphone'],['list','Lista','list'],['groups','Grupos','users'],['billing','Planos','wallet']];
+nav.innerHTML=menu.map((m,i)=>`<button class="${i?'':'active'}" onclick="openPage('${m[0]}',this)">${icon(m[2])}<span>${m[1]}</span></button>`).join('');
+mobilebar.innerHTML=menu.map((m,i)=>`<button class="${i?'':'active'}" onclick="openPage('${m[0]}',this)">${icon(m[2])}<span>${m[1]}</span></button>`).join('');
+let sessionsData=[],ads=[],groupsCache=[],selectedGroups=new Map(),currentGroupSession='',selectedRenewPlanId=null;
+function openPage(n,b){qsa('.page').forEach(p=>p.classList.remove('active'));qs('#p-'+n).classList.add('active');qsa('.nav button,.mobilebar button').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');qsa(`button[onclick*="${n}"]`).forEach(x=>x.classList.add('active'));title.textContent=(menu.find(m=>m[0]===n)||['',n])[1];if(n==='ads')loadAds();if(n==='billing')loadBilling();hydrateIcons()}
+function logout(){localStorage.removeItem('nz_token');location.href='/'}
+async function refreshAll(){await check();await loadSessions();await loadAds()}
+async function check(){let r=await api('/api/me');if(!r.success)return;if(r.user.role==='admin')location.href='/admin';if(r.user.role==='reseller')location.href='/revenda';planBox.innerHTML=`<b>${esc(r.plan?.name||r.user.planName||'-')}</b><br>Vencimento: ${esc(r.user.expiresAt||'-')}<br>Status: ${esc(r.user.status||'-')}`}
 
-function hydrateIcons(){
-  document.querySelectorAll('[data-ico]').forEach(el=>{el.innerHTML=icon(el.dataset.ico)});
-}
-document.addEventListener('DOMContentLoaded',()=>setTimeout(hydrateIcons,100));
+async function loadSessions(){sessionsData=await api('/sessions');renderSessions()}
+function connectedNames(){return sessionsData.filter(s=>s.connected).map(s=>s.name)}
+function selectedSessions(scope){let cls=scope==='groups'?'.groupSend:checked':scope==='list'?'.listSend:checked':'.sessionCheck:checked';let out=qsa(cls).map(i=>i.value);return out.length?out:connectedNames()}
+function statusLabel(s){return s.connected?'Conectado':s.stage==='qr'?'QR disponível':s.stage==='reconnecting'?'Reconectando':s.stage==='syncing'?'Sincronizando':s.starting?'Conectando':'Desconectado'}
+function renderSessions(){let conn=sessionsData.filter(s=>s.connected).length;mConn.textContent=conn+'/3';mSent.textContent=sessionsData.reduce((a,s)=>a+(s.sentToday||0),0);sessionsBox.innerHTML=sessionsData.map(s=>{let state=s.connected?'connected':(s.stage==='qr'||s.stage==='reconnecting'||s.starting||s.stage==='syncing')?'waiting':'offline';let label=statusLabel(s);return `<div class="session-card ${state}"><div class="session-top"><div class="session-main"><div class="session-icon">${icon('message')}</div><div><h3>${esc(s.label)}</h3><div class="session-status"><span class="dot"></span>${label}</div></div></div><label class="badge"><input class="sessionCheck" type="checkbox" value="${s.name}" ${s.connected?'checked':''}> usar</label></div><div class="session-info"><div class="info-chip"><small>Status</small><b>${label}</b></div><div class="info-chip"><small>Última atividade</small><b>${esc(s.lastSeen||'Sem atividade')}</b></div><div class="info-chip"><small>Envios hoje</small><b>${s.sentToday||0}</b></div><div class="info-chip"><small>Instância</small><b>${esc(s.name)}</b></div></div>${s.qr?`<div class="qr-panel"><p>Leia este QR Code no WhatsApp do celular.</p><img class="qr" src="${s.qr}"></div>`:''}<div class="session-actions"><button class="green" onclick="connect('${s.name}')">${icon('qrcode')} Conectar</button><button class="gray" onclick="connect('${s.name}')">${icon('refresh')} Reiniciar</button><button class="red" onclick="reset('${s.name}')">${icon('power')} Desconectar</button><button onclick="toast('Sessão ${label}')">${icon('activity')} Status</button></div><pre class="clean-pre">${esc((s.logs||[]).slice(0,4).join('\n'))}</pre></div>`}).join('');renderSendPickers();groupSessionCards.innerHTML=sessionsData.map((s,i)=>`<label class="send-card ${s.connected?'connected':''}"><input type="radio" name="readGroup" value="${s.name}" ${(currentGroupSession?currentGroupSession===s.name:(s.connected||i===0))?'checked':''} onchange="currentGroupSession=this.value;restoreGroupSelectionCache();renderGroups()"> <div><b>${esc(s.label)}</b><small>${s.connected?'Conectado para leitura':'Desconectado'}</small></div></label>`).join('');hydrateIcons()}
+function renderSendPickers(){let build=cls=>sessionsData.map(s=>`<label class="send-card ${s.connected?'connected':''}"><input type="checkbox" class="${cls}" value="${s.name}" ${s.connected?'checked':''} ${s.connected?'':'disabled'}> <div><b>${esc(s.label)}</b><small>${s.connected?'Conectado e disponível':'Desconectado'}</small></div></label>`).join('');listSessionPicker.innerHTML=build('listSend')}
+async function connect(n){await api('/connect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session:n})});setTimeout(loadSessions,1200)}
+async function reset(n){await api('/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session:n})});loadSessions()}
 
-function logout(){localStorage.removeItem('nz_token');location.href='/'}async function check(){let r=await api('/api/me');if(!r.success)return; if(r.user.role==='admin')location.href='/admin'; planBox.innerHTML=`<b>${esc(r.plan?.name||r.user.planName||'-')}</b><br>Vencimento: ${esc(r.user.expiresAt||'-')}<br>Status: ${esc(r.user.status)}`}
-async function loadSessions(){sessionsData=await api('/sessions');renderSessions()}function connectedNames(){return sessionsData.filter(s=>s.connected).map(s=>s.name)}function selectedSessions(scope){let cls=scope==='groups'?'.groupSend:checked':scope==='list'?'.listSend:checked':'.sessionCheck:checked';let out=qsa(cls).map(i=>i.value);return out.length?out:connectedNames()}
-function renderSessions(){let conn=sessionsData.filter(s=>s.connected).length;mConn.textContent=conn+'/3';mSent.textContent=sessionsData.reduce((a,s)=>a+(s.sentToday||0),0);sessionsBox.innerHTML=sessionsData.map(s=>`<div class="session-card ${s.connected?'connected':''}"><h3>${esc(s.label)}</h3><b class="status ${s.connected?'ok':s.stage==='qr'||s.stage==='reconnecting'?'wait':'bad'}">${s.connected?'Conectado':s.stage==='qr'?'QR disponível':s.stage==='reconnecting'?'Reconectando':s.starting?'Conectando':'Desconectado'}</b><label><input class="sessionCheck" type="checkbox" value="${s.name}" ${s.connected?'checked':''}> usar</label>${s.qr?`<img class="qr" src="${s.qr}">`:''}<div class="btnrow"><button class="green" onclick="connect('${s.name}')">Conectar</button><button class="red" onclick="reset('${s.name}')">Reset</button></div><pre>${esc((s.logs||[]).slice(0,3).join('\n'))}</pre></div>`).join('');renderSendPickers();groupSessionCards.innerHTML=sessionsData.map((s,i)=>`<label class="send-card ${s.connected?'connected':''}"><input type="radio" name="readGroup" value="${s.name}" ${i===0?'checked':''}> ${esc(s.label)} - ${s.connected?'conectado':'desconectado'}</label>`).join('')}
-function renderSendPickers(){function build(cls){return sessionsData.map(s=>`<label class="send-card ${s.connected?'connected':''}"><input type="checkbox" class="${cls}" value="${s.name}" ${s.connected?'checked':''} ${s.connected?'':'disabled'}> <b>${esc(s.label)}</b><br><small>${s.connected?'Disponível':'Desconectado'}</small></label>`).join('')}listSessionPicker.innerHTML=build('listSend');groupSendSessionPicker.innerHTML=build('groupSend')}
-async function connect(n){await api('/connect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session:n})});setTimeout(loadSessions,1200)}async function reset(n){await api('/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session:n})});loadSessions()}
-async function loadAds(){ads=await api('/ads');mAds.textContent=ads.length;renderAds();renderPickers()}function renderAds(){
-  mAds.textContent=ads.length
-  adsList.innerHTML=ads.map(a=>{
-    const media=a.mediaUrl?`<div class="desc">Mídia: ${esc(a.mediaName||a.mimetype||'arquivo')}</div>`:''
-    const type=a.mimetype?.startsWith('video/')?'Vídeo':a.mimetype?.startsWith('image/')?'Imagem':a.mediaUrl?'Documento':'Texto'
-    return `<div class="ad-item"><b>${esc(a.name)}</b> <span class="badge">${type}</span><br><small>${esc(a.note||'')}</small><div class="desc">${esc((a.message||'').slice(0,160))}</div>${media}${a.mediaUrl?`<a href="${a.mediaUrl}" target="_blank">Visualizar mídia</a>`:''}<div class="btnrow" style="margin-top:8px"><button onclick="duplicateAd('${a.id}')">Duplicar</button><button class="red" onclick="delAd('${a.id}')">Excluir</button></div></div>`
-  }).join('')||'<div class="desc">Nenhum anúncio salvo ainda.</div>'
-}
-
-async function saveAd(){
-  if(!String(adMessage.value||'').trim() && !adMedia.files[0]){
-    toast('Preencha a mensagem ou selecione uma foto/vídeo/documento.')
-    return
-  }
-  let fd=new FormData()
-  fd.append('name',adName.value||'Anúncio')
-  fd.append('message',adMessage.value)
-  fd.append('note',adNote.value)
-  if(adMedia.files[0])fd.append('media',adMedia.files[0])
-  let r=await api('/ads',{method:'POST',body:fd})
-  if(!r.success)return toast(r.error||'Não foi possível salvar.')
-  toast('Anúncio salvo')
-  adName.value='';adMessage.value='';adNote.value='';adMedia.value=''
-  await loadAds()
-}
-async function duplicateAd(id){
-  const a=ads.find(x=>x.id===id)
-  if(!a)return
-  let fd=new FormData()
-  fd.append('name',(a.name||'Anúncio')+' - cópia')
-  fd.append('message',a.message||'')
-  fd.append('note',a.note||'')
-  let r=await api('/ads',{method:'POST',body:fd})
-  toast(r.success?'Anúncio duplicado':'Não foi possível duplicar')
-  loadAds()
-}
+async function loadAds(){ads=await api('/ads');mAds.textContent=ads.length;renderAds();renderPickers()}
+function renderAds(){adsList.innerHTML=ads.map(a=>{let type=a.mimetype?.startsWith('video/')?'Vídeo':a.mimetype?.startsWith('image/')?'Imagem':a.mediaUrl?'Documento':'Texto';return `<div class="ad-item"><b>${esc(a.name)}</b> <span class="badge">${type}</span><br><small>${esc(a.note||'')}</small><div class="desc">${esc((a.message||'').slice(0,160))}</div>${a.mediaUrl?`<a href="${a.mediaUrl}" target="_blank">Visualizar mídia</a>`:''}<div class="btnrow" style="margin-top:8px"><button onclick="duplicateAd('${a.id}')">Duplicar</button><button class="red" onclick="delAd('${a.id}')">Excluir</button></div></div>`}).join('')||'<div class="desc">Nenhum anúncio salvo ainda.</div>'}
+async function saveAd(){if(!String(adMessage.value||'').trim()&&!adMedia.files[0])return toast('Preencha a mensagem ou selecione uma foto/vídeo/documento.');let fd=new FormData();fd.append('name',adName.value||'Anúncio');fd.append('message',adMessage.value);fd.append('note',adNote.value);if(adMedia.files[0])fd.append('media',adMedia.files[0]);let r=await api('/ads',{method:'POST',body:fd});if(!r.success)return toast(r.error||'Não foi possível salvar.');toast('Anúncio salvo');adName.value='';adMessage.value='';adNote.value='';adMedia.value='';loadAds()}
+async function duplicateAd(id){let a=ads.find(x=>x.id===id);if(!a)return;let fd=new FormData();fd.append('name',(a.name||'Anúncio')+' - cópia');fd.append('message',a.message||'');fd.append('note',a.note||'');let r=await api('/ads',{method:'POST',body:fd});toast(r.success?'Anúncio duplicado':'Não foi possível duplicar');loadAds()}
 async function delAd(id){await api('/ads/'+id,{method:'DELETE'});loadAds()}
 function renderPickers(){let html=ads.map(a=>`<label class="ad-item"><input type="checkbox" class="savedAd" value="${a.id}"> ${esc(a.name)}</label>`).join('')||'Nenhum anúncio salvo.';savedAdsPicker.innerHTML=html;gSavedAdsPicker.innerHTML=html.replaceAll('savedAd','gSavedAd')}
-function toggleAdMode(){let m=qs('input[name=adMode]:checked').value;manualBox.classList.toggle('hidden',m==='saved');savedBox.classList.toggle('hidden',m==='manual')}function toggleGroupAdMode(){let m=qs('input[name=gAdMode]:checked').value;gManualBox.classList.toggle('hidden',m==='saved');gSavedBox.classList.toggle('hidden',m==='manual');loadAds()}
-function setDelay(a,b){minDelay.value=a;maxDelay.value=b}function setGDelay(a,b){gMinDelay.value=a;gMaxDelay.value=b}function result(d){if(!d||typeof d!=='object')return d;let txt=`Finalizado\n\nEnviados: ${d.sent||0}\nFalhas: ${d.failed||0}\nCampanhas usadas: ${d.adsUsed||0}`;if(d.sessionsUsed)txt+=`\nWhatsApps: ${d.sessionsUsed.join(', ')}`;if(d.errors?.length)txt+='\n\nFalhas:\n'+d.errors.slice(0,5).map(e=>'• '+(e.target||'destino')+': '+e.error).join('\n');return txt}
-function buildAds(fd,prefix=''){
-  for(let i=1;i<=3;i++){
-    let m=qs('#'+prefix+'Msg'+i)||qs('#msg'+i)
-    let f=qs('#'+prefix+'Media'+i)||qs('#media'+i)
-    const msgKey = prefix==='g' ? 'gMsg'+i : 'msg'+i
-    const mediaKey = prefix==='g' ? 'gMedia'+i : 'media'+i
-    fd.append(msgKey,m?.value||'')
-    if(f?.files[0])fd.append(mediaKey,f.files[0])
-  }
-}
-function hasManualContent(prefix=''){
-  for(let i=1;i<=3;i++){
-    let m=qs('#'+prefix+'Msg'+i)||qs('#msg'+i)
-    let f=qs('#'+prefix+'Media'+i)||qs('#media'+i)
-    if(String(m?.value||'').trim() || f?.files?.[0]) return true
-  }
-  return false
-}
+function toggleAdMode(){let m=qs('input[name=adMode]:checked').value;manualBox.classList.toggle('hidden',m==='saved');savedBox.classList.toggle('hidden',m==='manual')}
+function toggleGroupAdMode(){let m=qs('input[name=gAdMode]:checked').value;gManualBox.classList.toggle('hidden',m==='saved');gSavedBox.classList.toggle('hidden',m==='manual');loadAds()}
+function setDelay(a,b){minDelay.value=a;maxDelay.value=b}function setGDelay(a,b){gMinDelay.value=a;gMaxDelay.value=b}
+function buildAds(fd,prefix=''){for(let i=1;i<=3;i++){let m=qs('#'+prefix+'Msg'+i)||qs('#msg'+i),f=qs('#'+prefix+'Media'+i)||qs('#media'+i);let msgKey=prefix==='g'?'gMsg'+i:'msg'+i;let mediaKey=prefix==='g'?'gMedia'+i:'media'+i;fd.append(msgKey,m?.value||'');if(f?.files[0])fd.append(mediaKey,f.files[0])}}
+function hasManualContent(prefix=''){for(let i=1;i<=3;i++){let m=qs('#'+prefix+'Msg'+i)||qs('#msg'+i),f=qs('#'+prefix+'Media'+i)||qs('#media'+i);if(String(m?.value||'').trim()||f?.files?.[0])return true}return false}
 function selectedSavedCount(cls){return qsa(cls+':checked').length}
-function validateCampaign(mode,prefix='',savedCls='.savedAd'){
-  if(mode==='manual' && !hasManualContent(prefix)) return 'Preencha pelo menos um anúncio criado na hora com texto, foto ou vídeo.'
-  if(mode==='saved' && !selectedSavedCount(savedCls)) return 'Selecione pelo menos um anúncio salvo.'
-  if(mode==='mix' && !hasManualContent(prefix) && !selectedSavedCount(savedCls)) return 'Crie um anúncio na hora ou selecione anúncios salvos.'
-  return ''
-}
-function normalizeHelp(){
-  return `O sistema normaliza os números automaticamente. Exemplos aceitos:\n11999999999\n1199999999\n5511999999999\n551199999999\nTambém tenta com e sem o 9 quando necessário.`
-}
-async function sendNumbers(){
-  let mode=qs('input[name=adMode]:checked').value
-  let err=validateCampaign(mode,'','.savedAd')
-  if(err){numberResult.textContent=err;return}
-  let sessions=selectedSessions('list')
-  if(!sessions.length){numberResult.textContent='Conecte ou selecione pelo menos um WhatsApp.';return}
-  if(!targets.value.trim() && !listFile.files[0]){numberResult.textContent='Cole uma lista de números ou envie uma planilha.';return}
-  let fd=new FormData()
-  fd.append('sessions',JSON.stringify(sessions))
-  fd.append('targets',targets.value)
-  fd.append('adMode',mode)
-  fd.append('savedAds',JSON.stringify(qsa('.savedAd:checked').map(i=>i.value)))
-  fd.append('minDelay',minDelay.value)
-  fd.append('maxDelay',maxDelay.value)
-  if(listFile.files[0])fd.append('listFile',listFile.files[0])
-  buildAds(fd,'')
-  numberResult.textContent='Enviando...\n'+normalizeHelp()
-  let r=await api('/campaign',{method:'POST',body:fd})
-  numberResult.textContent=result(r)
-}
-function groupCacheKey(){return 'nz_group_selection_'+(currentGroupSession||'default')}
-function saveGroupSelectionCache(){
-  if(!currentGroupSession)return
-  localStorage.setItem(groupCacheKey(), JSON.stringify([...selectedGroups.values()].filter(g=>g.session===currentGroupSession)))
-}
-function restoreGroupSelectionCache(){
-  selectedGroups.clear()
-  if(!currentGroupSession)return
-  try{
-    const arr=JSON.parse(localStorage.getItem(groupCacheKey())||'[]')
-    arr.forEach(g=>selectedGroups.set(groupKey(g),g))
-  }catch{}
-}
+function validateCampaign(mode,prefix='',savedCls='.savedAd'){if(mode==='manual'&&!hasManualContent(prefix))return 'Preencha pelo menos um anúncio criado na hora com texto, foto ou vídeo.';if(mode==='saved'&&!selectedSavedCount(savedCls))return 'Selecione pelo menos um anúncio salvo.';if(mode==='mix'&&!hasManualContent(prefix)&&!selectedSavedCount(savedCls))return 'Crie um anúncio na hora ou selecione anúncios salvos.';return ''}
+function result(d){if(!d||typeof d!=='object')return d;let txt=`Finalizado\n\nEnviados: ${d.sent||0}\nFalhas: ${d.failed||0}\nCampanhas usadas: ${d.adsUsed||0}`;if(d.sessionsUsed)txt+=`\nWhatsApps: ${d.sessionsUsed.join(', ')}`;if(d.errors?.length)txt+='\n\nFalhas:\n'+d.errors.slice(0,5).map(e=>'• '+(e.target||'destino')+': '+e.error).join('\n');return txt}
+
+async function sendNumbers(){let mode=qs('input[name=adMode]:checked').value;let err=validateCampaign(mode,'','.savedAd');if(err)return numberResult.textContent=err;let sessions=selectedSessions('list');if(!sessions.length)return numberResult.textContent='Conecte ou selecione pelo menos um WhatsApp.';if(!targets.value.trim()&&!listFile.files[0])return numberResult.textContent='Cole uma lista de números ou envie uma planilha.';let fd=new FormData();fd.append('sessions',JSON.stringify(sessions));fd.append('targets',targets.value);fd.append('adMode',mode);fd.append('savedAds',JSON.stringify(qsa('.savedAd:checked').map(i=>i.value)));fd.append('minDelay',minDelay.value);fd.append('maxDelay',maxDelay.value);if(listFile.files[0])fd.append('listFile',listFile.files[0]);buildAds(fd,'');numberResult.textContent='Enviando...';let r=await api('/campaign',{method:'POST',body:fd});numberResult.textContent=result(r)}
+
 function selectedReadSession(){return qs('input[name=readGroup]:checked')?.value||connectedNames()[0]||''}
-async function loadGroups(){
-  let s=selectedReadSession()
-  if(!s)return toast('Conecte ou escolha um WhatsApp para ler os grupos.')
-  currentGroupSession=s
-  let r=await api('/groups/'+s)
-  if(!r.success)return toast(r.error)
-  const incoming=(r.groups||[]).map(g=>Object.assign({},g,{session:s,sessionLabel:(sessionsData.find(x=>x.name===s)?.label||s)}))
-  groupsCache=[...groupsCache.filter(g=>g.session!==s),...incoming]
-  mGroups.textContent=groupsCache.length
-  restoreGroupSelectionCache()
-  renderGroups()
-}
 function groupKey(g){return (g.session||'')+'::'+(g.id||g.jid||g.name)}
-function currentGroups(){
-  const s=currentGroupSession||selectedReadSession()
-  return groupsCache.filter(g=>g.session===s)
-}
-function renderGroups(){
-  currentGroupSession=currentGroupSession||selectedReadSession()
-  let q=groupSearch.value.toLowerCase()
-  const list=currentGroups().filter(g=>g.name.toLowerCase().includes(q))
-  const label=sessionsData.find(x=>x.name===currentGroupSession)?.label||currentGroupSession||'WhatsApp'
-  groupsList.innerHTML=list.map(g=>{
-    const key=groupKey(g)
-    return `<div class="group-item ${selectedGroups.has(key)?'selected':''}" onclick="toggleGroup('${key}')"><b>${esc(g.name)}</b><br><small>${g.participants} membros</small><div class="group-owner">${icon('message')} ${esc(g.sessionLabel||g.session||'-')}</div></div>`
-  }).join('')||`Nenhum grupo carregado do ${esc(label)}. Clique em Carregar grupos.`
-}
-function toggleGroup(key){
-  if(selectedGroups.has(key)) selectedGroups.delete(key)
-  else selectGroupByKey(key)
-  saveGroupSelectionCache()
-  renderGroups()
-}
-function selectGroupByKey(key){
-  const g=groupsCache.find(x=>groupKey(x)===key)
-  if(g) selectedGroups.set(key,{id:g.id,name:g.name,participants:g.participants,session:g.session,sessionLabel:g.sessionLabel})
-}
-function selectAllGroups(){
-  currentGroups().forEach(g=>selectedGroups.set(groupKey(g),{id:g.id,name:g.name,participants:g.participants,session:g.session,sessionLabel:g.sessionLabel}))
-  saveGroupSelectionCache()
-  renderGroups()
-}));renderGroups()}
-async function saveGroupManualAsAds(){for(let i=1;i<=3;i++){let msg=qs('#gMsg'+i).value, file=qs('#gMedia'+i).files[0];if(!msg&&!file)continue;let fd=new FormData();fd.append('name','Grupo anúncio '+i);fd.append('message',msg);fd.append('note','Criado em grupos');if(file)fd.append('media',file);await api('/ads',{method:'POST',body:fd})}toast('Campanhas salvas');loadAds()}
-async function sendGroups(){
-  let mode=qs('input[name=gAdMode]:checked').value
-  let err=validateCampaign(mode,'g','.gSavedAd')
-  if(err){groupResult.textContent=err;return}
-  const session=currentGroupSession||selectedReadSession()
-  const selected=[...selectedGroups.values()].filter(g=>g.session===session)
-  if(!selected.length){groupResult.textContent='Selecione pelo menos um grupo deste WhatsApp.';return}
-  let fd=new FormData()
-  fd.append('sessions',JSON.stringify([session]))
-  fd.append('groups',JSON.stringify(selected))
-  fd.append('gAdMode',mode)
-  fd.append('savedAds',JSON.stringify(qsa('.gSavedAd:checked').map(i=>i.value)))
-  fd.append('minDelay',gMinDelay.value)
-  fd.append('maxDelay',gMaxDelay.value)
-  buildAds(fd,'g')
-  const label=sessionsData.find(x=>x.name===session)?.label||session
-  groupResult.textContent='Enviando somente pelos grupos do '+label+'...'
-  let r=await api('/campaign-groups',{method:'POST',body:fd})
-  groupResult.textContent=result(r)
-}
-async function loadBilling(){
-  let d=await api('/api/billing')
-  if(!d.success)return
-  window.nzBilling=d
-  billingInfo.innerHTML=`<b>${esc(d.plan?.name||d.user.planName||'-')}</b><br>Vencimento: ${esc(d.user.expiresAt||'-')}<br>Status: ${esc(d.user.status||'-')}`
-  renewPlans.innerHTML=d.plans.map(p=>`<label class="ad-item"><input type="radio" name="renew" value="${p.id}" ${p.id===d.user.planId?'checked':''}> <b>${esc(p.name)}</b><br><span>${money(p.price)} • ${p.durationDays} dias • ${p.whatsappLimit} WhatsApp(s)</span></label>`).join('')
-  billingResult.textContent='Escolha um plano e clique em Renovar agora.'
-}
-async function requestRenewal(){
-  let id=qs('input[name=renew]:checked')?.value
-  if(!id)return billingResult.textContent='Selecione um plano.'
-  let r=await api('/api/billing/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({planId:id})})
-  if(!r.success){billingResult.textContent=r.error;return}
-  const st=r.settings||window.nzBilling?.settings||{}
-  const phone=String(st.receiptWhatsapp||st.supportPhone||'').replace(/\D/g,'')
-  const text=encodeURIComponent(`Olá, fiz o pagamento da renovação ${r.order.planName} no valor de ${money(r.order.value)}. Meu e-mail: ${r.order.email}`)
-  renewModalContent.innerHTML=`<div class="pix-value">${money(r.order.value)}</div><p><b>Plano:</b> ${esc(r.order.planName)}</p><p><b>Chave PIX:</b></p><div class="pix-key" id="renewPixKey">${esc(st.pixKey||'Configure no admin')}</div><button class="green" style="width:100%;margin-top:10px" onclick="navigator.clipboard.writeText(renewPixKey.textContent);toast('Chave PIX copiada')">Copiar chave PIX</button><p class="desc">${esc(st.instruction||'Após o pagamento, envie o comprovante para liberação mais rápida.')}</p><a target="_blank" href="https://wa.me/${phone}?text=${text}"><button class="purple" style="width:100%;margin-top:10px">Enviar comprovante no WhatsApp</button></a>`
-  renewModal.classList.add('active')
-  billingResult.textContent='Pedido de renovação criado. Faça o PIX e envie o comprovante.'
-}
-check();loadSessions();loadAds();setInterval(loadSessions,12000)</script></body></html>
+function groupCacheKey(){return 'nz_group_selection_'+(currentGroupSession||'default')}
+function saveGroupSelectionCache(){if(!currentGroupSession)return;localStorage.setItem(groupCacheKey(),JSON.stringify([...selectedGroups.values()].filter(g=>g.session===currentGroupSession)))}
+function restoreGroupSelectionCache(){selectedGroups.clear();if(!currentGroupSession)return;try{JSON.parse(localStorage.getItem(groupCacheKey())||'[]').forEach(g=>selectedGroups.set(groupKey(g),g))}catch{}}
+function currentGroups(){const s=currentGroupSession||selectedReadSession();return groupsCache.filter(g=>g.session===s)}
+async function loadGroups(){let s=selectedReadSession();if(!s)return toast('Conecte ou escolha um WhatsApp para ler os grupos.');currentGroupSession=s;let r=await api('/groups/'+s);if(!r.success)return toast(r.error);let incoming=(r.groups||[]).map(g=>Object.assign({},g,{session:s,sessionLabel:(sessionsData.find(x=>x.name===s)?.label||s)}));groupsCache=[...groupsCache.filter(g=>g.session!==s),...incoming];mGroups.textContent=groupsCache.length;restoreGroupSelectionCache();renderGroups()}
+function renderGroups(){currentGroupSession=currentGroupSession||selectedReadSession();let q=groupSearch.value.toLowerCase();let list=currentGroups().filter(g=>g.name.toLowerCase().includes(q));let label=sessionsData.find(x=>x.name===currentGroupSession)?.label||currentGroupSession||'WhatsApp';groupsList.innerHTML=list.map(g=>{let key=groupKey(g);return `<div class="group-item ${selectedGroups.has(key)?'selected':''}" onclick="toggleGroup('${key}')"><b>${esc(g.name)}</b><br><small>${g.participants} membros</small><div class="group-owner">${icon('message')} ${esc(g.sessionLabel||g.session||'-')}</div></div>`}).join('')||`Nenhum grupo carregado do ${esc(label)}. Clique em Carregar grupos.`}
+function toggleGroup(key){if(selectedGroups.has(key))selectedGroups.delete(key);else selectGroupByKey(key);saveGroupSelectionCache();renderGroups()}
+function selectGroupByKey(key){let g=groupsCache.find(x=>groupKey(x)===key);if(g)selectedGroups.set(key,{id:g.id,name:g.name,participants:g.participants,session:g.session,sessionLabel:g.sessionLabel})}
+function selectAllGroups(){currentGroups().forEach(g=>selectedGroups.set(groupKey(g),{id:g.id,name:g.name,participants:g.participants,session:g.session,sessionLabel:g.sessionLabel}));saveGroupSelectionCache();renderGroups()}
+async function saveGroupManualAsAds(){for(let i=1;i<=3;i++){let msg=qs('#gMsg'+i).value,file=qs('#gMedia'+i).files[0];if(!msg&&!file)continue;let fd=new FormData();fd.append('name','Grupo anúncio '+i);fd.append('message',msg);fd.append('note','Criado em grupos');if(file)fd.append('media',file);await api('/ads',{method:'POST',body:fd})}toast('Campanhas salvas');loadAds()}
+async function sendGroups(){let mode=qs('input[name=gAdMode]:checked').value;let err=validateCampaign(mode,'g','.gSavedAd');if(err)return groupResult.textContent=err;let session=currentGroupSession||selectedReadSession();let selected=[...selectedGroups.values()].filter(g=>g.session===session);if(!selected.length)return groupResult.textContent='Selecione pelo menos um grupo deste WhatsApp.';let fd=new FormData();fd.append('sessions',JSON.stringify([session]));fd.append('groups',JSON.stringify(selected));fd.append('gAdMode',mode);fd.append('savedAds',JSON.stringify(qsa('.gSavedAd:checked').map(i=>i.value)));fd.append('minDelay',gMinDelay.value);fd.append('maxDelay',gMaxDelay.value);buildAds(fd,'g');let label=sessionsData.find(x=>x.name===session)?.label||session;groupResult.textContent='Enviando somente pelos grupos do '+label+'...';let r=await api('/campaign-groups',{method:'POST',body:fd});groupResult.textContent=result(r)}
+
+async function loadBilling(){let d=await api('/api/billing');if(!d.success)return;window.nzBilling=d;billingInfo.innerHTML=`<b>${esc(d.plan?.name||d.user.planName||'-')}</b><br>Vencimento: ${esc(d.user.expiresAt||'-')}<br>Status: ${esc(d.user.status||'-')}`;renewPlans.innerHTML=d.plans.map(p=>`<label class="ad-item"><input type="radio" name="renew" value="${p.id}" ${p.id===d.user.planId?'checked':''}> <b>${esc(p.name)}</b><br><span>${money(p.price)} • ${p.durationDays} dias • ${p.whatsappLimit} WhatsApp(s)</span></label>`).join('');billingResult.textContent='Escolha um plano e clique em Renovar agora.'}
+async function requestRenewal(){let id=qs('input[name=renew]:checked')?.value;if(!id)return billingResult.textContent='Selecione um plano.';let r=await api('/api/billing/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({planId:id})});if(!r.success){billingResult.textContent=r.error;return}let st=r.settings||window.nzBilling?.settings||{};let phone=String(st.receiptWhatsapp||st.supportPhone||'').replace(/\D/g,'');let text=encodeURIComponent(`Olá, fiz o pagamento da renovação ${r.order.planName} no valor de ${money(r.order.value)}. Meu e-mail: ${r.order.email}`);renewModalContent.innerHTML=`<div class="pix-value">${money(r.order.value)}</div><p><b>Plano:</b> ${esc(r.order.planName)}</p><p><b>Chave PIX:</b></p><div class="pix-key" id="renewPixKey">${esc(st.pixKey||'Configure no admin')}</div><button class="green" style="width:100%;margin-top:10px" onclick="navigator.clipboard.writeText(renewPixKey.textContent);toast('Chave PIX copiada')">Copiar chave PIX</button><p class="desc">${esc(st.instruction||'Após o pagamento, envie o comprovante para liberação mais rápida.')}</p><a target="_blank" href="https://wa.me/${phone}?text=${text}"><button class="purple" style="width:100%;margin-top:10px">Enviar comprovante no WhatsApp</button></a>`;renewModal.classList.add('active');billingResult.textContent='Pedido de renovação criado. Faça o PIX e envie o comprovante.'}
+
+refreshAll();setInterval(loadSessions,12000);hydrateIcons()
+</script>
+</body>
+</html>

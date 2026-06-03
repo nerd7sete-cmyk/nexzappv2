@@ -90,21 +90,29 @@ Correções:
 - Vídeos: tenta enviar como vídeo e, se falhar, envia como documento.
 - Melhor suporte para MP4, MOV, AVI, MKV, WEBM, M4V e 3GP conforme aceitação do WhatsApp.
 
-## Rebuild V6.1 - Correção Completa
+## Rebuild V6 - Renovação, Grupos e Anúncios
 
-Inclui as correções da V6:
-- Modal PIX de renovação com chave, valor e WhatsApp do comprovante.
-- Grupos separados por WhatsApp selecionado.
-- Disparo em grupos apenas pelo WhatsApp selecionado.
+- Renovação agora abre modal PIX profissional.
+- Modal mostra valor, plano, chave PIX, botão copiar e WhatsApp de comprovante configurado no admin.
+- Aba grupos mostra somente grupos do WhatsApp selecionado.
+- Disparo em grupos usa apenas o WhatsApp selecionado.
+- Seleção de grupos salva no cache por WhatsApp.
+- Explicação da lista simplificada.
+- Corrigido `saveAd` para async.
+- Biblioteca de anúncios mostra mídia, duplicar e excluir.
+- Landing mais compacta.
+- Área de revendedor com botão de login.
+- Aprovação de revendedor cria/atualiza usuário de revenda.
+
+## Rebuild V7 - Painel Cliente Reconstruído
+
+- `public/app.html` refeito limpo para corrigir menus e telas quebradas.
+- Menu do cliente funcional: Início, WhatsApps, Anúncios, Lista, Grupos e Planos.
+- Mantidas APIs e dados existentes.
+- Anúncios salvando, duplicando e excluindo.
+- Disparo em lista com mídia.
+- Disparo em grupos por WhatsApp responsável.
 - Cache de seleção de grupos por WhatsApp.
-- Anúncios corrigidos para salvar.
-- Biblioteca de anúncios com visualizar, duplicar e excluir.
-- Explicação de lista mais simples.
-- Login de revendedor após aprovação.
-- Landing compacta.
-
-Correção extra:
-- Layout do painel cliente restaurado.
-- Cards do WhatsApp alinhados.
-- Grid do dashboard corrigido.
-- Botões e cards sem sobreposição.
+- Modal PIX de renovação.
+- Vídeo com fallback para documento.
+- Layout desktop e mobile restaurado.

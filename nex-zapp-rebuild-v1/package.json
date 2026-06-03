@@ -1,7 +1,7 @@
 {
   "name": "nex-zapp-rebuild-v1",
-  "version": "6.1.0",
-  "description": "NEX-ZAPP Rebuild V6.1 - layout cliente corrigido + V6 completa",
+  "version": "7.0.0",
+  "description": "NEX-ZAPP Rebuild V7 - painel cliente reconstru\u00eddo",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
