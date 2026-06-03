@@ -378,7 +378,9 @@ async function connectWhatsApp(name) {
     connectTimeoutMs: 60000,
     defaultQueryTimeoutMs: 60000,
     keepAliveIntervalMs: 25000,
-    retryRequestDelayMs: 2000
+    retryRequestDelayMs: 2000,
+    shouldSyncHistoryMessage: () => false,
+    emitOwnEvents: false
   })
 
   s.sock = sock
@@ -408,6 +410,7 @@ async function connectWhatsApp(name) {
       s.lastSeen = new Date().toLocaleString()
       s.reconnectAttempts = 0
       if (s.reconnectTimer) { clearTimeout(s.reconnectTimer); s.reconnectTimer = null }
+      try { sock.sendPresenceUpdate('unavailable') } catch(e) {}
       log(name, 'Conta conectada com sucesso.')
     }
 

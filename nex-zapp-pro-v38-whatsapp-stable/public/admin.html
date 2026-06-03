@@ -81,6 +81,21 @@
 }
 @media(max-width:420px){main{padding:10px!important}.topbar h2{font-size:28px!important}.stat b{font-size:24px!important}}
 
+
+/* V41 desktop pedido fix */
+@media(min-width:1051px){
+  #p-pedidos .table-wrap table{display:table!important;width:100%!important}
+  #p-pedidos .table-wrap thead{display:table-header-group!important}
+  #p-pedidos .table-wrap tbody{display:table-row-group!important}
+  #p-pedidos .table-wrap tr{display:table-row!important}
+  #p-pedidos .table-wrap th,#p-pedidos .table-wrap td{display:table-cell!important}
+}
+
+
+.password-wrap{position:relative}
+.password-wrap input{padding-right:48px!important}
+.eye-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:12px;padding:0;background:rgba(148,163,184,.18)!important;box-shadow:none!important;color:#fff}
+
 </style></head><body>
 <div class="app"><aside class="sidebar"><div class="brand"><div class="logo">NZ</div><div><h1>NEX-ZAPP</h1><small>Painel Admin</small></div></div><nav class="nav" id="nav"></nav><div class="nav-footer"><b>NEX-ZAPP Admin</b><br>Integrado com JSON<br><span class="license">Dados reais</span></div></aside>
 <main><div class="mobilebar" id="mobilebar"></div><div class="topbar"><div><h2 id="pageTitle">Dashboard Admin</h2><p id="pageSub">Controle geral em tempo real.</p></div><div class="btnrow" style="max-width:330px"><button class="gray" onclick="loadAll()">Atualizar</button><button class="green" onclick="openNewClient()">Novo cliente</button></div></div>
@@ -249,29 +264,24 @@ function renderOrders(){
     return `<div class="order-actions"><button class="green" onclick="approveOrder('${oid}')">Aprovar</button><button class="red" onclick="cancelOrder('${oid}')">Recusar</button></div>`;
   };
 
-  if(typeof ordersTable !== 'undefined'){
-    ordersTable.innerHTML = pendingOrders.length ? pendingOrders.map(o=>`
-      <tr>
-        <td><b>${esc(o.name||'-')}</b><br><small>${esc(o.email||'-')}<br>${esc(o.phone||'-')}</small></td>
-        <td>${esc(o.planName||o.planId||'-')}</td>
-        <td>${money(o.value||0)}</td>
-        <td>${badge(o.status||'pending')}</td>
-        <td>${action(o)}</td>
-      </tr>
-    `).join('') : '<tr><td colspan="5"><div class="desc">Nenhum pedido pendente no momento.</div></td></tr>';
+  const row = (o, full=false) => `
+    <tr>
+      <td><b>${esc(o.name||'-')}</b><br><small>${esc(o.email||'-')}</small></td>
+      ${full ? `<td>${esc(o.phone||o.contact||'-')}</td>` : ''}
+      <td>${esc(o.planName||o.planId||'-')}</td>
+      <td>${money(o.value||0)}</td>
+      <td>${badge(o.status||'pending')}</td>
+      <td>${action(o)}</td>
+    </tr>`;
+
+  if(typeof ordersTable !== 'undefined' && ordersTable){
+    ordersTable.innerHTML = pendingOrders.length ? pendingOrders.map(o=>row(o,true)).join('') : '<tr><td colspan="6"><div class="desc">Nenhum pedido pendente no momento.</div></td></tr>';
   }
 
-  if(typeof dashOrders !== 'undefined'){
-    dashOrders.innerHTML = orders.length ? orders.slice(0,5).map(o=>`
-      <tr>
-        <td><b>${esc(o.name||'-')}</b><br><small>${esc(o.email||'-')}</small></td>
-        <td>${esc(o.planName||o.planId||'-')}</td>
-        <td>${money(o.value||0)}</td>
-        <td>${badge(o.status||'pending')}</td>
-        <td>${action(o)}</td>
-      </tr>
-    `).join('') : '<tr><td colspan="5"><div class="desc">Nenhum pedido recebido.</div></td></tr>';
+  if(typeof dashOrders !== 'undefined' && dashOrders){
+    dashOrders.innerHTML = orders.length ? orders.slice(0,5).map(o=>row(o,false)).join('') : '<tr><td colspan="5"><div class="desc">Nenhum pedido recebido.</div></td></tr>';
   }
+  if(typeof nzApplyMobileTableLabels === 'function') nzApplyMobileTableLabels();
 }
 function renderPayments(){
   const payments=state.payments||[];
@@ -513,5 +523,25 @@ function nzApplyMobileTableLabels(){
   });
 }
 setInterval(nzApplyMobileTableLabels,1200);
+
+
+function setupPasswordEyes(){
+  document.querySelectorAll('input[type="password"]').forEach(input=>{
+    if(input.dataset.eyeReady)return;
+    input.dataset.eyeReady='1';
+    const wrap=document.createElement('div');
+    wrap.className='password-wrap';
+    input.parentNode.insertBefore(wrap,input);
+    wrap.appendChild(input);
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='eye-btn';
+    btn.textContent='👁';
+    btn.onclick=()=>{input.type=input.type==='password'?'text':'password';btn.textContent=input.type==='password'?'👁':'🙈'};
+    wrap.appendChild(btn);
+  });
+}
+document.addEventListener('DOMContentLoaded',setupPasswordEyes);
+setTimeout(setupPasswordEyes,500);
 
 </script></body></html>

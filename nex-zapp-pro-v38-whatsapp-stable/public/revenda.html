@@ -16,6 +16,11 @@ table{width:100%;border-collapse:collapse;min-width:680px}th,td{padding:12px;bor
 .rev-close{position:absolute;right:18px;top:18px;width:40px;height:40px;border-radius:14px;background:#1e293b!important;box-shadow:none!important;font-size:22px;line-height:1;padding:0}
 .box{position:relative}
 
+
+.password-wrap{position:relative}
+.password-wrap input{padding-right:48px!important}
+.eye-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:12px;padding:0;background:rgba(148,163,184,.18)!important;box-shadow:none!important;color:#fff}
+
 </style></head>
 <body>
 <div id="loginBox" class="login"><div class="box"><button class="rev-close" onclick="location.href='/'">×</button><h1>Painel Revendedor</h1><p class="muted">Acesse para acompanhar indicações, comissões e saques.</p><label>E-mail</label><input id="email" placeholder="seu@email.com"><label>Senha</label><input id="password" type="password" placeholder="Senha"><button class="green" style="width:100%;margin-top:14px" onclick="login()">Entrar</button><p class="muted">Use a senha que você criou no cadastro de revendedor.</p><div id="loginMsg" class="msg"></div></div></div>
@@ -36,5 +41,25 @@ async function load(){const r=await api('/api/reseller/me');if(!r.success){login
 function copyLink(){navigator.clipboard?.writeText(myLink.textContent);alert('Link copiado.')}
 async function requestWithdraw(){withdrawMsg.textContent='Enviando...';const r=await api('/api/reseller/withdraw',{method:'POST',body:JSON.stringify({value:withdrawValue.value,pixKey:withdrawPix.value})});if(!r.success){withdrawMsg.className='msg err';withdrawMsg.textContent=r.error;return}withdrawMsg.className='msg';withdrawMsg.textContent='Saque solicitado. Aguarde o admin aprovar e pagar.';load()}
 load()
+
+function setupPasswordEyes(){
+  document.querySelectorAll('input[type="password"]').forEach(input=>{
+    if(input.dataset.eyeReady)return;
+    input.dataset.eyeReady='1';
+    const wrap=document.createElement('div');
+    wrap.className='password-wrap';
+    input.parentNode.insertBefore(wrap,input);
+    wrap.appendChild(input);
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='eye-btn';
+    btn.textContent='👁';
+    btn.onclick=()=>{input.type=input.type==='password'?'text':'password';btn.textContent=input.type==='password'?'👁':'🙈'};
+    wrap.appendChild(btn);
+  });
+}
+document.addEventListener('DOMContentLoaded',setupPasswordEyes);
+setTimeout(setupPasswordEyes,500);
+
 </script>
 </body></html>

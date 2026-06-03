@@ -82,6 +82,11 @@ footer{text-align:center;color:var(--muted);padding:30px}
 .reseller-point{background:#070d18;border:1px solid #243044;border-radius:18px;padding:16px}
 @media(max-width:760px){.reseller-grid{grid-template-columns:1fr}}
 
+
+.password-wrap{position:relative}
+.password-wrap input{padding-right:48px!important}
+.eye-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:12px;padding:0;background:rgba(148,163,184,.18)!important;box-shadow:none!important;color:#fff}
+
 </style>
 </head><body>
 <header class="wrap nav"><div class="brand"><div class="logo">NZ</div><div><h2>NEX-ZAPP</h2><small>Central de Mensagens</small></div></div><nav class="links"><a href="#recursos">Recursos</a><a href="#planos">Planos</a><button class="ghost" onclick="openLogin()">Entrar agora</button><button class="green" onclick="scrollPlans()">Comprar agora</button></nav></header>
@@ -192,4 +197,24 @@ async function applyReseller(){
 }
 
 load();
+
+function setupPasswordEyes(){
+  document.querySelectorAll('input[type="password"]').forEach(input=>{
+    if(input.dataset.eyeReady)return;
+    input.dataset.eyeReady='1';
+    const wrap=document.createElement('div');
+    wrap.className='password-wrap';
+    input.parentNode.insertBefore(wrap,input);
+    wrap.appendChild(input);
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='eye-btn';
+    btn.textContent='👁';
+    btn.onclick=()=>{input.type=input.type==='password'?'text':'password';btn.textContent=input.type==='password'?'👁':'🙈'};
+    wrap.appendChild(btn);
+  });
+}
+document.addEventListener('DOMContentLoaded',setupPasswordEyes);
+setTimeout(setupPasswordEyes,500);
+
 </script></body></html>

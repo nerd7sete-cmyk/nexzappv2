@@ -146,3 +146,15 @@ Correções aplicadas:
 - Landing salva em `data/landing.json`.
 - Adicionado diagnóstico `/api/admin/diagnostic` para conferir pasta real de dados.
 - Mantida base V39/V36 com mobile e WhatsApp estável.
+
+
+## V41 Ajustes Gerais
+
+- Pedidos pendentes corrigidos no desktop do admin.
+- Seleção de WhatsApp no mobile fica automática quando houver instância conectada.
+- Disparo em grupos no desktop mostra Criar conteúdo agora.
+- Botão para salvar campanha criada na hora como anúncio.
+- Resultado técnico JSON escondido; agora mostra resumo amigável.
+- Botão de olho para visualizar senha nos logins e landing.
+- WhatsApp tenta ficar como presença indisponível para reduzir impacto nas notificações do celular.
+- Mantidas correções da V40: PIX, senha, planos, landing e mobile.

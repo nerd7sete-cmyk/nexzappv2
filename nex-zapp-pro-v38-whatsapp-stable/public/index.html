@@ -119,6 +119,11 @@ input[type=file]::file-selector-button{background:#1E293B;color:#F8FAFC}
 
 .dashboard-hero,.hero-card{background:linear-gradient(90deg,rgba(30,41,59,.96),rgba(15,23,42,.92))!important;border:1px solid rgba(96,165,250,.18)!important}
 
+
+.password-wrap{position:relative}
+.password-wrap input{padding-right:48px!important}
+.eye-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:12px;padding:0;background:rgba(148,163,184,.18)!important;box-shadow:none!important;color:#fff}
+
 </style>
 </head>
 <body>
@@ -289,6 +294,26 @@ async function sendGroups(){let fd=new FormData();groupFields(fd);fd.append('gro
 async function refreshAll(){await loadSessions();await loadAds();let c=localStorage.getItem('groupsCacheV9');if(c&&!groupsCache.length){try{groupsCache=JSON.parse(c)||[]}catch{}}renderGroups()}
 function esc(s){return String(s||'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[x]))}
 openPage(localStorage.getItem('lastPageV12')||'dashboard');refreshAll();setInterval(loadSessions,4000)
+
+function setupPasswordEyes(){
+  document.querySelectorAll('input[type="password"]').forEach(input=>{
+    if(input.dataset.eyeReady)return;
+    input.dataset.eyeReady='1';
+    const wrap=document.createElement('div');
+    wrap.className='password-wrap';
+    input.parentNode.insertBefore(wrap,input);
+    wrap.appendChild(input);
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='eye-btn';
+    btn.textContent='👁';
+    btn.onclick=()=>{input.type=input.type==='password'?'text':'password';btn.textContent=input.type==='password'?'👁':'🙈'};
+    wrap.appendChild(btn);
+  });
+}
+document.addEventListener('DOMContentLoaded',setupPasswordEyes);
+setTimeout(setupPasswordEyes,500);
+
 </script>
 </body>
 </html>

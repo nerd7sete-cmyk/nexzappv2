@@ -178,6 +178,11 @@ input[type=file]::file-selector-button{background:#1E293B;color:#F8FAFC}
 }
 @media(max-width:420px){.main{padding:10px!important}.header h2{font-size:27px!important}}
 
+
+.password-wrap{position:relative}
+.password-wrap input{padding-right:48px!important}
+.eye-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:12px;padding:0;background:rgba(148,163,184,.18)!important;box-shadow:none!important;color:#fff}
+
 </style>
 </head>
 <body>
@@ -271,7 +276,7 @@ input[type=file]::file-selector-button{background:#1E293B;color:#F8FAFC}
 
 <div class="card s12"><h3>Conteúdo para grupos</h3><div class="help">Você pode criar um conteúdo apenas para este disparo ou selecionar anúncios salvos. A ordem dos anúncios selecionados será misturada automaticamente durante a operação.</div>
 <div class="grid" style="margin-top:14px"><div class="s6"><label class="mode-card"><input type="radio" name="gAdMode" value="manual" checked onchange="toggleGroupAdMode()"> Criar conteúdo agora</label></div><div class="s6"><label class="mode-card"><input type="radio" name="gAdMode" value="saved" onchange="toggleGroupAdMode()"> Usar anúncios salvos</label></div></div>
-<div id="gManualBox"><div class="desc">Configure até três anúncios temporários para grupos. Eles não ficam em ordem fixa.</div><div class="grid"><div class="card s4 ad"><h3>Anúncio A</h3><textarea id="gMsg1" placeholder="Mensagem para grupos"></textarea><label>Mídia A</label><div class="filebox"><input id="gMedia1" type="file" accept="image/*,video/*"></div></div><div class="card s4 ad two"><h3>Anúncio B</h3><textarea id="gMsg2" placeholder="Mensagem alternativa"></textarea><label>Mídia B</label><div class="filebox"><input id="gMedia2" type="file" accept="image/*,video/*"></div></div><div class="card s4 ad three"><h3>Anúncio C</h3><textarea id="gMsg3" placeholder="Mensagem complementar"></textarea><label>Mídia C</label><div class="filebox"><input id="gMedia3" type="file" accept="image/*,video/*"></div></div></div></div>
+<div id="gManualBox"><div class="desc">Configure até três anúncios temporários para grupos. Eles não ficam em ordem fixa.</div><div class="btnrow" style="margin:12px 0"><button class="purple" onclick="saveGroupManualAsAds()">Salvar conteúdo como anúncio</button></div><div class="grid"><div class="card s4 ad"><h3>Anúncio A</h3><textarea id="gMsg1" placeholder="Mensagem para grupos"></textarea><label>Mídia A</label><div class="filebox"><input id="gMedia1" type="file" accept="image/*,video/*"></div></div><div class="card s4 ad two"><h3>Anúncio B</h3><textarea id="gMsg2" placeholder="Mensagem alternativa"></textarea><label>Mídia B</label><div class="filebox"><input id="gMedia2" type="file" accept="image/*,video/*"></div></div><div class="card s4 ad three"><h3>Anúncio C</h3><textarea id="gMsg3" placeholder="Mensagem complementar"></textarea><label>Mídia C</label><div class="filebox"><input id="gMedia3" type="file" accept="image/*,video/*"></div></div></div></div>
 <div id="gSavedBox" class="hidden"><div class="desc">Selecione um ou mais anúncios salvos para usar no disparo em grupos.</div><div id="gSavedAdsPicker" class="saved-picker"></div></div>
 </div>
 
@@ -326,7 +331,11 @@ function show(id,d){document.getElementById(id).textContent=typeof d==='string'?
 function openPage(n,b){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p-'+n).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');title.textContent=meta[n][0];sub.textContent=meta[n][1];localStorage.setItem('lastPageV12',n);if(n==='ads')loadAds();if(n==='billing')loadBilling()}
 function selectedSessions(scope){
   const cls = scope==='groups' ? '.groupSendSessionCheck:checked' : scope==='list' ? '.listSessionCheck:checked' : '.sessionCheck:checked';
-  return [...document.querySelectorAll(cls)].map(i=>i.value);
+  let selected=[...document.querySelectorAll(cls)].map(i=>i.value);
+  if(!selected.length && Array.isArray(sessionsData)){
+    selected=sessionsData.filter(s=>s.connected).map(s=>s.name);
+  }
+  return selected;
 }
 function cacheSessions(scope){
   if(scope==='list') localStorage.setItem('selectedListSessionsV15',JSON.stringify(selectedSessions('list')));
@@ -375,7 +384,8 @@ function renderSendSessionPickers(data){
       const connected=!!s.connected;
       const label=document.createElement('label');
       label.className='send-session-card '+(connected?'connected':'disabled');
-      label.innerHTML=`<input type="checkbox" class="${cls}" value="${name}" ${saved.has(name)?'checked':''} ${connected?'':'disabled'} onchange="cacheSessions('${scope}')"><div><b>${labels[name]}</b><small>${connected?'Conectado e disponível':'Desconectado'}</small></div>`;
+      const shouldCheck = connected && (saved.has(name) || saved.size===0);
+      label.innerHTML=`<input type="checkbox" class="${cls}" value="${name}" ${shouldCheck?'checked':''} ${connected?'':'disabled'} onchange="cacheSessions('${scope}')"><div><b>${labels[name]}</b><small>${connected?'Conectado e disponível':'Desconectado'}</small></div>`;
       box.appendChild(label);
     });
   }
@@ -429,23 +439,11 @@ function toggleAdMode(){let mode=document.querySelector('input[name="adMode"]:ch
 function currentAdMode(){return document.querySelector('input[name="adMode"]:checked').value}
 function selectedSavedAds(){return [...document.querySelectorAll('.savedAdCheck:checked')].map(i=>i.value)}
 
-function toggleGroupAdMode(){let mode=document.querySelector('input[name="gAdMode"]:checked').value;gManualBox.classList.toggle('hidden',mode!=='manual');gSavedBox.classList.toggle('hidden',mode!=='saved');if(mode==='saved')loadAds()}
-function currentGroupAdMode(){return document.querySelector('input[name="gAdMode"]:checked')?.value||'manual'}
-function selectedGroupSavedAds(){return [...document.querySelectorAll('.gSavedAdCheck:checked')].map(i=>i.value)}
-function groupFields(fd){cacheSessions('groups');fd.append('sessions',JSON.stringify(selectedSessions('groups')));fd.append('adMode',currentGroupAdMode());fd.append('selectedAds',JSON.stringify(selectedGroupSavedAds()));fd.append('msg1',gMsg1.value);fd.append('msg2',gMsg2.value);fd.append('msg3',gMsg3.value);fd.append('minDelay',gMinDelay.value);fd.append('maxDelay',gMaxDelay.value);if(gMedia1.files[0])fd.append('media1',gMedia1.files[0]);if(gMedia2.files[0])fd.append('media2',gMedia2.files[0]);if(gMedia3.files[0])fd.append('media3',gMedia3.files[0])}
-async function loadGroups(){let checked=document.querySelector('input[name="groupSession"]:checked');let name=checked?checked.value:(localStorage.getItem('groupReadSessionV15')||'whatsapp1');localStorage.setItem('groupReadSessionV15',name);let g=await api('/groups?session='+encodeURIComponent(name));groupsCache=Array.isArray(g)?g:[];localStorage.setItem('groupsCacheV9',JSON.stringify(groupsCache));renderGroups();toast('Grupos carregados de '+(labels[name]||name))}
-function saveGroups(){localStorage.setItem('selectedGroupsV12',JSON.stringify([...selectedGroups]))}
-function renderGroups(){if(typeof metricGroups!=='undefined')metricGroups.textContent=groupsCache.length||0;let q=(groupSearch.value||'').toLowerCase();let list=groupsCache.filter(g=>(g.name||'').toLowerCase().includes(q));groupsList.innerHTML=list.length?'':'Nenhum grupo localizado.';list.forEach(g=>{let div=document.createElement('div');let ck=selectedGroups.has(g.id);div.className='group-item '+(ck?'selected':'');div.onclick=()=>{ck?selectedGroups.delete(g.id):selectedGroups.add(g.id);saveGroups();renderGroups()};div.innerHTML=`<input type="checkbox" ${ck?'checked':''}><div><b>${esc(g.name)}</b><div class="group-id">${esc(g.id)}</div></div>`;groupsList.appendChild(div)})}
-function selectAllVisibleGroups(){let q=(groupSearch.value||'').toLowerCase();groupsCache.filter(g=>(g.name||'').toLowerCase().includes(q)).forEach(g=>selectedGroups.add(g.id));saveGroups();renderGroups()}
-function clearSelectedGroups(){selectedGroups.clear();saveGroups();renderGroups()}
-function fields(fd){cacheSessions('list');fd.append('sessions',JSON.stringify(selectedSessions('list')));fd.append('adMode',currentAdMode());fd.append('selectedAds',JSON.stringify(selectedSavedAds()));fd.append('msg1',msg1.value);fd.append('msg2',msg2.value);fd.append('msg3',msg3.value);fd.append('minDelay',minDelay.value);fd.append('maxDelay',maxDelay.value);if(media1.files[0])fd.append('media1',media1.files[0]);if(media2.files[0])fd.append('media2',media2.files[0]);if(media3.files[0])fd.append('media3',media3.files[0])}
-
-function normalizePhonePreview(raw){
-  let n=String(raw||'').replace(/\D/g,'');
-  if(!n)return '';
-  if(!n.startsWith('55') && (n.length===10 || n.length===11)) n='55'+n;
-  if(n.startsWith('55') && n.length===12) n='55'+n.slice(2,4)+'9'+n.slice(4);
-  return n;
+function toggleGroupAdMode(){
+  let mode=document.querySelector('input[name="gAdMode"]:checked')?.value || 'manual';
+  if(typeof gManualBox!=='undefined') gManualBox.classList.toggle('hidden',mode!=='manual');
+  if(typeof gSavedBox!=='undefined') gSavedBox.classList.toggle('hidden',mode!=='saved');
+  if(mode==='saved')loadAds();
 }
 function previewContactFile(){
   const f=contactsFile?.files?.[0];
@@ -464,7 +462,27 @@ function previewContactFile(){
 }
 
 async function sendNumbers(){if(!selectedSessions('list').length)return show('numberResult','Selecione pelo menos um WhatsApp conectado para este disparo.');let fd=new FormData();fields(fd);fd.append('targets',targets.value);if(contactsFile?.files?.[0])fd.append('contactsFile',contactsFile.files[0]);show('numberResult','Operação em andamento...');show('numberResult',await api('/campaign-numbers',{method:'POST',body:fd}))}
-async function sendGroups(){if(!selectedSessions('groups').length)return show('groupResult','Selecione pelo menos um WhatsApp conectado para enviar aos grupos.');let fd=new FormData();groupFields(fd);fd.append('groups',JSON.stringify([...selectedGroups]));show('groupResult','Operação em andamento...');show('groupResult',await api('/campaign-groups',{method:'POST',body:fd}))}
+
+function formatCampaignResult(d){
+  if(typeof d === 'string') return d;
+  if(!d || typeof d !== 'object') return 'Operação finalizada.';
+  const sent = Number(d.sent || 0);
+  const failed = Number(d.failed || 0);
+  const adsUsed = Number(d.adsUsed || 0);
+  const sessions = Array.isArray(d.sessionsUsed) ? d.sessionsUsed.join(', ') : '';
+  const errors = Array.isArray(d.errors) ? d.errors : [];
+  let txt = `✅ Disparo finalizado\n\nEnviados: ${sent}\nFalhas: ${failed}`;
+  if(adsUsed) txt += `\nCampanhas usadas: ${adsUsed}`;
+  if(sessions) txt += `\nWhatsApp usado: ${sessions}`;
+  if(errors.length){
+    const sample=errors.slice(0,3).map(e=>`• ${e.target||'Destino'}: ${e.error||'falha'}`).join('\n');
+    txt += `\n\nAtenção:\n${sample}`;
+    if(errors.length>3) txt += `\n+ ${errors.length-3} falha(s)`;
+  }
+  return txt;
+}
+
+async function sendGroups(){if(!selectedSessions('groups').length)return show('groupResult','Selecione pelo menos um WhatsApp conectado para enviar aos grupos.');let fd=new FormData();groupFields(fd);fd.append('groups',JSON.stringify([...selectedGroups]));show('groupResult','Operação em andamento...');const resp=await api('/campaign-groups',{method:'POST',body:fd});show('groupResult',formatCampaignResult(resp))}
 
 async function loadBilling(){
   const d=await api('/api/billing');
@@ -514,6 +532,30 @@ function nzApplyMobileTableLabels(){
   });
 }
 setInterval(nzApplyMobileTableLabels,1200);
+
+
+function setupPasswordEyes(){
+  document.querySelectorAll('input[type="password"]').forEach(input=>{
+    if(input.dataset.eyeReady)return;
+    input.dataset.eyeReady='1';
+    const wrap=document.createElement('div');
+    wrap.className='password-wrap';
+    input.parentNode.insertBefore(wrap,input);
+    wrap.appendChild(input);
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='eye-btn';
+    btn.textContent='👁';
+    btn.onclick=()=>{input.type=input.type==='password'?'text':'password';btn.textContent=input.type==='password'?'👁':'🙈'};
+    wrap.appendChild(btn);
+  });
+}
+document.addEventListener('DOMContentLoaded',setupPasswordEyes);
+setTimeout(setupPasswordEyes,500);
+
+
+/* V41 group manual force */
+setTimeout(()=>{try{toggleGroupAdMode()}catch(e){}},700);
 
 </script>
 </body>
