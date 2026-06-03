@@ -1,0 +1,41 @@
+[
+  {
+    "id": "starter",
+    "name": "Starter",
+    "price": 49.9,
+    "whatsappLimit": 1,
+    "sendLimit": 500,
+    "groups": false,
+    "ads": true,
+    "active": true,
+    "featured": false,
+    "description": "Ideal para começar com uma instância.",
+    "durationDays": 30
+  },
+  {
+    "id": "pro",
+    "name": "Pro",
+    "price": 97.9,
+    "whatsappLimit": 3,
+    "sendLimit": 9999,
+    "groups": true,
+    "ads": true,
+    "active": true,
+    "featured": true,
+    "description": "Plano completo para operação comercial.",
+    "durationDays": 60
+  },
+  {
+    "id": "enterprise",
+    "name": "Enterprise",
+    "price": 197.9,
+    "whatsappLimit": 10,
+    "sendLimit": 99999,
+    "groups": true,
+    "ads": true,
+    "active": true,
+    "featured": false,
+    "description": "Para equipes e operações maiores.",
+    "durationDays": 90
+  }
+]

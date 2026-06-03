@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEX-ZAPP | Plataforma</title>
+<style>
+:root{--bg:#050816;--card:#0f172a;--field:#070d18;--line:#243044;--text:#f8fafc;--muted:#94a3b8;--blue:#2563eb;--green:#22c55e;--red:#ef4444;--shadow:0 28px 90px rgba(0,0,0,.45)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at top left,rgba(37,99,235,.28),transparent 30%),radial-gradient(circle at top right,rgba(34,197,94,.12),transparent 24%),linear-gradient(180deg,#050816,#0b1120 45%,#050816);color:var(--text)}
+.wrap{width:min(1180px,calc(100% - 32px));margin:auto}button,.btn{border:0;border-radius:16px;padding:14px 18px;font-weight:900;color:white;background:linear-gradient(135deg,var(--blue),#1d4ed8);box-shadow:0 14px 34px rgba(37,99,235,.28);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.green{background:linear-gradient(135deg,var(--green),#16a34a)!important;box-shadow:0 14px 34px rgba(34,197,94,.22)!important}.ghost{background:rgba(15,23,42,.74)!important;border:1px solid var(--line);box-shadow:none}
+.nav{margin-top:16px;padding:14px;border:1px solid rgba(148,163,184,.16);border-radius:24px;background:rgba(5,8,20,.72);backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:12px;z-index:20}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:50px;height:50px;border-radius:18px;background:linear-gradient(135deg,#2563eb,#0f172a);display:grid;place-items:center;font-weight:950}.brand h2{margin:0}.brand small{color:var(--muted)}
+.links{display:flex;gap:8px;align-items:center}.links a{color:#cbd5e1;text-decoration:none;font-weight:800;padding:10px}
+.hero{padding:78px 0 44px;display:grid;grid-template-columns:1.05fr .95fr;gap:42px;align-items:center}.chip{display:inline-flex;padding:9px 13px;border:1px solid rgba(96,165,250,.25);border-radius:999px;background:rgba(37,99,235,.12);color:#bfdbfe;font-weight:900;margin-bottom:18px}h1{font-size:clamp(42px,6vw,74px);line-height:1;letter-spacing:-2px;margin:0 0 18px}.hero p{color:#cbd5e1;font-size:18px;line-height:1.7;margin:0 0 26px}.actions{display:flex;gap:12px;flex-wrap:wrap}
+.mock{border:1px solid rgba(148,163,184,.16);background:linear-gradient(180deg,rgba(17,24,39,.94),rgba(15,23,42,.90));border-radius:32px;padding:22px;box-shadow:var(--shadow)}.mock-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.mini{background:#070d18;border:1px solid var(--line);border-radius:18px;padding:14px}.mini span{color:var(--muted);font-size:13px}.mini b{display:block;font-size:30px;margin-top:6px}.row{display:flex;gap:10px;align-items:center;background:#070d18;border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:10px}.ic{width:38px;height:38px;border-radius:13px;background:rgba(37,99,235,.15);display:grid;place-items:center;color:#bfdbfe;font-weight:900}
+section{padding:42px 0}.head{text-align:center;margin-bottom:22px}.head h2{font-size:clamp(30px,4vw,46px);margin:0 0 8px}.head p{color:var(--muted);margin:auto;max-width:720px;line-height:1.6}.grid{display:grid;gap:16px}.features{grid-template-columns:repeat(4,1fr)}.plans{grid-template-columns:repeat(3,1fr)}.box{background:linear-gradient(180deg,rgba(17,24,39,.90),rgba(15,23,42,.82));border:1px solid rgba(148,163,184,.16);border-radius:24px;padding:22px;box-shadow:0 20px 70px rgba(0,0,0,.18)}.box p,.box li{color:#cbd5e1;line-height:1.55}.price{font-size:38px;font-weight:950;margin:12px 0}.plan.pro{border-color:rgba(96,165,250,.5)}ul{list-style:none;padding:0}li:before{content:'✓';color:var(--green);font-weight:950;margin-right:8px}
+.modal-bg{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.72);backdrop-filter:blur(12px);z-index:50;padding:18px}.modal-bg.active{display:flex}.modal{width:100%;max-width:480px;background:linear-gradient(180deg,#111827,#0f172a);border:1px solid rgba(148,163,184,.2);border-radius:28px;padding:24px;box-shadow:0 32px 110px rgba(0,0,0,.55)}.modal-head{display:flex;justify-content:space-between}.close{width:40px;height:40px;padding:0;background:#1e293b;box-shadow:none}label{display:block;color:#cbd5e1;font-weight:900;margin:12px 0 7px}input,select{width:100%;padding:14px;border-radius:16px;border:1px solid var(--line);background:#070d18;color:white}.msg{margin-top:12px;color:#cbd5e1;white-space:pre-wrap}.err{color:#fca5a5}
+footer{text-align:center;color:var(--muted);padding:30px}
+@media(max-width:900px){.nav{display:block}.links{margin-top:12px;flex-wrap:wrap}.links a{display:none}.hero,.features,.plans,.mock-grid{grid-template-columns:1fr}.actions button{flex:1}.hero{padding-top:42px}h1{font-size:42px}}
+
+.pix-modal-card{background:linear-gradient(180deg,#111827,#0f172a);border:1px solid rgba(96,165,250,.24);border-radius:24px;padding:18px;margin-top:14px}
+.pix-price{font-size:34px;font-weight:950;margin:10px 0}
+.pix-key{display:flex;gap:10px;align-items:center;background:#070d18;border:1px solid #243044;border-radius:16px;padding:12px;margin:12px 0;word-break:break-all}
+.pix-key code{flex:1;color:#bfdbfe;font-weight:900}
+.pix-note{color:#cbd5e1;line-height:1.5;font-size:14px}
+
+
+/* compact professional PIX / validation */
+.field-error{color:#fca5a5;font-size:12px;font-weight:800;margin-top:6px;display:none}
+.field-error.show{display:block}
+.pix-card-compact{
+  border:1px solid rgba(96,165,250,.24);
+  background:linear-gradient(180deg,#111827,#0f172a);
+  border-radius:22px;
+  padding:18px;
+  margin-top:12px;
+  max-width:100%;
+}
+.pix-card-compact h3{margin:0 0 8px;font-size:21px}
+.pix-card-compact .pix-value{font-size:32px;font-weight:950;margin:8px 0 12px}
+.pix-row-compact{display:grid;gap:6px;margin:10px 0}
+.pix-row-compact small{color:var(--muted);font-weight:800}
+.pix-copy-line{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#070d18;
+  border:1px solid #243044;
+  border-radius:14px;
+  padding:10px;
+}
+.pix-copy-line code{flex:1;color:#bfdbfe;font-weight:900;word-break:break-all;font-size:13px}
+.pix-copy-line button{padding:10px 12px;border-radius:12px;white-space:nowrap}
+.pix-note-compact{color:#cbd5e1;line-height:1.45;font-size:13px;margin-top:10px}
+@media(max-width:520px){
+  .pix-card-compact .pix-value{font-size:26px}
+  .pix-copy-line{display:block}
+  .pix-copy-line button{width:100%;margin-top:8px}
+}
+
+
+.field-error{color:#fca5a5;font-size:12px;font-weight:800;margin-top:6px;display:none}
+.field-error.show{display:block}
+.pix-modal-bg{position:fixed;inset:0;background:rgba(2,6,23,.74);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;z-index:999;padding:18px}
+.pix-modal-bg.active{display:flex}
+.pix-modal-card{width:100%;max-width:430px;background:linear-gradient(180deg,#111827,#0f172a);border:1px solid rgba(96,165,250,.28);border-radius:26px;padding:22px;box-shadow:0 32px 110px rgba(0,0,0,.55)}
+.pix-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.pix-modal-head h3{margin:0;font-size:24px}
+.pix-close{width:38px;height:38px;padding:0;background:#1e293b!important;box-shadow:none!important}
+.pix-value{font-size:34px;font-weight:950;margin:8px 0 14px}
+.pix-line{margin:12px 0}.pix-line small{display:block;color:#94a3b8;font-weight:900;margin-bottom:6px}
+.pix-copy{display:flex;gap:8px;align-items:center;background:#070d18;border:1px solid #243044;border-radius:14px;padding:10px}
+.pix-copy code{flex:1;color:#bfdbfe;font-weight:900;word-break:break-all;font-size:13px}
+.pix-copy button{padding:10px 12px;border-radius:12px;white-space:nowrap}
+.pix-note{color:#cbd5e1;line-height:1.45;font-size:14px;margin-top:12px}
+@media(max-width:520px){.pix-copy{display:block}.pix-copy button{width:100%;margin-top:8px}.pix-value{font-size:28px}}
+
+
+.reseller-section{margin-top:38px;border:1px solid rgba(96,165,250,.18);background:linear-gradient(180deg,rgba(17,24,39,.92),rgba(15,23,42,.84));border-radius:30px;padding:30px;box-shadow:0 24px 80px rgba(0,0,0,.28)}
+.reseller-section h2{font-size:34px;margin:0 0 10px}
+.reseller-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.reseller-point{background:#070d18;border:1px solid #243044;border-radius:18px;padding:16px}
+@media(max-width:760px){.reseller-grid{grid-template-columns:1fr}}
+
+</style>
+</head><body>
+<header class="wrap nav"><div class="brand"><div class="logo">NZ</div><div><h2>NEX-ZAPP</h2><small>Central de Mensagens</small></div></div><nav class="links"><a href="#recursos">Recursos</a><a href="#planos">Planos</a><button class="ghost" onclick="openLogin()">Entrar agora</button><button class="green" onclick="scrollPlans()">Comprar agora</button></nav></header>
+<main class="wrap">
+<section class="hero"><div><div class="chip">Plataforma premium para WhatsApp</div><h1 id="heroTitle">Transforme seu WhatsApp em uma central de campanhas.</h1><p id="heroSub">Conecte múltiplas instâncias, salve anúncios, gerencie listas e grupos em um painel profissional.</p><div class="actions"><button class="green" onclick="scrollPlans()">Comprar agora</button><button onclick="openLogin()">Entrar agora</button></div></div><aside class="mock"><h3>Dashboard operacional</h3><small style="color:var(--muted)">Resumo visual do seu painel</small><div class="mock-grid"><div class="mini"><span>WhatsApps</span><b>3</b></div><div class="mini"><span>Anúncios</span><b>18</b></div><div class="mini"><span>Grupos</span><b>142</b></div><div class="mini"><span>Plano</span><b>Pro</b></div></div><div class="row"><div class="ic">W</div><div><b>Instância conectada</b><br><small style="color:var(--muted)">WhatsApp pronto para operação</small></div></div><div class="row"><div class="ic">PX</div><div><b>PIX configurado</b><br><small style="color:var(--muted)">Renovação manual pelo admin</small></div></div></aside></section>
+<section id="recursos"><div class="head"><h2>Recursos principais</h2><p>Controle campanhas, anúncios, grupos e assinaturas em um só lugar.</p></div><div class="grid features"><div class="box"><h3>Multi WhatsApp</h3><p>Conecte múltiplas instâncias.</p></div><div class="box"><h3>Anúncios salvos</h3><p>Biblioteca com textos e mídias.</p></div><div class="box"><h3>Listas e grupos</h3><p>Operação por contatos ou grupos.</p></div><div class="box"><h3>Planos e PIX</h3><p>Admin controla preços e chave PIX.</p></div></div></section>
+<section id="planos"><div class="head"><h2>Escolha seu plano</h2><p>Valores controlados pelo painel admin.</p></div><div id="plansBox" class="grid plans"></div></section>
+
+<section class="wrap reseller-section" id="revenda">
+  <h2>Programa de Revendedores NEX-ZAPP</h2>
+  <p style="color:var(--muted);line-height:1.6">Ganhe comissão por venda aprovada, tenha seu link exclusivo, acompanhe resultados em um painel próprio e solicite saque via PIX.</p>
+  <div class="reseller-grid">
+    <div class="reseller-point"><b>Link próprio</b><br><small style="color:var(--muted)">Cada revendedor aprovado recebe um link de indicação.</small></div>
+    <div class="reseller-point"><b>Comissões configuráveis</b><br><small style="color:var(--muted)">O admin define porcentagem ou valor fixo por plano.</small></div>
+    <div class="reseller-point"><b>Saque via PIX</b><br><small style="color:var(--muted)">Solicite saque e acompanhe o status no painel.</small></div>
+    <div class="reseller-point"><b>Painel separado</b><br><small style="color:var(--muted)">Área própria para acompanhar clientes, comissões e saques.</small></div>
+  </div>
+  <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap">
+    <button class="green" onclick="openReseller()">Quero ser revendedor</button>
+    <button onclick="location.href='/revenda'">Entrar como revendedor</button>
+  </div>
+</section>
+
+</main><footer>NEX-ZAPP • Plataforma profissional</footer>
+<div class="modal-bg" id="loginModal"><div class="modal"><div class="modal-head"><div><h2>Entrar agora</h2><small style="color:var(--muted)">Acesse sua conta</small></div><button class="close" onclick="closeLogin()">×</button></div><label>E-mail</label><input id="loginEmail" placeholder="seu@email.com"><label>Senha</label><input id="loginPass" type="password" placeholder="Sua senha"><button class="green" style="width:100%;margin-top:14px" onclick="login()">Entrar</button><div id="loginMsg" class="msg"></div></div></div>
+<div class="modal-bg" id="buyModal"><div class="modal"><div class="modal-head"><div><h2>Comprar agora</h2><small id="buyPlanText" style="color:var(--muted)">Plano</small></div><button class="close" onclick="closeBuy()">×</button></div><label>Nome</label><input id="buyName" placeholder="Seu nome"><label>Nome do pagador</label><input id="buyPayerName" placeholder="Nome de quem vai pagar o PIX"><div id="errName" class="field-error"></div><div id="errName" class="field-error"></div><label>E-mail</label><input id="buyEmail" placeholder="cliente@email.com"><label>Senha de acesso</label><input id="buyPassword" type="password" placeholder="Crie sua senha"><div id="errEmail" class="field-error"></div><div id="errEmail" class="field-error"></div><label>WhatsApp</label><input id="buyPhone" placeholder="5599999999999"><div id="errPhone" class="field-error"></div><div id="errPhone" class="field-error"></div><button class="green" style="width:100%;margin-top:14px" onclick="order()">Gerar pedido PIX</button><div id="buyMsg" class="msg"></div></div></div>
+
+<div id="pixResultModal" class="pix-modal-bg">
+  <div class="pix-modal-card">
+    <div class="pix-modal-head">
+      <div>
+        <h3>Pedido PIX criado</h3>
+        <small style="color:#94a3b8">Faça o pagamento para liberar sua conta.</small>
+      </div>
+      <button class="pix-close" onclick="closePixModal()">×</button>
+    </div>
+    <div id="pixResultContent"></div>
+  </div>
+</div>
+
+
+<div class="modal-bg" id="resellerModal"><div class="modal"><div class="modal-head"><div><h2>Cadastro de revendedor</h2><small style="color:var(--muted)">Preencha seus dados para análise.</small></div><button class="close" onclick="closeReseller()">×</button></div><label>Nome</label><input id="resName" placeholder="Seu nome"><label>E-mail</label><input id="resEmail" placeholder="seu@email.com"><label>WhatsApp</label><input id="resPhone" placeholder="11999999999"><label>Cidade</label><input id="resCity" placeholder="Sua cidade"><label>Chave PIX</label><input id="resPix" placeholder="Sua chave PIX"><label>Crie sua senha</label><input id="resPassword" type="password" placeholder="Mínimo 6 caracteres"><button class="green" style="width:100%;margin-top:14px" onclick="applyReseller()">Enviar solicitação</button><div id="resMsg" class="msg"></div></div></div>
+
+<script>
+let plans=[],chosen='';
+function openLogin(){loginModal.classList.add('active');setTimeout(()=>loginEmail.focus(),80)}function closeLogin(){loginModal.classList.remove('active')}function scrollPlans(){document.querySelector('#planos').scrollIntoView({behavior:'smooth'})}
+async function load(){let d=await fetch('/api/public/plans').then(r=>r.json());plans=d.plans||[];plansBox.innerHTML=plans.map((p,i)=>`<div class="box plan ${p.featured?'pro':''}"><h3>${p.name}</h3><p>${p.description||''}</p><div class="price">${Number(p.price).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</div><ul><li>${p.whatsappLimit} WhatsApp(s)</li><li>${p.groups?'Grupos liberados':'Lista de contatos'}</li><li>Anúncios salvos</li></ul><button class="${p.featured?'green':''}" onclick="openBuy('${p.id}')">Comprar agora</button></div>`).join('');let l=await fetch('/api/public/landing').then(r=>r.json());if(l.landing){heroTitle.textContent=l.landing.title||heroTitle.textContent;heroSub.textContent=l.landing.subtitle||heroSub.textContent}}
+function openBuy(id){chosen=id;let p=plans.find(x=>x.id===id);buyPlanText.textContent=p?'Plano '+p.name:'Plano';buyModal.classList.add('active')}function closeBuy(){buyModal.classList.remove('active')}
+async function login(){loginMsg.textContent='Entrando...';let r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:loginEmail.value,password:loginPass.value})}).then(r=>r.json());if(!r.success){loginMsg.className='msg err';loginMsg.textContent=r.error;return}localStorage.setItem('nz_token',r.token);location.href=r.role==='admin'?'/admin':'/app'}
+function clearBuyErrors(){
+  for(const id of ['errName','errEmail','errPhone']){
+    const el=document.getElementById(id);
+    if(el){el.textContent='';el.classList.remove('show')}
+  }
+}
+function setBuyError(id,msg){
+  const el=document.getElementById(id);
+  if(el){el.textContent=msg;el.classList.add('show')}
+}
+function validateBuy(){
+  clearBuyErrors();
+  const name=buyName.value.trim();
+  const email=buyEmail.value.trim();
+  const phone=buyPhone.value.replace(/\D/g,'');
+  let ok=true;
+  if(name.length<3 || !/[a-zA-ZÀ-ÿ]{2,}/.test(name) || /^\d+$/.test(name) || /^(teste|aaaa|qwe|qwer|asdf)$/i.test(name)){setBuyError('errName','Informe um nome válido.');ok=false}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(email)){setBuyError('errEmail','Informe um e-mail válido.');ok=false}
+  if(phone.length<10 || phone.length>15){setBuyError('errPhone','Informe um WhatsApp válido com DDD.');ok=false}
+  buyPhone.value=phone;
+  return ok;
+}
+async function order(){
+  if(!validateBuy()) return;
+  buyMsg.className='msg';
+  buyMsg.textContent='Gerando pedido...';
+  let r=await fetch('/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:buyName.value,email:buyEmail.value,phone:buyPhone.value,password:(typeof buyPassword!=='undefined'?buyPassword.value:''),planId:chosen,payerName:(typeof buyPayerName!=='undefined'?buyPayerName.value:buyName.value),ref:localStorage.getItem('nz_ref')||''})}).then(r=>r.json());
+  if(!r.success){buyMsg.className='msg err';buyMsg.textContent=r.error;return}
+  const value=Number(r.order.value).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const pix=(r.settings&&r.settings.pixKey)||'Configure no admin';
+  const inst=(r.settings&&r.settings.instruction)||'Envie o comprovante pelo WhatsApp para liberação mais rápida. Caso não envie, aguarde até 30 minutos após a confirmação do pagamento.';
+  buyMsg.className='msg';
+  buyMsg.textContent='Pedido criado. Copie a chave PIX no modal.';
+  pixResultContent.innerHTML=`<div class="pix-value">${value}</div>
+    <div class="pix-line"><small>Plano</small><b>${r.order.planName}</b></div>
+    <div class="pix-line"><small>Chave PIX</small><div class="pix-copy"><code id="pixKeyOrder">${pix}</code><button class="green" onclick="copyText('pixKeyOrder')">Copiar</button></div></div>
+    <div class="pix-note">${inst}</div>`;
+  pixResultModal.classList.add('active');
+}
+function closePixModal(){pixResultModal.classList.remove('active')}
+function copyText(id){const t=document.getElementById(id)?.textContent||'';navigator.clipboard?.writeText(t);alert('Chave PIX copiada.')}
+
+const urlRef=new URLSearchParams(location.search).get('ref');
+if(urlRef)localStorage.setItem('nz_ref',urlRef.toUpperCase());
+function openReseller(){resellerModal.classList.add('active')}
+function closeReseller(){resellerModal.classList.remove('active')}
+async function applyReseller(){
+  resMsg.className='msg';resMsg.textContent='Enviando solicitação...';
+  const body={name:resName.value,email:resEmail.value,phone:resPhone.value,city:resCity.value,pixKey:resPix.value,password:resPassword.value};
+  const r=await fetch('/api/reseller/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+  if(!r.success){resMsg.className='msg err';resMsg.textContent=r.error||'Erro ao enviar.';return}
+  resMsg.className='msg';resMsg.textContent=r.message||'Solicitação enviada. Aguarde aprovação.';
+}
+
+load();
+</script></body></html>
