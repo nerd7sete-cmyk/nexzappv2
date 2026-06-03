@@ -154,21 +154,23 @@ function mediaPayload(item, msg){
   }
 
   if(!fs.existsSync(item.mediaPath)) throw new Error('Arquivo de mídia não encontrado no servidor.')
-  const type=item.mimetype || mime.lookup(item.mediaPath) || ''
+  const type=item.mimetype || mime.lookup(item.mediaPath) || 'application/octet-stream'
   const buffer = fs.readFileSync(item.mediaPath)
+  const fileName = item.mediaName || path.basename(item.mediaPath) || 'arquivo'
 
   if(type.startsWith('image/')){
-    const payload = {image: buffer}
-    if(text) payload.caption = text
-    return payload
-  }
-  if(type.startsWith('video/')){
-    const payload = {video: buffer}
+    const payload = {image: buffer, mimetype:type}
     if(text) payload.caption = text
     return payload
   }
 
-  const payload = {document: buffer, mimetype:type||'application/octet-stream', fileName:item.mediaName||'arquivo'}
+  if(type.startsWith('video/')){
+    const payload = {video: buffer, mimetype:type}
+    if(text) payload.caption = text
+    return payload
+  }
+
+  const payload = {document: buffer, mimetype:type, fileName}
   if(text) payload.caption = text
   return payload
 }
@@ -400,7 +402,7 @@ function buildCampaignAds(req, filesUpload){
         message:String(msg||''),
         mediaPath:f?.path||'',
         mediaName:f?.originalname||'',
-        mimetype:f?.mimetype||''
+        mimetype:f?.mimetype||mime.lookup(f?.originalname||'')||''
       })
     }
   }
@@ -414,11 +416,16 @@ async function sendToTarget(sessionName, jid, payload){
   try{
     await s.sock.sendMessage(jid, payload)
   }catch(e){
-    // Alguns formatos de vídeo podem falhar como vídeo. Tenta reenviar como documento.
     if(payload && payload.video){
-      const doc={document:payload.video, mimetype:'video/mp4', fileName:'video.mp4'}
+      const doc={
+        document: payload.video,
+        mimetype: payload.mimetype || 'video/mp4',
+        fileName: 'video.' + ((payload.mimetype||'video/mp4').split('/')[1] || 'mp4')
+      }
       if(payload.caption) doc.caption=payload.caption
       await s.sock.sendMessage(jid, doc)
+    }else if(payload && (payload.image || payload.document)){
+      throw new Error('Falha ao enviar mídia: '+(e.message||'formato não aceito pelo WhatsApp.'))
     }else{
       throw e
     }
@@ -447,18 +454,27 @@ app.post('/campaign', requireLogin, upload.any(), async(req,res)=>{
 })
 app.post('/campaign-groups', requireLogin, upload.any(), async(req,res)=>{
   try{
-    const sessions=JSON.parse(req.body.sessions||'[]').filter(Boolean); const groups=JSON.parse(req.body.groups||'[]').filter(Boolean)
-    if(!sessions.length)return res.json({success:false,error:'Selecione um WhatsApp conectado para grupos.'})
+    const sessions=JSON.parse(req.body.sessions||'[]').filter(Boolean)
+    let groups=JSON.parse(req.body.groups||'[]').filter(Boolean)
     if(!groups.length)return res.json({success:false,error:'Selecione pelo menos um grupo.'})
+
     const ads=buildCampaignAds(req, req.files), min=Number(req.body.minDelay||9000), max=Number(req.body.maxDelay||18000)
     let sent=0, failed=0, errors=[], list=shuffle(groups)
+
     for(let i=0;i<list.length;i++){
-      const group=list[i], ad=ads[i%ads.length], session=sessions[i%sessions.length]
-      const msg=applyVars(ad.message,{grupo:group.name||'',empresa:'NEX-ZAPP',data:new Date().toLocaleDateString('pt-BR')})
-      try{ await sendToTarget(session,group.id||group,mediaPayload(ad,msg)); sent++ }catch(e){ failed++; errors.push({target:group.name||group.id||group,error:e.message}) }
+      const group=list[i]
+      const groupId = typeof group === 'string' ? group : (group.id || group.jid)
+      const ownerSession = typeof group === 'string' ? (sessions[0] || '') : (group.session || group.ownerSession || group.whatsapp || '')
+      const session = ownerSession || sessions[i%sessions.length]
+      if(!session){ failed++; errors.push({target:groupId,error:'Grupo sem WhatsApp responsável.'}); continue }
+
+      const ad=ads[i%ads.length]
+      const msg=applyVars(ad.message,{grupo:group.name||'',empresa:'NEX-ZAPP',data:new Date().toLocaleDateString('pt-BR'),whatsapp:display(session)})
+      try{ await sendToTarget(session,groupId,mediaPayload(ad,msg)); sent++ }
+      catch(e){ failed++; errors.push({target:group.name||groupId,error:e.message,session}) }
       if(i<list.length-1) await delay(min+Math.random()*(max-min))
     }
-    res.json({success:true,sent,failed,adsUsed:ads.length,sessionsUsed:sessions,errors:errors.slice(0,20)})
+    res.json({success:true,sent,failed,adsUsed:ads.length,sessionsUsed:[...new Set(list.map(g=>typeof g==='string'?(sessions[0]||''):(g.session||g.ownerSession||g.whatsapp||'')).filter(Boolean))],errors:errors.slice(0,20)})
   }catch(e){ res.json({success:false,error:e.message}) }
 })
 

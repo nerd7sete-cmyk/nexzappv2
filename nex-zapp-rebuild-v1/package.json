@@ -1,7 +1,7 @@
 {
   "name": "nex-zapp-rebuild-v1",
-  "version": "4.0.0",
-  "description": "NEX-ZAPP Rebuild V4 - landing login modal, revendedor, an\u00fancios e v\u00eddeo fix",
+  "version": "5.0.0",
+  "description": "NEX-ZAPP Rebuild V5 - grupos por WhatsApp, dark landing e v\u00eddeo robusto",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

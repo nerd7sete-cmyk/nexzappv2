@@ -70,6 +70,12 @@
 .preview-box small{color:#94a3b8}
 @media(max-width:900px){.help-grid{grid-template-columns:1fr}}
 
+
+/* V5 group owner + media helpers */
+.group-owner{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:6px 9px;border-radius:999px;background:rgba(37,99,235,.14);border:1px solid rgba(96,165,250,.22);font-size:12px;font-weight:900;color:#bfdbfe}
+.media-note{background:rgba(37,99,235,.10);border:1px solid rgba(96,165,250,.22);border-radius:18px;padding:12px;margin:10px 0;color:#cbd5e1;line-height:1.45}
+.dark-clean-note{background:rgba(2,6,23,.42);border:1px solid rgba(148,163,184,.14);border-radius:18px;padding:12px}
+
 </style></head><body><div class="app"><aside class="sidebar"><div class="brand"><div class="logo">NZ</div><div><h1>NEX-ZAPP</h1><small>Cliente</small></div></div><nav class="nav" id="nav"></nav></aside><main><div class="mobilebar" id="mobilebar"></div><div class="top"><div><h2 id="title">Dashboard</h2><p class="desc" id="sub">Central operacional.</p></div><div class="btnrow"><button class="gray" onclick="refreshAll()">Atualizar</button><button class="red" onclick="logout()">Sair</button></div></div>
 <section id="p-dashboard" class="page active"><div class="stats"><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="message"></div><span>WhatsApps Online</span></div><b id="mConn">0/3</b><div class="progress-line"><span id="waProgress" style="width:0%"></span></div></div><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="megaphone"></div><span>Anúncios Ativos</span></div><b id="mAds">0</b></div><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="users"></div><span>Grupos Carregados</span></div><b id="mGroups">0</b></div><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="send"></div><span>Envios Hoje</span></div><b id="mSent">0</b></div></div><div class="grid" style="margin-top:16px"><div class="card s6"><h3>Plano</h3><div id="planBox" class="desc">Carregando...</div></div><div class="card s6"><h3>Atalhos</h3><div class="btnrow"><button onclick="openPage('sessions')">Conectar WhatsApp</button><button class="purple" onclick="openPage('ads')">Criar anúncio</button><button class="green" onclick="openPage('list')">Disparo lista</button><button class="green" onclick="openPage('groups')">Disparo grupos</button></div></div></div></section>
 <section id="p-sessions" class="page"><div class="hero-card"><h3>Conexões WhatsApp</h3><p>Conecte até 3 sessões. Quando o status ficar verde, a instância está pronta para disparos de lista e grupos.</p><div class="progress-line"><span id="waProgress2" style="width:0%"></span></div></div><div class="explain-box"><span data-ico="shield"></span><div><b>Como funciona</b><br>Ao clicar em conectar, o sistema inicializa a sessão, gera o QR Code e aguarda a leitura pelo celular. Depois de autenticado, o card muda para conectado.</div></div><div id="sessionsBox" class="session-grid" style="margin-top:16px"></div></section>
@@ -77,7 +83,7 @@
 Salve campanhas prontas com texto, foto, vídeo ou documento. Depois você pode selecionar vários anúncios no disparo e o sistema alterna entre eles.</div><label>Nome</label><input id="adName"><label>Mensagem</label><textarea id="adMessage" placeholder="{Oi|Olá} {nome}, tudo bem?"></textarea><label>Observação</label><input id="adNote"><label>Foto, vídeo ou documento</label><input id="adMedia" type="file"><button class="green" style="width:100%;margin-top:14px" onclick="saveAd()">Salvar anúncio</button></div><div class="card s7"><h3>Biblioteca</h3><div id="adsList" class="ad-list"></div></div></div></section>
 <section id="p-list" class="page"><div class="grid"><div class="card s12"><h3>WhatsApps para envio</h3><div id="listSessionPicker" class="send-grid"></div></div><div class="card s5"><h3>Contatos</h3><div class="help-card"><b><span data-ico="list"></span> Como preencher a lista</b>
 <div class="desc">Cole um número por linha. O sistema corrige automaticamente números sem 55 e testa com/sem o 9.</div>
-<div class="preview-box"><small>Exemplo:</small><br>11999999999;nome=João;pedido=123<br>5511988887777;nome=Maria</div></div><textarea id="targets"></textarea><label>Subir planilha/lista</label><input id="listFile" type="file" accept=".xlsx,.xls,.csv,.txt"></div><div class="card s7"><h3>Campanhas</h3><div class="help-grid">
+<div class="preview-box"><small>Exemplo:</small><br>11999999999;nome=João;pedido=123<br>5511988887777;nome=Maria</div></div><textarea id="targets"></textarea><label>Subir planilha/lista</label><input id="listFile" type="file" accept=".xlsx,.xls,.csv,.txt"></div><div class="card s7"><h3>Campanhas</h3><div class="media-note"><b>Formatos de vídeo aceitos:</b> MP4, MOV, AVI, MKV, WEBM, M4V e 3GP. Se o WhatsApp não aceitar como vídeo, o sistema tenta enviar como documento com legenda.</div><div class="help-grid">
 <div class="help-card"><b><span data-ico="megaphone"></span> Criar agora</b>Use até 3 anúncios diferentes, cada um com texto, foto ou vídeo.</div>
 <div class="help-card"><b><span data-ico="activity"></span> Alternância</b>O sistema alterna os anúncios automaticamente durante o disparo.</div>
 <div class="help-card"><b><span data-ico="file"></span> Variáveis</b>Use variáveis e spintax para variar a mensagem.</div>
@@ -90,7 +96,7 @@ Salve campanhas prontas com texto, foto, vídeo ou documento. Depois você pode 
 <span class="var-chip" onclick="navigator.clipboard.writeText('{data}')">{data}</span>
 <span class="var-chip" onclick="navigator.clipboard.writeText('{Oi|Olá|Fala}')">{Oi|Olá|Fala}</span>
 </div><div class="btnrow"><label><input type="radio" name="adMode" value="manual" checked onchange="toggleAdMode()"> Criar agora</label><label><input type="radio" name="adMode" value="saved" onchange="toggleAdMode()"> Salvos</label><label><input type="radio" name="adMode" value="mix" onchange="toggleAdMode()"> Misturar</label></div><div id="manualBox"><div class="grid"><div class="card s4"><h3>Anúncio A</h3><textarea id="msg1" placeholder="{Oi|Olá} {nome}"></textarea><input id="media1" type="file"></div><div class="card s4"><h3>Anúncio B</h3><textarea id="msg2"></textarea><input id="media2" type="file"></div><div class="card s4"><h3>Anúncio C</h3><textarea id="msg3"></textarea><input id="media3" type="file"></div></div></div><div id="savedBox" class="hidden"><h3>Escolha anúncios salvos</h3><div id="savedAdsPicker" class="picker"></div></div></div><div class="card s12"><h3>Cadência</h3><div class="delay-grid"><div class="delay-card" onclick="setDelay(4000,9000)">Rápido<br><small>4 a 9s</small></div><div class="delay-card" onclick="setDelay(9000,18000)">Equilibrado<br><small>9 a 18s</small></div><div class="delay-card" onclick="setDelay(20000,45000)">Conservador<br><small>20 a 45s</small></div></div><input id="minDelay" type="hidden" value="9000"><input id="maxDelay" type="hidden" value="18000"><button class="green" style="width:100%;margin-top:14px" onclick="sendNumbers()">Iniciar disparo em lista</button><pre id="numberResult">Aguardando operação...\n\nDica: use números com ou sem 55. O sistema tenta ajustar automaticamente.</pre></div></div></section>
-<section id="p-groups" class="page"><div class="hero-card"><h3>Disparo em grupos</h3><p>Carregue seus grupos, selecione os destinos, crie até 3 conteúdos na hora ou misture com anúncios salvos.</p></div><div class="grid"><div class="card s5"><h3>Carregar grupos</h3><label>Instância para leitura</label><div id="groupSessionCards"></div><button class="gray" style="width:100%;margin-top:12px" onclick="loadGroups()">Carregar grupos</button><label>Filtro</label><input id="groupSearch" oninput="renderGroups()" placeholder="Pesquisar grupo"></div><div class="card s7"><h3>Grupos</h3><div class="btnrow"><button onclick="selectAllGroups()">Selecionar todos</button><button class="red" onclick="selectedGroups.clear();renderGroups()">Limpar</button></div><div id="groupsList" class="group-list">Carregue os grupos.</div></div><div class="card s12"><h3>WhatsApps para grupos</h3><div id="groupSendSessionPicker" class="send-grid"></div></div><div class="card s12"><h3>Campanhas para grupos</h3><div class="help-grid">
+<section id="p-groups" class="page"><div class="hero-card"><h3>Disparo em grupos</h3><p>Carregue os grupos por WhatsApp. Cada grupo fica vinculado ao número que o carregou, então grupos do WhatsApp 01 são enviados somente pelo WhatsApp 01.</p></div><div class="grid"><div class="card s5"><h3>Carregar grupos</h3><label>Instância para leitura</label><div id="groupSessionCards"></div><button class="gray" style="width:100%;margin-top:12px" onclick="loadGroups()">Carregar grupos</button><label>Filtro</label><input id="groupSearch" oninput="renderGroups()" placeholder="Pesquisar grupo"></div><div class="card s7"><h3>Grupos</h3><div class="btnrow"><button onclick="selectAllGroups()">Selecionar todos</button><button class="red" onclick="selectedGroups.clear();renderGroups()">Limpar</button></div><div id="groupsList" class="group-list">Carregue os grupos.</div></div><div class="card s12"><h3>WhatsApps para grupos</h3><div id="groupSendSessionPicker" class="send-grid"></div></div><div class="card s12"><h3>Campanhas para grupos</h3><div class="media-note"><b>Importante:</b> os grupos serão enviados pelo WhatsApp responsável. Vídeos em formatos diferentes serão tentados como vídeo e depois como documento.</div><div class="help-grid">
 <div class="help-card"><b><span data-ico="megaphone"></span> 3 conteúdos na hora</b>Preencha Anúncio A, B e C com textos/mídias diferentes.</div>
 <div class="help-card"><b><span data-ico="image"></span> Foto e vídeo</b>Envie imagem, vídeo ou documento com legenda.</div>
 <div class="help-card"><b><span data-ico="send"></span> Rotação automática</b>O sistema alterna os conteúdos entre os grupos selecionados.</div>
@@ -136,7 +142,7 @@ function labels(){qsa('.table-wrap table').forEach(t=>{let h=qsa('thead th').map
 document.addEventListener('DOMContentLoaded',()=>{setupEyes();setInterval(labels,1000)})
 
 const menu=[['dashboard','Início','home'],['sessions','WhatsApps','message'],['ads','Anúncios','megaphone'],['list','Lista','list'],['groups','Grupos','users'],['billing','Planos','wallet']];nav.innerHTML=menu.map((m,i)=>`<button class="${i?'':'active'}" onclick="openPage('${m[0]}',this)">${icon(m[2])}<span>${m[1]}</span></button>`).join('');mobilebar.innerHTML=menu.map((m,i)=>`<button class="${i?'':'active'}" onclick="openPage('${m[0]}',this)">${icon(m[2])}<span>${m[1]}</span></button>`).join('');
-let sessionsData=[],ads=[],groupsCache=[],selectedGroups=new Set(),selectedRenewPlanId=null;
+let sessionsData=[],ads=[],groupsCache=[],selectedGroups=new Map(),selectedRenewPlanId=null;
 function openPage(n,b){qsa('.page').forEach(p=>p.classList.remove('active'));qs('#p-'+n).classList.add('active');qsa('.nav button,.mobilebar button').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');qsa(`button[onclick*="${n}"]`).forEach(x=>x.classList.add('active'));title.textContent=(menu.find(m=>m[0]===n)||['',n])[1];if(n==='ads')loadAds();if(n==='billing')loadBilling();labels()}
 
 function hydrateIcons(){
@@ -217,24 +223,52 @@ async function sendNumbers(){
   let r=await api('/campaign',{method:'POST',body:fd})
   numberResult.textContent=result(r)
 }
-async function loadGroups(){let s=qs('input[name=readGroup]:checked')?.value||connectedNames()[0];let r=await api('/groups/'+s);if(!r.success)return toast(r.error);groupsCache=r.groups||[];mGroups.textContent=groupsCache.length;renderGroups()}function renderGroups(){let q=groupSearch.value.toLowerCase();groupsList.innerHTML=groupsCache.filter(g=>g.name.toLowerCase().includes(q)).map(g=>`<div class="group-item ${selectedGroups.has(g.id)?'selected':''}" onclick="selectedGroups.has('${g.id}')?selectedGroups.delete('${g.id}'):selectedGroups.add('${g.id}');renderGroups()"><b>${esc(g.name)}</b><br><small>${g.participants} membros</small></div>`).join('')||'Nenhum grupo.'}function selectAllGroups(){groupsCache.forEach(g=>selectedGroups.add(g.id));renderGroups()}
+async function loadGroups(){
+  let s=qs('input[name=readGroup]:checked')?.value||connectedNames()[0]
+  if(!s)return toast('Conecte ou escolha um WhatsApp para ler os grupos.')
+  let r=await api('/groups/'+s)
+  if(!r.success)return toast(r.error)
+  const incoming=(r.groups||[]).map(g=>Object.assign({},g,{session:s,sessionLabel:(sessionsData.find(x=>x.name===s)?.label||s)}))
+  // Mantém grupos já carregados de outros WhatsApps e atualiza os da sessão atual.
+  groupsCache=[...groupsCache.filter(g=>g.session!==s),...incoming]
+  mGroups.textContent=groupsCache.length
+  renderGroups()
+}
+function groupKey(g){return (g.session||'')+'::'+(g.id||g.jid||g.name)}
+function renderGroups(){
+  let q=groupSearch.value.toLowerCase()
+  groupsList.innerHTML=groupsCache.filter(g=>g.name.toLowerCase().includes(q)).map(g=>{
+    const key=groupKey(g)
+    return `<div class="group-item ${selectedGroups.has(key)?'selected':''}" onclick="toggleGroup('${key}')"><b>${esc(g.name)}</b><br><small>${g.participants} membros</small><div class="group-owner">${icon('message')} ${esc(g.sessionLabel||g.session||'-')}</div></div>`
+  }).join('')||'Nenhum grupo.'
+}
+function toggleGroup(key){
+  if(selectedGroups.has(key)) selectedGroups.delete(key)
+  else selectGroupByKey(key)
+  renderGroups()
+}
+function selectGroupByKey(key){
+  const g=groupsCache.find(x=>groupKey(x)===key)
+  if(g) selectedGroups.set(key,{id:g.id,name:g.name,participants:g.participants,session:g.session,sessionLabel:g.sessionLabel})
+}
+function selectAllGroups(){groupsCache.forEach(g=>selectedGroups.set(groupKey(g),{id:g.id,name:g.name,participants:g.participants,session:g.session,sessionLabel:g.sessionLabel}));renderGroups()}
 async function saveGroupManualAsAds(){for(let i=1;i<=3;i++){let msg=qs('#gMsg'+i).value, file=qs('#gMedia'+i).files[0];if(!msg&&!file)continue;let fd=new FormData();fd.append('name','Grupo anúncio '+i);fd.append('message',msg);fd.append('note','Criado em grupos');if(file)fd.append('media',file);await api('/ads',{method:'POST',body:fd})}toast('Campanhas salvas');loadAds()}
 async function sendGroups(){
   let mode=qs('input[name=gAdMode]:checked').value
   let err=validateCampaign(mode,'g','.gSavedAd')
   if(err){groupResult.textContent=err;return}
-  let sessions=selectedSessions('groups')
-  if(!sessions.length){groupResult.textContent='Conecte ou selecione pelo menos um WhatsApp.';return}
-  if(!selectedGroups.size){groupResult.textContent='Selecione pelo menos um grupo.';return}
+  const selected=[...selectedGroups.values()]
+  if(!selected.length){groupResult.textContent='Selecione pelo menos um grupo.';return}
   let fd=new FormData()
-  fd.append('sessions',JSON.stringify(sessions))
-  fd.append('groups',JSON.stringify([...selectedGroups]))
+  // Em grupos, cada grupo já leva o WhatsApp responsável. Não mistura sessões.
+  fd.append('sessions',JSON.stringify([...new Set(selected.map(g=>g.session).filter(Boolean))]))
+  fd.append('groups',JSON.stringify(selected))
   fd.append('gAdMode',mode)
   fd.append('savedAds',JSON.stringify(qsa('.gSavedAd:checked').map(i=>i.value)))
   fd.append('minDelay',gMinDelay.value)
   fd.append('maxDelay',gMaxDelay.value)
   buildAds(fd,'g')
-  groupResult.textContent='Enviando...'
+  groupResult.textContent='Enviando grupos pelo WhatsApp responsável de cada grupo...'
   let r=await api('/campaign-groups',{method:'POST',body:fd})
   groupResult.textContent=result(r)
 }

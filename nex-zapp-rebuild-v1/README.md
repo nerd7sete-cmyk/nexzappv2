@@ -76,3 +76,16 @@ Correções:
 - Anúncios do cliente validam texto/mídia e salvam corretamente.
 - Campos de anúncio limpam após salvar.
 - Envio de vídeo tenta como vídeo e, se falhar, reenvia como documento.
+
+## Rebuild V5 - Grupos por WhatsApp + Landing Dark + Vídeo
+
+- Aba de grupos agora vincula cada grupo ao WhatsApp que carregou.
+- Grupos do WhatsApp 01 são enviados somente pelo WhatsApp 01.
+- Grupos do WhatsApp 02 são enviados somente pelo WhatsApp 02.
+- Grupos do WhatsApp 03 são enviados somente pelo WhatsApp 03.
+- Cada grupo mostra o WhatsApp responsável.
+- Landing page em tema dark mais limpo.
+- Removido card "Acesse quando precisar".
+- Mantidos botões Comprar agora, Entrar agora e Quero ser revendedor.
+- Vídeos: tenta enviar como vídeo e, se falhar, envia como documento.
+- Melhor suporte para MP4, MOV, AVI, MKV, WEBM, M4V e 3GP conforme aceitação do WhatsApp.
