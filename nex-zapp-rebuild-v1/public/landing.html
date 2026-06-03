@@ -66,23 +66,15 @@ body{background:radial-gradient(circle at top,#1d4ed8,#0b1120 42%,#050816)}.wrap
 
 /* V5 dark landing cleanup */
 body{background:radial-gradient(circle at top,#0f172a 0%,#020617 44%,#000 100%)!important}
-.hero{grid-template-columns:1fr!important;min-height:42vh!important;text-align:left}
+.hero{grid-template-columns:1fr!important;min-height:68vh!important;text-align:left}
 .login-trigger-card{display:none!important}
 .public-actions{justify-content:flex-start}
 .hero:after{content:"";display:block;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(96,165,250,.35),transparent);margin-top:32px}
 
-
-/* V6 landing compact */
-.wrap{padding-top:18px!important}
-.hero{padding:28px 0 18px!important}
-.hero h1{max-width:920px}
-.feature-strip{margin-top:18px!important}
-#planos{margin-top:22px!important}
-
 </style></head><body><div class="wrap">
 <div class="hero"><div><div class="badge active">NEX-ZAPP</div><h1 id="ltitle">Central profissional para WhatsApp.</h1><p id="lsub">Carregando...</p><div class="public-actions"><button class="green" onclick="scrollPlans()">Comprar agora</button><button onclick="openLogin()">Entrar agora</button><button class="purple" onclick="openReseller()">Quero ser revendedor</button></div></div></div><div class="feature-strip"><div class="feature-card"><div class="stat-icon" data-ico="message"></div><b>Multi WhatsApp</b><p class="desc">Conecte instâncias separadas por QR Code.</p></div><div class="feature-card"><div class="stat-icon" data-ico="send"></div><b>Disparo inteligente</b><p class="desc">Lista, grupos, mídia e campanhas alternadas.</p></div><div class="feature-card"><div class="stat-icon" data-ico="megaphone"></div><b>Anúncios A/B/C</b><p class="desc">Crie na hora ou use anúncios salvos.</p></div><div class="feature-card"><div class="stat-icon" data-ico="wallet"></div><b>PIX e revenda</b><p class="desc">Pedidos, aprovação e comissão automática.</p></div></div>
 <h2 id="planos">Escolha seu plano</h2><div id="plans" class="plans"></div>
-<section class="card" style="margin-top:22px"><h2>Quero ser revendedor</h2><p class="desc">Tenha seu link exclusivo, indique clientes e acompanhe suas comissões no painel de revenda.</p><div class="btnrow"><button class="purple" onclick="openReseller()">Solicitar cadastro de revendedor</button><button onclick="openLogin()">Entrar como revendedor</button></div></section>
+<section class="card" style="margin-top:22px"><h2>Quero ser revendedor</h2><p class="desc">Tenha seu link exclusivo, indique clientes e acompanhe suas comissões no painel de revenda.</p><button class="purple" onclick="openReseller()">Solicitar cadastro de revendedor</button></section>
 </div>
 <div id="loginModal" class="modal-bg"><div class="modal"><h2>Entrar no painel</h2><label>E-mail</label><input id="loginEmail" autocomplete="username"><label>Senha</label><input id="loginPass" type="password" autocomplete="current-password"><div class="btnrow" style="margin-top:14px"><button class="green" onclick="login()">Entrar</button><button class="gray" onclick="loginModal.classList.remove('active')">Fechar</button></div><p class="desc">A senha não fica exposta na página pública.</p></div></div>
 <div id="buyModal" class="modal-bg"><div class="modal"><h2>Contratar plano</h2><p class="desc" id="buyPlan"></p><label>Nome</label><input id="buyName"><label>E-mail</label><input id="buyEmail"><label>WhatsApp</label><input id="buyPhone"><label>Senha de acesso</label><input id="buyPass" type="password"><label>Confirmar senha</label><input id="buyPass2" type="password"><label>Nome do pagador</label><input id="payerName"><div class="btnrow" style="margin-top:14px"><button class="green" onclick="makeOrder()">Gerar PIX</button><button class="gray" onclick="buyModal.classList.remove('active')">Fechar</button></div><div id="buyMsg" class="desc" style="margin-top:12px"></div></div></div>

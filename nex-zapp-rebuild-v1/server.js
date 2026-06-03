@@ -152,20 +152,24 @@ function mediaPayload(item, msg){
     if(!text) throw new Error('Mensagem vazia. Preencha o texto ou envie uma mídia.')
     return {text}
   }
+
   if(!fs.existsSync(item.mediaPath)) throw new Error('Arquivo de mídia não encontrado no servidor.')
   const type=item.mimetype || mime.lookup(item.mediaPath) || 'application/octet-stream'
   const buffer = fs.readFileSync(item.mediaPath)
   const fileName = item.mediaName || path.basename(item.mediaPath) || 'arquivo'
+
   if(type.startsWith('image/')){
     const payload = {image: buffer, mimetype:type}
     if(text) payload.caption = text
     return payload
   }
+
   if(type.startsWith('video/')){
     const payload = {video: buffer, mimetype:type}
     if(text) payload.caption = text
     return payload
   }
+
   const payload = {document: buffer, mimetype:type, fileName}
   if(text) payload.caption = text
   return payload
@@ -339,23 +343,36 @@ app.get('/api/reseller/me', requireReseller, (req,res)=>{
   res.json({success:true,reseller:r,commissions,withdrawals,stats:{total,paid,pending,available:Math.max(0,total-paid-pending)}})
 })
 app.post('/api/reseller/withdraw', requireReseller, (req,res)=>{ const r=read(files.resellers,[]).find(x=>x.email===req.user.email || x.id===req.user.resellerId); if(!r)return res.json({success:false,error:'Revendedor não encontrado.'}); const value=money(req.body.value); const list=read(files.withdrawals,[]); list.unshift({id:uid('wd'),resellerId:r.id,resellerName:r.name,resellerEmail:r.email,pixKey:r.pixKey,value,status:'pending',createdAt:now()}); write(files.withdrawals,list); res.json({success:true}) })
-app.post('/api/admin/resellers/:id/status', requireAdmin, (req,res)=>{
-  const r=read(files.resellers,[])
-  const i=r.findIndex(x=>x.id===req.params.id)
-  if(i<0)return res.json({success:false,error:'Revendedor não encontrado.'})
-  r[i].status=req.body.status||'approved'
-  write(files.resellers,r)
-  let users=read(files.users,[])
-  let u=users.find(x=>String(x.email).toLowerCase()===String(r[i].email).toLowerCase())
-  if(r[i].status==='approved'){
-    if(!u){
-      users.unshift({id:uid('user'),role:'reseller',resellerId:r[i].id,name:r[i].name,email:r[i].email,password:r[i].password,phone:r[i].phone,status:'active',createdAt:now()})
-    }else{
-      u.role='reseller'; u.resellerId=r[i].id; u.status='active'; if(r[i].password)u.password=r[i].password
-    }
-    write(files.users,users)
+app.post('/api/admin/resellers/:id/status', requireAdmin, (req,res)=>{ const r=read(files.resellers,[]); const i=r.findIndex(x=>x.id===req.params.id); if(i<0)return res.json({success:false}); r[i].status=req.body.status||'approved'; write(files.resellers,r); let users=read(files.users,[]); if(r[i].status==='approved'&&!users.find(u=>u.email===r[i].email)){ users.unshift({id:uid('user'),role:'reseller',resellerId:r[i].id,name:r[i].name,email:r[i].email,password:r[i].password,phone:r[i].phone,status:'active',createdAt:now()}); write(files.users,users) } res.json({success:true,reseller:r[i]}) })
+app.post('/api/admin/withdrawals/:id/status', requireAdmin, (req,res)=>{ const list=read(files.withdrawals,[]); const i=list.findIndex(w=>w.id===req.params.id); if(i<0)return res.json({success:false}); list[i].status=req.body.status||'paid'; list[i].updatedAt=now(); write(files.withdrawals,list); res.json({success:true}) })
+
+app.get('/sessions', requireLogin, (_,res)=>res.json(['whatsapp1','whatsapp2','whatsapp3'].map(n=>{ const s=sess(n); return {...s, sock:undefined, reconnectTimer:undefined} })))
+app.post('/connect', requireLogin, async(req,res)=>{ const name=safeName(req.body.session); connectWhatsApp(name).catch(e=>log(name,e.message)); res.json({success:true}) })
+app.post('/reset', requireLogin, (req,res)=>{ const name=safeName(req.body.session); const s=sess(name); s.manualStop=true; if(s.reconnectTimer)clearTimeout(s.reconnectTimer); try{s.sock?.logout?.()}catch{}; try{fs.rmSync(authPath(name),{recursive:true,force:true})}catch{}; Object.assign(s,{sock:null,qr:null,connected:false,starting:false,stage:'offline'}); res.json({success:true}) })
+app.get('/groups/:session', requireLogin, async(req,res)=>{ const s=sess(req.params.session); if(!s.connected||!s.sock)return res.json({success:false,error:'WhatsApp não conectado.'}); const groups=await s.sock.groupFetchAllParticipating(); res.json({success:true,groups:Object.values(groups).map(g=>({id:g.id,name:g.subject||g.id,participants:g.participants?.length||0}))}) })
+
+app.get('/ads', requireLogin, (req,res)=>res.json(read(files.ads,[]).filter(a=>a.userEmail===req.user.email || req.user.role==='admin')))
+app.post('/ads', requireLogin, upload.single('media'), (req,res)=>{
+  const message = String(req.body.message || '').trim()
+  const name = String(req.body.name || 'Anúncio').trim()
+  const note = String(req.body.note || '').trim()
+  if(!message && !req.file) return res.json({success:false,error:'Preencha o texto ou envie uma foto/vídeo/documento.'})
+  const ads=read(files.ads,[])
+  const ad={
+    id:uid('ad'),
+    userEmail:req.user.email,
+    name:name || 'Anúncio',
+    message,
+    note,
+    mediaPath:req.file?.path||'',
+    mediaUrl:req.file?'/uploads/'+path.basename(req.file.path):'',
+    mediaName:req.file?.originalname||'',
+    mimetype:req.file?.mimetype||mime.lookup(req.file?.originalname||'')||'',
+    createdAt:now()
   }
-  res.json({success:true,reseller:r[i]})
+  ads.unshift(ad)
+  write(files.ads,ads)
+  res.json({success:true,ad})
 })
 app.delete('/ads/:id', requireLogin, (req,res)=>{ const ads=read(files.ads,[]); const ad=ads.find(a=>a.id===req.params.id); if(ad&&ad.mediaPath)try{fs.unlinkSync(ad.mediaPath)}catch{}; write(files.ads, ads.filter(a=>a.id!==req.params.id || (a.userEmail!==req.user.email && req.user.role!=='admin'))); res.json({success:true}) })
 
@@ -407,6 +424,8 @@ async function sendToTarget(sessionName, jid, payload){
       }
       if(payload.caption) doc.caption=payload.caption
       await s.sock.sendMessage(jid, doc)
+    }else if(payload && (payload.image || payload.document)){
+      throw new Error('Falha ao enviar mídia: '+(e.message||'formato não aceito pelo WhatsApp.'))
     }else{
       throw e
     }
