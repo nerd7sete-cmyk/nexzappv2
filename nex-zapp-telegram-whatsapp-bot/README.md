@@ -60,3 +60,16 @@ Depois podemos adicionar:
 - Corrigido disparo em lista com confirmação.
 - Verifica se o WhatsApp está conectado antes de enviar.
 - Mantém vídeo com fallback para documento.
+
+
+## V3 - Painel Profissional no Telegram
+
+- Menu principal mais organizado.
+- Vídeo fica oculto e só avisa se o cliente tentar enviar.
+- Foto e documento funcionando.
+- QR Code antigo é apagado quando gerar QR novo ou quando conectar.
+- Seleção de grupos salva por cliente e WhatsApp.
+- Próximo disparo em grupos oferece usar seleção salva.
+- Lista de grupos mais organizada.
+- Relatório final profissional com tipo, WhatsApp, destinos, enviados, falhas e horário.
+- Histórico de últimos disparos.

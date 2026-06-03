@@ -1,7 +1,7 @@
 {
   "name": "nex-zapp-telegram-whatsapp-bot",
-  "version": "2.0.0",
-  "description": "NEX-ZAPP Bot Telegram v2 com botões e disparo em lista corrigido",
+  "version": "3.0.0",
+  "description": "NEX-ZAPP Bot Telegram V3 painel profissional",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js"
