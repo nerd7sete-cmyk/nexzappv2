@@ -89,35 +89,14 @@ function normalizeBR(raw){
   const add=v=>{ v=onlyNum(v); if(v.length>=10&&v.length<=15)set.add(v) }
   if(!n) return []
   if(n.startsWith('00')) n=n.slice(2)
-
-  // Normalização inteligente Brasil:
-  // 11999999999 -> 5511999999999
-  // 1199999999  -> 551199999999
-  // 551199999999 -> também tenta 5511999999999
-  // 5511999999999 -> também tenta 551199999999
   if(!n.startsWith('55')){
     if(n.length===11) add('55'+n)
-    if(n.length===10){
-      add('55'+n)
-      add('55'+n.slice(0,2)+'9'+n.slice(2))
-    }
+    if(n.length===10){ add('55'+n); add('55'+n.slice(0,2)+'9'+n.slice(2)) }
   }
-
   add(n)
-
-  if(n.startsWith('55') && n.length===12){
-    add('55'+n.slice(2,4)+'9'+n.slice(4))
-  }
-  if(n.startsWith('55') && n.length===13 && n[4]==='9'){
-    add('55'+n.slice(2,4)+n.slice(5))
-  }
-
-  // retorna primeiro as opções com 55 e com 9, depois alternativas
-  return [...set].sort((a,b)=>{
-    const aw=(a.startsWith('55')?2:0)+(a.length===13?1:0)
-    const bw=(b.startsWith('55')?2:0)+(b.length===13?1:0)
-    return bw-aw
-  })
+  if(n.startsWith('55') && n.length===12) add('55'+n.slice(2,4)+'9'+n.slice(4))
+  if(n.startsWith('55') && n.length===13 && n[4]==='9') add('55'+n.slice(2,4)+n.slice(5))
+  return [...set].sort((a,b)=>(((b.startsWith('55')?2:0)+(b.length===13?1:0))-((a.startsWith('55')?2:0)+(a.length===13?1:0))))
 }
 function parseTargetLine(line){
   const parts=String(line||'').split(/[;,]/).map(x=>x.trim()).filter(Boolean)
@@ -152,24 +131,20 @@ function mediaPayload(item, msg){
     if(!text) throw new Error('Mensagem vazia. Preencha o texto ou envie uma mídia.')
     return {text}
   }
-
   if(!fs.existsSync(item.mediaPath)) throw new Error('Arquivo de mídia não encontrado no servidor.')
   const type=item.mimetype || mime.lookup(item.mediaPath) || 'application/octet-stream'
   const buffer = fs.readFileSync(item.mediaPath)
   const fileName = item.mediaName || path.basename(item.mediaPath) || 'arquivo'
-
   if(type.startsWith('image/')){
     const payload = {image: buffer, mimetype:type}
     if(text) payload.caption = text
     return payload
   }
-
   if(type.startsWith('video/')){
     const payload = {video: buffer, mimetype:type}
     if(text) payload.caption = text
     return payload
   }
-
   const payload = {document: buffer, mimetype:type, fileName}
   if(text) payload.caption = text
   return payload
@@ -343,36 +318,23 @@ app.get('/api/reseller/me', requireReseller, (req,res)=>{
   res.json({success:true,reseller:r,commissions,withdrawals,stats:{total,paid,pending,available:Math.max(0,total-paid-pending)}})
 })
 app.post('/api/reseller/withdraw', requireReseller, (req,res)=>{ const r=read(files.resellers,[]).find(x=>x.email===req.user.email || x.id===req.user.resellerId); if(!r)return res.json({success:false,error:'Revendedor não encontrado.'}); const value=money(req.body.value); const list=read(files.withdrawals,[]); list.unshift({id:uid('wd'),resellerId:r.id,resellerName:r.name,resellerEmail:r.email,pixKey:r.pixKey,value,status:'pending',createdAt:now()}); write(files.withdrawals,list); res.json({success:true}) })
-app.post('/api/admin/resellers/:id/status', requireAdmin, (req,res)=>{ const r=read(files.resellers,[]); const i=r.findIndex(x=>x.id===req.params.id); if(i<0)return res.json({success:false}); r[i].status=req.body.status||'approved'; write(files.resellers,r); let users=read(files.users,[]); if(r[i].status==='approved'&&!users.find(u=>u.email===r[i].email)){ users.unshift({id:uid('user'),role:'reseller',resellerId:r[i].id,name:r[i].name,email:r[i].email,password:r[i].password,phone:r[i].phone,status:'active',createdAt:now()}); write(files.users,users) } res.json({success:true,reseller:r[i]}) })
-app.post('/api/admin/withdrawals/:id/status', requireAdmin, (req,res)=>{ const list=read(files.withdrawals,[]); const i=list.findIndex(w=>w.id===req.params.id); if(i<0)return res.json({success:false}); list[i].status=req.body.status||'paid'; list[i].updatedAt=now(); write(files.withdrawals,list); res.json({success:true}) })
-
-app.get('/sessions', requireLogin, (_,res)=>res.json(['whatsapp1','whatsapp2','whatsapp3'].map(n=>{ const s=sess(n); return {...s, sock:undefined, reconnectTimer:undefined} })))
-app.post('/connect', requireLogin, async(req,res)=>{ const name=safeName(req.body.session); connectWhatsApp(name).catch(e=>log(name,e.message)); res.json({success:true}) })
-app.post('/reset', requireLogin, (req,res)=>{ const name=safeName(req.body.session); const s=sess(name); s.manualStop=true; if(s.reconnectTimer)clearTimeout(s.reconnectTimer); try{s.sock?.logout?.()}catch{}; try{fs.rmSync(authPath(name),{recursive:true,force:true})}catch{}; Object.assign(s,{sock:null,qr:null,connected:false,starting:false,stage:'offline'}); res.json({success:true}) })
-app.get('/groups/:session', requireLogin, async(req,res)=>{ const s=sess(req.params.session); if(!s.connected||!s.sock)return res.json({success:false,error:'WhatsApp não conectado.'}); const groups=await s.sock.groupFetchAllParticipating(); res.json({success:true,groups:Object.values(groups).map(g=>({id:g.id,name:g.subject||g.id,participants:g.participants?.length||0}))}) })
-
-app.get('/ads', requireLogin, (req,res)=>res.json(read(files.ads,[]).filter(a=>a.userEmail===req.user.email || req.user.role==='admin')))
-app.post('/ads', requireLogin, upload.single('media'), (req,res)=>{
-  const message = String(req.body.message || '').trim()
-  const name = String(req.body.name || 'Anúncio').trim()
-  const note = String(req.body.note || '').trim()
-  if(!message && !req.file) return res.json({success:false,error:'Preencha o texto ou envie uma foto/vídeo/documento.'})
-  const ads=read(files.ads,[])
-  const ad={
-    id:uid('ad'),
-    userEmail:req.user.email,
-    name:name || 'Anúncio',
-    message,
-    note,
-    mediaPath:req.file?.path||'',
-    mediaUrl:req.file?'/uploads/'+path.basename(req.file.path):'',
-    mediaName:req.file?.originalname||'',
-    mimetype:req.file?.mimetype||mime.lookup(req.file?.originalname||'')||'',
-    createdAt:now()
+app.post('/api/admin/resellers/:id/status', requireAdmin, (req,res)=>{
+  const r=read(files.resellers,[])
+  const i=r.findIndex(x=>x.id===req.params.id)
+  if(i<0)return res.json({success:false,error:'Revendedor não encontrado.'})
+  r[i].status=req.body.status||'approved'
+  write(files.resellers,r)
+  let users=read(files.users,[])
+  let u=users.find(x=>String(x.email).toLowerCase()===String(r[i].email).toLowerCase())
+  if(r[i].status==='approved'){
+    if(!u){
+      users.unshift({id:uid('user'),role:'reseller',resellerId:r[i].id,name:r[i].name,email:r[i].email,password:r[i].password,phone:r[i].phone,status:'active',createdAt:now()})
+    }else{
+      u.role='reseller'; u.resellerId=r[i].id; u.status='active'; if(r[i].password)u.password=r[i].password
+    }
+    write(files.users,users)
   }
-  ads.unshift(ad)
-  write(files.ads,ads)
-  res.json({success:true,ad})
+  res.json({success:true,reseller:r[i]})
 })
 app.delete('/ads/:id', requireLogin, (req,res)=>{ const ads=read(files.ads,[]); const ad=ads.find(a=>a.id===req.params.id); if(ad&&ad.mediaPath)try{fs.unlinkSync(ad.mediaPath)}catch{}; write(files.ads, ads.filter(a=>a.id!==req.params.id || (a.userEmail!==req.user.email && req.user.role!=='admin'))); res.json({success:true}) })
 
@@ -380,33 +342,14 @@ function buildCampaignAds(req, filesUpload){
   const saved=read(files.ads,[])
   let savedIds=[]; try{ savedIds=JSON.parse(req.body.savedAds||'[]') }catch{}
   const picked=saved.filter(a=>savedIds.includes(a.id) && (a.userEmail===req.user.email || req.user.role==='admin'))
-
   let manual=[]
   for(let i=1;i<=3;i++){
-    const msg =
-      req.body['msg'+i] ??
-      req.body['Msg'+i] ??
-      req.body['gMsg'+i] ??
-      req.body['gmsg'+i] ??
-      ''
-    const f=(filesUpload||[]).find(x=>
-      x.fieldname==='media'+i ||
-      x.fieldname==='Media'+i ||
-      x.fieldname==='gMedia'+i ||
-      x.fieldname==='gmedia'+i
-    )
+    const msg = req.body['msg'+i] ?? req.body['Msg'+i] ?? req.body['gMsg'+i] ?? req.body['gmsg'+i] ?? ''
+    const f=(filesUpload||[]).find(x=>x.fieldname==='media'+i || x.fieldname==='Media'+i || x.fieldname==='gMedia'+i || x.fieldname==='gmedia'+i)
     if(String(msg).trim()||f){
-      manual.push({
-        id:'manual'+i,
-        name:'Manual '+i,
-        message:String(msg||''),
-        mediaPath:f?.path||'',
-        mediaName:f?.originalname||'',
-        mimetype:f?.mimetype||mime.lookup(f?.originalname||'')||''
-      })
+      manual.push({id:'manual'+i,name:'Manual '+i,message:String(msg||''),mediaPath:f?.path||'',mediaName:f?.originalname||'',mimetype:f?.mimetype||mime.lookup(f?.originalname||'')||''})
     }
   }
-
   const mode=req.body.adMode||req.body.gAdMode||req.body.gadMode||'mix'
   let ads=mode==='saved'?picked:mode==='manual'?manual:[...manual,...picked]
   return ads.length?shuffle(ads):[{id:'default',message:req.body.message||'',mediaPath:''}]
@@ -417,15 +360,9 @@ async function sendToTarget(sessionName, jid, payload){
     await s.sock.sendMessage(jid, payload)
   }catch(e){
     if(payload && payload.video){
-      const doc={
-        document: payload.video,
-        mimetype: payload.mimetype || 'video/mp4',
-        fileName: 'video.' + ((payload.mimetype||'video/mp4').split('/')[1] || 'mp4')
-      }
+      const doc={document: payload.video, mimetype: payload.mimetype || 'video/mp4', fileName: 'video.' + ((payload.mimetype||'video/mp4').split('/')[1] || 'mp4')}
       if(payload.caption) doc.caption=payload.caption
       await s.sock.sendMessage(jid, doc)
-    }else if(payload && (payload.image || payload.document)){
-      throw new Error('Falha ao enviar mídia: '+(e.message||'formato não aceito pelo WhatsApp.'))
     }else{
       throw e
     }
@@ -457,17 +394,14 @@ app.post('/campaign-groups', requireLogin, upload.any(), async(req,res)=>{
     const sessions=JSON.parse(req.body.sessions||'[]').filter(Boolean)
     let groups=JSON.parse(req.body.groups||'[]').filter(Boolean)
     if(!groups.length)return res.json({success:false,error:'Selecione pelo menos um grupo.'})
-
     const ads=buildCampaignAds(req, req.files), min=Number(req.body.minDelay||9000), max=Number(req.body.maxDelay||18000)
     let sent=0, failed=0, errors=[], list=shuffle(groups)
-
     for(let i=0;i<list.length;i++){
       const group=list[i]
       const groupId = typeof group === 'string' ? group : (group.id || group.jid)
       const ownerSession = typeof group === 'string' ? (sessions[0] || '') : (group.session || group.ownerSession || group.whatsapp || '')
       const session = ownerSession || sessions[i%sessions.length]
       if(!session){ failed++; errors.push({target:groupId,error:'Grupo sem WhatsApp responsável.'}); continue }
-
       const ad=ads[i%ads.length]
       const msg=applyVars(ad.message,{grupo:group.name||'',empresa:'NEX-ZAPP',data:new Date().toLocaleDateString('pt-BR'),whatsapp:display(session)})
       try{ await sendToTarget(session,groupId,mediaPayload(ad,msg)); sent++ }

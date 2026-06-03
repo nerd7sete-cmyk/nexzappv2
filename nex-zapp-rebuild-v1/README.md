@@ -89,3 +89,15 @@ Correções:
 - Mantidos botões Comprar agora, Entrar agora e Quero ser revendedor.
 - Vídeos: tenta enviar como vídeo e, se falhar, envia como documento.
 - Melhor suporte para MP4, MOV, AVI, MKV, WEBM, M4V e 3GP conforme aceitação do WhatsApp.
+
+## Rebuild V8 - Cliente Limpo Funcional
+
+- Painel cliente refeito limpo.
+- Aba WhatsApps sempre mostra WhatsApp 01, 02 e 03.
+- Menus corrigidos: Início, WhatsApps, Anúncios, Lista, Grupos e Planos.
+- Anúncios salvando texto, foto, vídeo e documento.
+- Disparo em lista com mídia.
+- Disparo em grupos por WhatsApp responsável.
+- Seleção de grupos salva no cache por WhatsApp.
+- Renovação com modal PIX e WhatsApp do comprovante configurado pelo admin.
+- Vídeo com fallback como documento.
