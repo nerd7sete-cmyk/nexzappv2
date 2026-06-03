@@ -1,7 +1,7 @@
 {
   "name": "nex-zapp-telegram-whatsapp-bot",
-  "version": "1.0.0",
-  "description": "NEX-ZAPP Bot Telegram controlando disparos pelo WhatsApp",
+  "version": "2.0.0",
+  "description": "NEX-ZAPP Bot Telegram v2 com botões e disparo em lista corrigido",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js"

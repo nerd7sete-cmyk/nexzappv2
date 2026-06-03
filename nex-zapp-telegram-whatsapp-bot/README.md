@@ -48,3 +48,15 @@ Depois podemos adicionar:
 - Revenda pelo Telegram.
 - Pedidos e aprovação.
 - PIX automático por conversa.
+
+
+## V2 - Botões e Lista Corrigida
+
+- Mais botões durante a criação da campanha.
+- Botão Pular mídia.
+- Botão Finalizar campanha.
+- Botão Adicionar Anúncio B/C.
+- Corrigido fluxo de FINALIZAR que antes podia virar texto do anúncio.
+- Corrigido disparo em lista com confirmação.
+- Verifica se o WhatsApp está conectado antes de enviar.
+- Mantém vídeo com fallback para documento.

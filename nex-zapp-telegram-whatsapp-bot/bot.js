@@ -35,20 +35,15 @@ const files = {
   logs: path.join(DATA, 'logs.json')
 }
 
-function read(file, fallback) {
-  try { return JSON.parse(fs.readFileSync(file, 'utf8')) } catch { return fallback }
-}
-function write(file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2))
-}
-function uid(p='id') {
-  return p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
-}
+function read(file, fallback) { try { return JSON.parse(fs.readFileSync(file, 'utf8')) } catch { return fallback } }
+function write(file, data) { fs.writeFileSync(file, JSON.stringify(data, null, 2)) }
+function uid(p='id') { return p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8) }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
 function onlyNum(s) { return String(s || '').replace(/\D/g, '') }
 function now() { return new Date().toISOString() }
 function minDelay() { return Number(process.env.MIN_DELAY || 8000) }
 function maxDelay() { return Number(process.env.MAX_DELAY || 18000) }
+function clampText(s, n=3500) { s = String(s || ''); return s.length > n ? s.slice(0,n) + '\n...' : s }
 
 function init() {
   if (!fs.existsSync(files.users)) write(files.users, [])
@@ -74,9 +69,7 @@ const flows = {}
 function waDisplay(name) {
   return ({ whatsapp1:'WhatsApp 01', whatsapp2:'WhatsApp 02', whatsapp3:'WhatsApp 03' }[name] || name)
 }
-function safeName(n) {
-  return String(n || 'whatsapp1').replace(/[^a-z0-9_-]/gi, '') || 'whatsapp1'
-}
+function safeName(n) { return String(n || 'whatsapp1').replace(/[^a-z0-9_-]/gi, '') || 'whatsapp1' }
 function authPath(n) { return path.join(AUTH, safeName(n)) }
 function sess(n) {
   n = safeName(n)
@@ -91,7 +84,7 @@ function log(n, msg) {
   const s = sess(n)
   const line = '[' + new Date().toLocaleTimeString() + '] ' + msg
   s.logs.unshift(line)
-  s.logs = s.logs.slice(0, 40)
+  s.logs = s.logs.slice(0, 60)
   console.log('[' + waDisplay(n) + '] ' + msg)
 }
 
@@ -150,7 +143,7 @@ async function connectWhatsApp(name, notifyChatId=null) {
       if (s.reconnectTimer) clearTimeout(s.reconnectTimer)
       try { await sock.sendPresenceUpdate('unavailable') } catch {}
       log(name, 'Conectado.')
-      if (notifyChatId) await bot.telegram.sendMessage(notifyChatId, `${waDisplay(name)} conectado com sucesso.`)
+      if (notifyChatId) await bot.telegram.sendMessage(notifyChatId, `${waDisplay(name)} conectado com sucesso.`, mainMenu())
     }
 
     if (connection === 'close') {
@@ -268,7 +261,27 @@ function mainMenu() {
     [Markup.button.callback('Planos/Renovar', 'plans')]
   ])
 }
-
+function cancelMenu() { return Markup.inlineKeyboard([[Markup.button.callback('Cancelar', 'cancel')]]) }
+function adMediaMenu() {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback('Pular mídia', 'ad_skip_media')],
+    [Markup.button.callback('Finalizar campanha', 'ad_finish')],
+    [Markup.button.callback('Cancelar', 'cancel')]
+  ])
+}
+function nextAdMenu(label) {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback(`Adicionar Anúncio ${label}`, 'ad_next')],
+    [Markup.button.callback('Finalizar e revisar', 'ad_finish')],
+    [Markup.button.callback('Cancelar', 'cancel')]
+  ])
+}
+function confirmMenu() {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback('Confirmar envio', 'confirm_send')],
+    [Markup.button.callback('Cancelar', 'cancel')]
+  ])
+}
 function waMenu() {
   return Markup.inlineKeyboard([
     [Markup.button.callback('WhatsApp 01', 'wa_whatsapp1')],
@@ -277,48 +290,54 @@ function waMenu() {
     [Markup.button.callback('Voltar', 'menu')]
   ])
 }
-
 function sessionMenu(prefix='sel') {
   return Markup.inlineKeyboard([
     [Markup.button.callback('WhatsApp 01', `${prefix}_whatsapp1`)],
     [Markup.button.callback('WhatsApp 02', `${prefix}_whatsapp2`)],
     [Markup.button.callback('WhatsApp 03', `${prefix}_whatsapp3`)],
-    [Markup.button.callback('Cancelar', 'menu')]
+    [Markup.button.callback('Cancelar', 'cancel')]
   ])
 }
-
 function statusText() {
   return ['whatsapp1','whatsapp2','whatsapp3'].map(n => {
     const s = sess(n)
     return `${waDisplay(n)}\nStatus: ${s.connected ? 'Conectado' : (s.stage || 'offline')}\nÚltima atividade: ${s.lastSeen || '-'}\nEnvios hoje: ${s.sentToday || 0}`
   }).join('\n\n')
 }
+function labelFor(i) { return ['A','B','C'][i] || String(i+1) }
 
-bot.start(async ctx => {
+async function registerUser(ctx) {
   const users = read(files.users, [])
   const id = String(ctx.from.id)
   if (!users.find(u => u.telegramId === id)) {
     users.push({ id: uid('user'), telegramId: id, name: ctx.from.first_name || 'Cliente', role: 'client', status: 'active', createdAt: now() })
     write(files.users, users)
   }
+}
+
+bot.start(async ctx => {
+  await registerUser(ctx)
   await ctx.reply(`${APP_NAME}\n\nEscolha uma opção:`, mainMenu())
 })
 
 bot.action('menu', async ctx => {
   await ctx.answerCbQuery()
-  await ctx.editMessageText(`${APP_NAME}\n\nEscolha uma opção:`, mainMenu())
+  delete flows[ctx.from.id]
+  await ctx.editMessageText(`${APP_NAME}\n\nEscolha uma opção:`, mainMenu()).catch(() => ctx.reply(`${APP_NAME}\n\nEscolha uma opção:`, mainMenu()))
 })
-
+bot.action('cancel', async ctx => {
+  await ctx.answerCbQuery()
+  delete flows[ctx.from.id]
+  await ctx.reply('Operação cancelada.', mainMenu())
+})
 bot.action('status', async ctx => {
   await ctx.answerCbQuery()
   await ctx.reply(statusText(), mainMenu())
 })
-
 bot.action('wa_menu', async ctx => {
   await ctx.answerCbQuery()
-  await ctx.editMessageText('Escolha qual WhatsApp deseja conectar:', waMenu())
+  await ctx.editMessageText('Escolha qual WhatsApp deseja conectar:', waMenu()).catch(() => ctx.reply('Escolha qual WhatsApp deseja conectar:', waMenu()))
 })
-
 bot.action(/^wa_(whatsapp\d)$/, async ctx => {
   await ctx.answerCbQuery()
   const name = ctx.match[1]
@@ -331,69 +350,122 @@ bot.action('list_start', async ctx => {
   flows[ctx.from.id] = { type: 'list', step: 'session', ads: [], targets: [] }
   await ctx.reply('Escolha o WhatsApp que fará o disparo em lista:', sessionMenu('listwa'))
 })
-
 bot.action(/^listwa_(whatsapp\d)$/, async ctx => {
   await ctx.answerCbQuery()
-  const f = flows[ctx.from.id] = flows[ctx.from.id] || { type: 'list', ads: [], targets: [] }
-  f.session = ctx.match[1]
-  f.step = 'targets'
-  await ctx.reply('Envie a lista de contatos.\n\nPode colar um número por linha.\nExemplo:\n11999999999\n21988887777')
+  const f = flows[ctx.from.id] = { type: 'list', ads: [], targets: [], session: ctx.match[1], step: 'targets' }
+  await ctx.reply(
+    `WhatsApp escolhido: ${waDisplay(f.session)}\n\nEnvie a lista de contatos agora.\n\nPode colar um número por linha:\n11999999999\n11988887777\n\nDepois disso vou pedir Anúncio A/B/C.`,
+    cancelMenu()
+  )
+})
+
+bot.action('groups_start', async ctx => {
+  await ctx.answerCbQuery()
+  flows[ctx.from.id] = { type: 'groups', step: 'session', ads: [] }
+  await ctx.reply('Escolha o WhatsApp para carregar os grupos:', sessionMenu('groupwa'))
+})
+bot.action(/^groupwa_(whatsapp\d)$/, async ctx => {
+  await ctx.answerCbQuery()
+  const session = ctx.match[1]
+  const s = sess(session)
+  if (!s.connected || !s.sock) return ctx.reply(`${waDisplay(session)} não está conectado.`, mainMenu())
+
+  await ctx.reply('Carregando grupos...')
+  try {
+    const all = await s.sock.groupFetchAllParticipating()
+    const groups = Object.values(all || {}).map(g => ({
+      id: g.id,
+      name: g.subject || g.id,
+      participants: Array.isArray(g.participants) ? g.participants.length : (g.size || 0)
+    })).sort((a,b)=>a.name.localeCompare(b.name))
+
+    const f = flows[ctx.from.id] = { type:'groups', step:'select_groups', session, groups, ads: [] }
+    if (!groups.length) return ctx.reply('Nenhum grupo encontrado.', mainMenu())
+
+    const text = groups.slice(0,100).map((g,i)=>`${i+1}. ${g.name} (${g.participants})`).join('\n')
+    await ctx.reply(clampText(`Escolha os grupos enviando os números separados por vírgula.\n\nExemplo: 1,3,8\n\n${text}`), cancelMenu())
+  } catch(e) {
+    await ctx.reply('Erro ao carregar grupos: '+e.message, mainMenu())
+  }
+})
+
+bot.action('ad_skip_media', async ctx => {
+  await ctx.answerCbQuery()
+  const f = flows[ctx.from.id]
+  if (!f || f.step !== 'ad_media') return ctx.reply('Nenhuma mídia pendente.', mainMenu())
+  await nextAdOrConfirm(ctx, f)
+})
+bot.action('ad_next', async ctx => {
+  await ctx.answerCbQuery()
+  const f = flows[ctx.from.id]
+  if (!f) return ctx.reply('Nenhuma campanha em andamento.', mainMenu())
+  if (f.currentAd >= 3) return confirmCampaign(ctx, f)
+  f.step = 'ad_text'
+  await ctx.reply(`Envie o texto do Anúncio ${labelFor(f.currentAd)}.`, cancelMenu())
+})
+bot.action('ad_finish', async ctx => {
+  await ctx.answerCbQuery()
+  const f = flows[ctx.from.id]
+  if (!f) return ctx.reply('Nenhuma campanha em andamento.', mainMenu())
+  await confirmCampaign(ctx, f)
 })
 
 bot.on('text', async ctx => {
+  await registerUser(ctx)
   const f = flows[ctx.from.id]
   if (!f) {
     await ctx.reply('Escolha uma opção:', mainMenu())
     return
   }
 
+  const text = String(ctx.message.text || '').trim()
+
+  if (text.toUpperCase() === 'CANCELAR') {
+    delete flows[ctx.from.id]
+    await ctx.reply('Operação cancelada.', mainMenu())
+    return
+  }
+
   if (f.type === 'list') {
     if (f.step === 'targets') {
-      f.targets = ctx.message.text.split(/\r?\n/).map(x => x.trim()).filter(Boolean)
+      f.targets = text.split(/\r?\n|,/).map(x => x.trim()).filter(Boolean)
+      if (!f.targets.length) return ctx.reply('Lista vazia. Envie números, um por linha.')
       f.step = 'ad_text'
       f.currentAd = 0
-      await ctx.reply('Agora envie o texto do Anúncio A.\n\nVocê pode usar {nome}, {telefone}, {data} e spintax {Oi|Olá|Fala}.')
+      await ctx.reply(`Lista recebida: ${f.targets.length} contatos.\n\nEnvie o texto do Anúncio A.\n\nVariáveis: {telefone}, {data}\nVariação: {Oi|Olá|Fala}`, cancelMenu())
       return
     }
 
     if (f.step === 'ad_text') {
-      const labels = ['A','B','C']
-      f.ads[f.currentAd] = { text: ctx.message.text }
+      if (text.toUpperCase() === 'FINALIZAR') return confirmCampaign(ctx, f)
+      f.ads[f.currentAd] = { ...(f.ads[f.currentAd] || {}), text }
       f.step = 'ad_media'
-      await ctx.reply(`Quer enviar mídia para o Anúncio ${labels[f.currentAd]}?\n\nEnvie foto/vídeo/documento agora ou digite PULAR.`)
+      await ctx.reply(`Quer enviar mídia para o Anúncio ${labelFor(f.currentAd)}?\n\nEnvie foto/vídeo/documento agora ou use os botões abaixo.`, adMediaMenu())
       return
-    }
-
-    if (f.step === 'ad_media') {
-      if (ctx.message.text && ctx.message.text.toUpperCase() === 'PULAR') {
-        return nextAdOrConfirm(ctx, f)
-      }
     }
   }
 
   if (f.type === 'groups') {
     if (f.step === 'select_groups') {
-      const nums = ctx.message.text.split(',').map(x => Number(x.trim())).filter(n => n > 0)
+      const nums = text.split(',').map(x => Number(x.trim())).filter(n => n > 0)
       f.selectedGroups = nums.map(n => f.groups[n-1]).filter(Boolean)
-      if (!f.selectedGroups.length) return ctx.reply('Nenhum grupo válido. Envie os números separados por vírgula.')
+      if (!f.selectedGroups.length) return ctx.reply('Nenhum grupo válido. Envie números separados por vírgula, exemplo: 1,3,8')
       f.step = 'ad_text'
       f.currentAd = 0
-      await ctx.reply('Envie o texto do Anúncio A para grupos.')
+      await ctx.reply(`Grupos selecionados: ${f.selectedGroups.length}\n\nEnvie o texto do Anúncio A para grupos.`, cancelMenu())
       return
     }
 
     if (f.step === 'ad_text') {
-      const labels = ['A','B','C']
-      f.ads[f.currentAd] = { text: ctx.message.text }
+      if (text.toUpperCase() === 'FINALIZAR') return confirmCampaign(ctx, f)
+      f.ads[f.currentAd] = { ...(f.ads[f.currentAd] || {}), text }
       f.step = 'ad_media'
-      await ctx.reply(`Quer enviar mídia para o Anúncio ${labels[f.currentAd]}?\n\nEnvie foto/vídeo/documento agora ou digite PULAR.`)
+      await ctx.reply(`Quer enviar mídia para o Anúncio ${labelFor(f.currentAd)}?\n\nEnvie foto/vídeo/documento agora ou use os botões abaixo.`, adMediaMenu())
       return
     }
-
-    if (f.step === 'ad_media') {
-      if (ctx.message.text && ctx.message.text.toUpperCase() === 'PULAR') return nextAdOrConfirm(ctx, f)
-    }
   }
+
+  await ctx.reply('Use os botões abaixo para continuar.', cancelMenu())
 })
 
 async function downloadTelegramFile(ctx, fileId, originalName='arquivo') {
@@ -409,7 +481,10 @@ async function downloadTelegramFile(ctx, fileId, originalName='arquivo') {
 
 async function handleMedia(ctx, kind) {
   const f = flows[ctx.from.id]
-  if (!f || f.step !== 'ad_media') return
+  if (!f || f.step !== 'ad_media') {
+    await ctx.reply('Para enviar mídia, primeiro inicie um disparo em Lista ou Grupos.', mainMenu())
+    return
+  }
 
   let fileId, fileName='arquivo'
   if (kind === 'photo') {
@@ -426,6 +501,7 @@ async function handleMedia(ctx, kind) {
 
   const info = await downloadTelegramFile(ctx, fileId, fileName)
   f.ads[f.currentAd] = { ...(f.ads[f.currentAd]||{}), ...info }
+  await ctx.reply(`Mídia adicionada ao Anúncio ${labelFor(f.currentAd)}.`)
   await nextAdOrConfirm(ctx, f)
 }
 
@@ -434,41 +510,36 @@ bot.on('video', ctx => handleMedia(ctx, 'video'))
 bot.on('document', ctx => handleMedia(ctx, 'document'))
 
 async function nextAdOrConfirm(ctx, f) {
-  const labels = ['A','B','C']
   f.currentAd += 1
   if (f.currentAd < 3) {
-    f.step = 'ad_text'
-    await ctx.reply(`Quer adicionar Anúncio ${labels[f.currentAd]}?\n\nEnvie o texto agora ou digite FINALIZAR.`)
+    await ctx.reply(`Deseja adicionar o Anúncio ${labelFor(f.currentAd)}?`, nextAdMenu(labelFor(f.currentAd)))
   } else {
     await confirmCampaign(ctx, f)
   }
 }
 
-bot.hears(/^FINALIZAR$/i, async ctx => {
-  const f = flows[ctx.from.id]
-  if (!f) return ctx.reply('Nenhuma campanha em andamento.')
-  await confirmCampaign(ctx, f)
-})
-
 async function confirmCampaign(ctx, f) {
-  f.ads = f.ads.filter(a => a && (a.text || a.filePath))
+  f.ads = (f.ads || []).filter(a => a && (String(a.text || '').trim() || a.filePath))
   if (!f.ads.length) {
     f.step = 'ad_text'
     f.currentAd = 0
-    return ctx.reply('Preencha pelo menos o Anúncio A.')
+    return ctx.reply('Preencha pelo menos o Anúncio A.', cancelMenu())
   }
   f.step = 'confirm'
-  const total = f.type === 'list' ? f.targets.length : f.selectedGroups.length
-  await ctx.reply(`Confirmar disparo?\n\nTipo: ${f.type === 'list' ? 'Lista' : 'Grupos'}\nDestinos: ${total}\nAnúncios: ${f.ads.length}\nWhatsApp: ${waDisplay(f.session)}`, Markup.inlineKeyboard([
-    [Markup.button.callback('Confirmar envio', 'confirm_send')],
-    [Markup.button.callback('Cancelar', 'menu')]
-  ]))
+  const total = f.type === 'list' ? (f.targets || []).length : (f.selectedGroups || []).length
+  if (!total) return ctx.reply('Nenhum destino encontrado. Cancele e comece novamente.', mainMenu())
+  const preview = f.ads.map((a,i)=>`Anúncio ${labelFor(i)}: ${a.text ? 'texto' : ''}${a.filePath ? (a.text ? ' + mídia' : 'mídia') : ''}`).join('\n')
+  await ctx.reply(`Confirmar disparo?\n\nTipo: ${f.type === 'list' ? 'Lista' : 'Grupos'}\nDestinos: ${total}\nAnúncios: ${f.ads.length}\nWhatsApp: ${waDisplay(f.session)}\n\n${preview}`, confirmMenu())
 }
 
 bot.action('confirm_send', async ctx => {
   await ctx.answerCbQuery()
   const f = flows[ctx.from.id]
-  if (!f) return ctx.reply('Nenhuma campanha em andamento.')
+  if (!f || f.step !== 'confirm') return ctx.reply('Nenhuma campanha pronta para envio.', mainMenu())
+
+  const s = sess(f.session)
+  if (!s.connected || !s.sock) return ctx.reply(`${waDisplay(f.session)} não está conectado. Conecte antes de disparar.`, mainMenu())
+
   await ctx.reply('Iniciando disparo...')
 
   let sent=0, failed=0, errors=[]
@@ -477,7 +548,7 @@ bot.action('confirm_send', async ctx => {
   if (f.type === 'list') {
     for (let i=0;i<f.targets.length;i++) {
       const nums = normalizeBR(f.targets[i])
-      if (!nums.length) { failed++; continue }
+      if (!nums.length) { failed++; errors.push(f.targets[i]+': número inválido'); continue }
       const ad = f.ads[i % f.ads.length]
       try {
         await sendToTarget(f.session, nums[0]+'@s.whatsapp.net', ad, { telefone: nums[0], data: new Date().toLocaleDateString('pt-BR') })
@@ -499,50 +570,27 @@ bot.action('confirm_send', async ctx => {
     }
   }
 
+  const finished = {
+    id: uid('camp'),
+    type: f.type,
+    session: f.session,
+    sent,
+    failed,
+    createdAt: new Date().toISOString()
+  }
+  const campaigns = read(files.campaigns, [])
+  campaigns.unshift(finished)
+  write(files.campaigns, campaigns)
+
   delete flows[ctx.from.id]
   await ctx.reply(`Disparo finalizado.\n\nEnviados: ${sent}\nFalhas: ${failed}${errors.length ? '\n\nFalhas:\n'+errors.slice(0,10).join('\n') : ''}`, mainMenu())
-})
-
-bot.action('groups_start', async ctx => {
-  await ctx.answerCbQuery()
-  flows[ctx.from.id] = { type: 'groups', step: 'session', ads: [] }
-  await ctx.reply('Escolha o WhatsApp para carregar os grupos:', sessionMenu('groupwa'))
-})
-
-bot.action(/^groupwa_(whatsapp\d)$/, async ctx => {
-  await ctx.answerCbQuery()
-  const session = ctx.match[1]
-  const s = sess(session)
-  if (!s.connected || !s.sock) return ctx.reply(`${waDisplay(session)} não está conectado.`)
-
-  await ctx.reply('Carregando grupos...')
-  try {
-    const all = await s.sock.groupFetchAllParticipating()
-    const groups = Object.values(all || {}).map(g => ({
-      id: g.id,
-      name: g.subject || g.id,
-      participants: Array.isArray(g.participants) ? g.participants.length : (g.size || 0)
-    })).sort((a,b)=>a.name.localeCompare(b.name))
-
-    const f = flows[ctx.from.id]
-    f.session = session
-    f.groups = groups
-    f.step = 'select_groups'
-
-    if (!groups.length) return ctx.reply('Nenhum grupo encontrado.')
-
-    const text = groups.slice(0,80).map((g,i)=>`${i+1}. ${g.name} (${g.participants})`).join('\n')
-    await ctx.reply(`Escolha os grupos enviando os números separados por vírgula.\n\n${text}`)
-  } catch(e) {
-    await ctx.reply('Erro ao carregar grupos: '+e.message)
-  }
 })
 
 bot.action('plans', async ctx => {
   await ctx.answerCbQuery()
   const st = read(files.settings, {})
   const plans = st.plans || []
-  await ctx.reply('Planos disponíveis:\n\n' + plans.map(p=>`${p.name}: R$ ${p.price} - ${p.days} dias`).join('\n') + `\n\nPIX: ${st.pixKey}\nEnvie o comprovante para o suporte: ${st.supportWhatsapp}`, mainMenu())
+  await ctx.reply('Planos disponíveis:\n\n' + plans.map(p=>`${p.name}: R$ ${p.price} - ${p.days} dias`).join('\n') + `\n\nPIX: ${st.pixKey}\nSuporte: ${st.supportWhatsapp}`, mainMenu())
 })
 
 bot.catch(err => console.error(err))
