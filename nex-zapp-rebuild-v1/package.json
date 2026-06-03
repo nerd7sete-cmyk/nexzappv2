@@ -1,7 +1,7 @@
 {
   "name": "nex-zapp-rebuild-v1",
-  "version": "1.0.0",
-  "description": "NEX-ZAPP Rebuild V1 - SaaS WhatsApp com admin, cliente, revenda, PIX e campanhas",
+  "version": "2.0.0",
+  "description": "NEX-ZAPP Rebuild V2 - UI premium com \u00edcones SVG e cards WhatsApp avan\u00e7ados",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

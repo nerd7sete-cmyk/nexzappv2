@@ -38,3 +38,17 @@ pm2 save
 - Mobile e desktop responsivos
 - iPhone sem zoom
 - Pasta única `data/`
+
+
+## Rebuild V2 UI Premium
+
+Atualização visual:
+- Ícones SVG profissionais, sem emojis.
+- Cards separados para WhatsApp 01, 02 e 03.
+- Status visual por sessão: conectado, conectando/QR, desconectado.
+- Etapas de conexão com loader animado.
+- Explicações para o cliente entender o fluxo.
+- Dashboard com cards mais informativos e barra de progresso.
+- Menu com ícones.
+- Landing com cards de recursos.
+- Admin e revenda com ícones nos cards.
