@@ -89,12 +89,35 @@ function normalizeBR(raw){
   const add=v=>{ v=onlyNum(v); if(v.length>=10&&v.length<=15)set.add(v) }
   if(!n) return []
   if(n.startsWith('00')) n=n.slice(2)
+
+  // Normalização inteligente Brasil:
+  // 11999999999 -> 5511999999999
+  // 1199999999  -> 551199999999
+  // 551199999999 -> também tenta 5511999999999
+  // 5511999999999 -> também tenta 551199999999
+  if(!n.startsWith('55')){
+    if(n.length===11) add('55'+n)
+    if(n.length===10){
+      add('55'+n)
+      add('55'+n.slice(0,2)+'9'+n.slice(2))
+    }
+  }
+
   add(n)
-  if(!n.startsWith('55') && (n.length===10 || n.length===11)) add('55'+n)
-  if(!n.startsWith('55') && n.length===10) add('55'+n.slice(0,2)+'9'+n.slice(2))
-  if(n.startsWith('55') && n.length===12) add('55'+n.slice(0,4)+'9'+n.slice(4))
-  if(n.startsWith('55') && n.length===13 && n[4]==='9') add('55'+n.slice(2,4)+n.slice(5))
-  return [...set]
+
+  if(n.startsWith('55') && n.length===12){
+    add('55'+n.slice(2,4)+'9'+n.slice(4))
+  }
+  if(n.startsWith('55') && n.length===13 && n[4]==='9'){
+    add('55'+n.slice(2,4)+n.slice(5))
+  }
+
+  // retorna primeiro as opções com 55 e com 9, depois alternativas
+  return [...set].sort((a,b)=>{
+    const aw=(a.startsWith('55')?2:0)+(a.length===13?1:0)
+    const bw=(b.startsWith('55')?2:0)+(b.length===13?1:0)
+    return bw-aw
+  })
 }
 function parseTargetLine(line){
   const parts=String(line||'').split(/[;,]/).map(x=>x.trim()).filter(Boolean)
@@ -124,11 +147,30 @@ function applyVars(text, vars={}){
 function shuffle(arr){ return [...arr].sort(()=>Math.random()-.5) }
 function delay(ms){ return new Promise(r=>setTimeout(r,ms)) }
 function mediaPayload(item, msg){
-  if(!item || !item.mediaPath) return {text:msg}
+  const text = String(msg || '').trim()
+  if(!item || !item.mediaPath){
+    if(!text) throw new Error('Mensagem vazia. Preencha o texto ou envie uma mídia.')
+    return {text}
+  }
+
+  if(!fs.existsSync(item.mediaPath)) throw new Error('Arquivo de mídia não encontrado no servidor.')
   const type=item.mimetype || mime.lookup(item.mediaPath) || ''
-  if(type.startsWith('image/')) return {image:{url:item.mediaPath}, caption:msg}
-  if(type.startsWith('video/')) return {video:{url:item.mediaPath}, caption:msg}
-  return {document:{url:item.mediaPath}, mimetype:type||'application/octet-stream', fileName:item.mediaName||'arquivo', caption:msg}
+  const buffer = fs.readFileSync(item.mediaPath)
+
+  if(type.startsWith('image/')){
+    const payload = {image: buffer}
+    if(text) payload.caption = text
+    return payload
+  }
+  if(type.startsWith('video/')){
+    const payload = {video: buffer}
+    if(text) payload.caption = text
+    return payload
+  }
+
+  const payload = {document: buffer, mimetype:type||'application/octet-stream', fileName:item.mediaName||'arquivo'}
+  if(text) payload.caption = text
+  return payload
 }
 
 const sessions={}
@@ -315,8 +357,34 @@ function buildCampaignAds(req, filesUpload){
   const saved=read(files.ads,[])
   let savedIds=[]; try{ savedIds=JSON.parse(req.body.savedAds||'[]') }catch{}
   const picked=saved.filter(a=>savedIds.includes(a.id) && (a.userEmail===req.user.email || req.user.role==='admin'))
-  let manual=[]; for(let i=1;i<=3;i++){ const msg=req.body['msg'+i]||req.body['gMsg'+i]||''; const f=(filesUpload||[]).find(x=>x.fieldname==='media'+i || x.fieldname==='gMedia'+i); if(String(msg).trim()||f) manual.push({id:'manual'+i,name:'Manual '+i,message:msg,mediaPath:f?.path||'',mediaName:f?.originalname||'',mimetype:f?.mimetype||''}) }
-  const mode=req.body.adMode||req.body.gAdMode||'mix'
+
+  let manual=[]
+  for(let i=1;i<=3;i++){
+    const msg =
+      req.body['msg'+i] ??
+      req.body['Msg'+i] ??
+      req.body['gMsg'+i] ??
+      req.body['gmsg'+i] ??
+      ''
+    const f=(filesUpload||[]).find(x=>
+      x.fieldname==='media'+i ||
+      x.fieldname==='Media'+i ||
+      x.fieldname==='gMedia'+i ||
+      x.fieldname==='gmedia'+i
+    )
+    if(String(msg).trim()||f){
+      manual.push({
+        id:'manual'+i,
+        name:'Manual '+i,
+        message:String(msg||''),
+        mediaPath:f?.path||'',
+        mediaName:f?.originalname||'',
+        mimetype:f?.mimetype||''
+      })
+    }
+  }
+
+  const mode=req.body.adMode||req.body.gAdMode||req.body.gadMode||'mix'
   let ads=mode==='saved'?picked:mode==='manual'?manual:[...manual,...picked]
   return ads.length?shuffle(ads):[{id:'default',message:req.body.message||'',mediaPath:''}]
 }
@@ -330,7 +398,7 @@ app.post('/campaign', requireLogin, upload.any(), async(req,res)=>{
   try{
     const sessions=JSON.parse(req.body.sessions||'[]').filter(Boolean); if(!sessions.length)return res.json({success:false,error:'Selecione um WhatsApp conectado.'})
     let targets=parseTargets(req.body.targets||'')
-    if(req.files?.find(f=>f.fieldname==='listFile')){ const f=req.files.find(f=>f.fieldname==='listFile'); const wb=XLSX.readFile(f.path); const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''}); targets.push(...rows.map(r=>({phone:r.telefone||r.phone||r.whatsapp||Object.values(r)[0],vars:r}))) }
+    if(req.files?.find(f=>f.fieldname==='listFile')){ const f=req.files.find(f=>f.fieldname==='listFile'); const wb=XLSX.readFile(f.path); const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''}); targets.push(...rows.map(r=>({phone:r.telefone||r.Telefone||r.numero||r['número']||r.celular||r.Celular||r.phone||r.whatsapp||r.WhatsApp||Object.values(r)[0],vars:r}))) }
     targets=shuffle(targets)
     const ads=buildCampaignAds(req, req.files)
     const min=Number(req.body.minDelay||5000), max=Number(req.body.maxDelay||12000)

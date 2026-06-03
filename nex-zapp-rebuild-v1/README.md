@@ -52,3 +52,16 @@ Atualização visual:
 - Menu com ícones.
 - Landing com cards de recursos.
 - Admin e revenda com ícones nos cards.
+
+
+## Rebuild V3 - Disparo e Mídia Fix
+
+Correções:
+- Corrigido envio em branco no disparo em grupos.
+- Corrigido nome dos campos gMsg/gMedia.
+- Foto e vídeo agora são enviados como arquivo/buffer no Baileys.
+- Validação antes do disparo para evitar campanha vazia.
+- Lista inteligente: aceita números com ou sem 55 e tenta com/sem 9.
+- Planilhas aceitam colunas telefone, Telefone, numero, número, celular, WhatsApp.
+- Adicionadas explicações nas abas de anúncios, lista e grupos.
+- Variáveis visíveis para copiar: {nome}, {telefone}, {pedido}, {plano}, {empresa}, {data}.

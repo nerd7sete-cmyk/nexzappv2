@@ -58,12 +58,43 @@
 .send-card.connected .send-ico{background:rgba(34,197,94,.13);color:#86efac}
 @media(max-width:1050px){.session-grid{grid-template-columns:1fr!important}.hero-card{padding:16px}.hero-card h3{font-size:23px}.session-info{grid-template-columns:1fr}}
 
+
+/* V3 explanation helpers */
+.help-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}
+.help-card{background:rgba(37,99,235,.10);border:1px solid rgba(96,165,250,.22);border-radius:18px;padding:12px;color:#cbd5e1}
+.help-card b{display:flex;align-items:center;gap:8px;color:#fff;margin-bottom:6px}
+.vars{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.var-chip{border:1px solid rgba(148,163,184,.18);background:#070d18;border-radius:999px;padding:8px 10px;font-size:12px;font-weight:900;color:#cbd5e1;cursor:pointer}
+.var-chip:hover{border-color:#60a5fa;color:#fff}
+.preview-box{background:#06120b;border:1px solid rgba(34,197,94,.25);border-radius:18px;padding:12px;margin-top:10px}
+.preview-box small{color:#94a3b8}
+@media(max-width:900px){.help-grid{grid-template-columns:1fr}}
+
 </style></head><body><div class="app"><aside class="sidebar"><div class="brand"><div class="logo">NZ</div><div><h1>NEX-ZAPP</h1><small>Cliente</small></div></div><nav class="nav" id="nav"></nav></aside><main><div class="mobilebar" id="mobilebar"></div><div class="top"><div><h2 id="title">Dashboard</h2><p class="desc" id="sub">Central operacional.</p></div><div class="btnrow"><button class="gray" onclick="refreshAll()">Atualizar</button><button class="red" onclick="logout()">Sair</button></div></div>
 <section id="p-dashboard" class="page active"><div class="stats"><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="message"></div><span>WhatsApps Online</span></div><b id="mConn">0/3</b><div class="progress-line"><span id="waProgress" style="width:0%"></span></div></div><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="megaphone"></div><span>Anúncios Ativos</span></div><b id="mAds">0</b></div><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="users"></div><span>Grupos Carregados</span></div><b id="mGroups">0</b></div><div class="stat"><div class="stat-head"><div class="stat-icon" data-ico="send"></div><span>Envios Hoje</span></div><b id="mSent">0</b></div></div><div class="grid" style="margin-top:16px"><div class="card s6"><h3>Plano</h3><div id="planBox" class="desc">Carregando...</div></div><div class="card s6"><h3>Atalhos</h3><div class="btnrow"><button onclick="openPage('sessions')">Conectar WhatsApp</button><button class="purple" onclick="openPage('ads')">Criar anúncio</button><button class="green" onclick="openPage('list')">Disparo lista</button><button class="green" onclick="openPage('groups')">Disparo grupos</button></div></div></div></section>
 <section id="p-sessions" class="page"><div class="hero-card"><h3>Conexões WhatsApp</h3><p>Conecte até 3 sessões. Quando o status ficar verde, a instância está pronta para disparos de lista e grupos.</p><div class="progress-line"><span id="waProgress2" style="width:0%"></span></div></div><div class="explain-box"><span data-ico="shield"></span><div><b>Como funciona</b><br>Ao clicar em conectar, o sistema inicializa a sessão, gera o QR Code e aguarda a leitura pelo celular. Depois de autenticado, o card muda para conectado.</div></div><div id="sessionsBox" class="session-grid" style="margin-top:16px"></div></section>
-<section id="p-ads" class="page"><div class="grid"><div class="card s5"><h3>Novo anúncio salvo</h3><label>Nome</label><input id="adName"><label>Mensagem</label><textarea id="adMessage" placeholder="{Oi|Olá} {nome}, tudo bem?"></textarea><label>Observação</label><input id="adNote"><label>Foto, vídeo ou documento</label><input id="adMedia" type="file"><button class="green" style="width:100%;margin-top:14px" onclick="saveAd()">Salvar anúncio</button></div><div class="card s7"><h3>Biblioteca</h3><div id="adsList" class="ad-list"></div></div></div></section>
-<section id="p-list" class="page"><div class="grid"><div class="card s12"><h3>WhatsApps para envio</h3><div id="listSessionPicker" class="send-grid"></div></div><div class="card s5"><h3>Contatos</h3><div class="desc">Um por linha: 11999999999;nome=João;pedido=123. Também aceita planilha.</div><textarea id="targets"></textarea><label>Subir planilha/lista</label><input id="listFile" type="file" accept=".xlsx,.xls,.csv,.txt"></div><div class="card s7"><h3>Campanhas</h3><div class="btnrow"><label><input type="radio" name="adMode" value="manual" checked onchange="toggleAdMode()"> Criar agora</label><label><input type="radio" name="adMode" value="saved" onchange="toggleAdMode()"> Salvos</label><label><input type="radio" name="adMode" value="mix" onchange="toggleAdMode()"> Misturar</label></div><div id="manualBox"><div class="grid"><div class="card s4"><h3>Anúncio A</h3><textarea id="msg1" placeholder="{Oi|Olá} {nome}"></textarea><input id="media1" type="file"></div><div class="card s4"><h3>Anúncio B</h3><textarea id="msg2"></textarea><input id="media2" type="file"></div><div class="card s4"><h3>Anúncio C</h3><textarea id="msg3"></textarea><input id="media3" type="file"></div></div></div><div id="savedBox" class="hidden"><h3>Escolha anúncios salvos</h3><div id="savedAdsPicker" class="picker"></div></div></div><div class="card s12"><h3>Cadência</h3><div class="delay-grid"><div class="delay-card" onclick="setDelay(4000,9000)">Rápido<br><small>4 a 9s</small></div><div class="delay-card" onclick="setDelay(9000,18000)">Equilibrado<br><small>9 a 18s</small></div><div class="delay-card" onclick="setDelay(20000,45000)">Conservador<br><small>20 a 45s</small></div></div><input id="minDelay" type="hidden" value="9000"><input id="maxDelay" type="hidden" value="18000"><button class="green" style="width:100%;margin-top:14px" onclick="sendNumbers()">Iniciar disparo em lista</button><pre id="numberResult">Aguardando operação...</pre></div></div></section>
-<section id="p-groups" class="page"><div class="grid"><div class="card s5"><h3>Carregar grupos</h3><label>Instância para leitura</label><div id="groupSessionCards"></div><button class="gray" style="width:100%;margin-top:12px" onclick="loadGroups()">Carregar grupos</button><label>Filtro</label><input id="groupSearch" oninput="renderGroups()" placeholder="Pesquisar grupo"></div><div class="card s7"><h3>Grupos</h3><div class="btnrow"><button onclick="selectAllGroups()">Selecionar todos</button><button class="red" onclick="selectedGroups.clear();renderGroups()">Limpar</button></div><div id="groupsList" class="group-list">Carregue os grupos.</div></div><div class="card s12"><h3>WhatsApps para grupos</h3><div id="groupSendSessionPicker" class="send-grid"></div></div><div class="card s12"><h3>Campanhas para grupos</h3><div class="btnrow"><label><input type="radio" name="gAdMode" value="manual" checked onchange="toggleGroupAdMode()"> Criar conteúdo agora</label><label><input type="radio" name="gAdMode" value="saved" onchange="toggleGroupAdMode()"> Salvos</label><label><input type="radio" name="gAdMode" value="mix" onchange="toggleGroupAdMode()"> Misturar</label></div><div id="gManualBox"><button class="purple" onclick="saveGroupManualAsAds()">Salvar conteúdo como anúncio</button><div class="grid" style="margin-top:12px"><div class="card s4"><h3>Anúncio A</h3><textarea id="gMsg1"></textarea><input id="gMedia1" type="file"></div><div class="card s4"><h3>Anúncio B</h3><textarea id="gMsg2"></textarea><input id="gMedia2" type="file"></div><div class="card s4"><h3>Anúncio C</h3><textarea id="gMsg3"></textarea><input id="gMedia3" type="file"></div></div></div><div id="gSavedBox" class="hidden"><div id="gSavedAdsPicker" class="picker"></div></div></div><div class="card s12"><h3>Cadência grupos</h3><div class="delay-grid"><div class="delay-card" onclick="setGDelay(5000,9000)">Rápido</div><div class="delay-card" onclick="setGDelay(9000,18000)">Equilibrado</div><div class="delay-card" onclick="setGDelay(20000,45000)">Conservador</div></div><input id="gMinDelay" type="hidden" value="9000"><input id="gMaxDelay" type="hidden" value="18000"><button class="green" style="width:100%;margin-top:14px" onclick="sendGroups()">Iniciar disparo em grupos</button><pre id="groupResult">Aguardando operação...</pre></div></div></section>
+<section id="p-ads" class="page"><div class="grid"><div class="card s5"><h3>Novo anúncio salvo</h3><div class="help-card"><b><span data-ico="megaphone"></span> Biblioteca de anúncios</b>
+Salve campanhas prontas com texto, foto, vídeo ou documento. Depois você pode selecionar vários anúncios no disparo e o sistema alterna entre eles.</div><label>Nome</label><input id="adName"><label>Mensagem</label><textarea id="adMessage" placeholder="{Oi|Olá} {nome}, tudo bem?"></textarea><label>Observação</label><input id="adNote"><label>Foto, vídeo ou documento</label><input id="adMedia" type="file"><button class="green" style="width:100%;margin-top:14px" onclick="saveAd()">Salvar anúncio</button></div><div class="card s7"><h3>Biblioteca</h3><div id="adsList" class="ad-list"></div></div></div></section>
+<section id="p-list" class="page"><div class="grid"><div class="card s12"><h3>WhatsApps para envio</h3><div id="listSessionPicker" class="send-grid"></div></div><div class="card s5"><h3>Contatos</h3><div class="help-card"><b><span data-ico="list"></span> Como preencher a lista</b>
+<div class="desc">Cole um número por linha. O sistema corrige automaticamente números sem 55 e testa com/sem o 9.</div>
+<div class="preview-box"><small>Exemplo:</small><br>11999999999;nome=João;pedido=123<br>5511988887777;nome=Maria</div></div><textarea id="targets"></textarea><label>Subir planilha/lista</label><input id="listFile" type="file" accept=".xlsx,.xls,.csv,.txt"></div><div class="card s7"><h3>Campanhas</h3><div class="help-grid">
+<div class="help-card"><b><span data-ico="megaphone"></span> Criar agora</b>Use até 3 anúncios diferentes, cada um com texto, foto ou vídeo.</div>
+<div class="help-card"><b><span data-ico="activity"></span> Alternância</b>O sistema alterna os anúncios automaticamente durante o disparo.</div>
+<div class="help-card"><b><span data-ico="file"></span> Variáveis</b>Use variáveis e spintax para variar a mensagem.</div>
+</div><div class="vars">
+<span class="var-chip" onclick="navigator.clipboard.writeText('{nome}')">{nome}</span>
+<span class="var-chip" onclick="navigator.clipboard.writeText('{telefone}')">{telefone}</span>
+<span class="var-chip" onclick="navigator.clipboard.writeText('{pedido}')">{pedido}</span>
+<span class="var-chip" onclick="navigator.clipboard.writeText('{plano}')">{plano}</span>
+<span class="var-chip" onclick="navigator.clipboard.writeText('{empresa}')">{empresa}</span>
+<span class="var-chip" onclick="navigator.clipboard.writeText('{data}')">{data}</span>
+<span class="var-chip" onclick="navigator.clipboard.writeText('{Oi|Olá|Fala}')">{Oi|Olá|Fala}</span>
+</div><div class="btnrow"><label><input type="radio" name="adMode" value="manual" checked onchange="toggleAdMode()"> Criar agora</label><label><input type="radio" name="adMode" value="saved" onchange="toggleAdMode()"> Salvos</label><label><input type="radio" name="adMode" value="mix" onchange="toggleAdMode()"> Misturar</label></div><div id="manualBox"><div class="grid"><div class="card s4"><h3>Anúncio A</h3><textarea id="msg1" placeholder="{Oi|Olá} {nome}"></textarea><input id="media1" type="file"></div><div class="card s4"><h3>Anúncio B</h3><textarea id="msg2"></textarea><input id="media2" type="file"></div><div class="card s4"><h3>Anúncio C</h3><textarea id="msg3"></textarea><input id="media3" type="file"></div></div></div><div id="savedBox" class="hidden"><h3>Escolha anúncios salvos</h3><div id="savedAdsPicker" class="picker"></div></div></div><div class="card s12"><h3>Cadência</h3><div class="delay-grid"><div class="delay-card" onclick="setDelay(4000,9000)">Rápido<br><small>4 a 9s</small></div><div class="delay-card" onclick="setDelay(9000,18000)">Equilibrado<br><small>9 a 18s</small></div><div class="delay-card" onclick="setDelay(20000,45000)">Conservador<br><small>20 a 45s</small></div></div><input id="minDelay" type="hidden" value="9000"><input id="maxDelay" type="hidden" value="18000"><button class="green" style="width:100%;margin-top:14px" onclick="sendNumbers()">Iniciar disparo em lista</button><pre id="numberResult">Aguardando operação...\n\nDica: use números com ou sem 55. O sistema tenta ajustar automaticamente.</pre></div></div></section>
+<section id="p-groups" class="page"><div class="hero-card"><h3>Disparo em grupos</h3><p>Carregue seus grupos, selecione os destinos, crie até 3 conteúdos na hora ou misture com anúncios salvos.</p></div><div class="grid"><div class="card s5"><h3>Carregar grupos</h3><label>Instância para leitura</label><div id="groupSessionCards"></div><button class="gray" style="width:100%;margin-top:12px" onclick="loadGroups()">Carregar grupos</button><label>Filtro</label><input id="groupSearch" oninput="renderGroups()" placeholder="Pesquisar grupo"></div><div class="card s7"><h3>Grupos</h3><div class="btnrow"><button onclick="selectAllGroups()">Selecionar todos</button><button class="red" onclick="selectedGroups.clear();renderGroups()">Limpar</button></div><div id="groupsList" class="group-list">Carregue os grupos.</div></div><div class="card s12"><h3>WhatsApps para grupos</h3><div id="groupSendSessionPicker" class="send-grid"></div></div><div class="card s12"><h3>Campanhas para grupos</h3><div class="help-grid">
+<div class="help-card"><b><span data-ico="megaphone"></span> 3 conteúdos na hora</b>Preencha Anúncio A, B e C com textos/mídias diferentes.</div>
+<div class="help-card"><b><span data-ico="image"></span> Foto e vídeo</b>Envie imagem, vídeo ou documento com legenda.</div>
+<div class="help-card"><b><span data-ico="send"></span> Rotação automática</b>O sistema alterna os conteúdos entre os grupos selecionados.</div>
+</div><div class="btnrow"><label><input type="radio" name="gAdMode" value="manual" checked onchange="toggleGroupAdMode()"> Criar conteúdo agora</label><label><input type="radio" name="gAdMode" value="saved" onchange="toggleGroupAdMode()"> Salvos</label><label><input type="radio" name="gAdMode" value="mix" onchange="toggleGroupAdMode()"> Misturar</label></div><div id="gManualBox"><button class="purple" onclick="saveGroupManualAsAds()">Salvar conteúdo como anúncio</button><div class="grid" style="margin-top:12px"><div class="card s4"><h3>Anúncio A</h3><textarea id="gMsg1"></textarea><input id="gMedia1" type="file"></div><div class="card s4"><h3>Anúncio B</h3><textarea id="gMsg2"></textarea><input id="gMedia2" type="file"></div><div class="card s4"><h3>Anúncio C</h3><textarea id="gMsg3"></textarea><input id="gMedia3" type="file"></div></div></div><div id="gSavedBox" class="hidden"><div id="gSavedAdsPicker" class="picker"></div></div></div><div class="card s12"><h3>Cadência grupos</h3><div class="delay-grid"><div class="delay-card" onclick="setGDelay(5000,9000)">Rápido</div><div class="delay-card" onclick="setGDelay(9000,18000)">Equilibrado</div><div class="delay-card" onclick="setGDelay(20000,45000)">Conservador</div></div><input id="gMinDelay" type="hidden" value="9000"><input id="gMaxDelay" type="hidden" value="18000"><button class="green" style="width:100%;margin-top:14px" onclick="sendGroups()">Iniciar disparo em grupos</button><pre id="groupResult">Aguardando operação...</pre></div></div></section>
 <section id="p-billing" class="page"><div class="grid"><div class="card s6"><h3>Minha assinatura</h3><div id="billingInfo"></div><h3>Renovar</h3><div id="renewPlans" class="picker"></div><button class="green" style="width:100%;margin-top:14px" onclick="requestRenewal()">Gerar PIX</button><pre id="billingResult"></pre></div><div class="card s6"><h3>PIX</h3><div id="pixInfo" class="desc"></div></div></div></section>
 </main></div><div id="toast" class="toast"></div><script>
 
@@ -121,11 +152,75 @@ async function connect(n){await api('/connect',{method:'POST',headers:{'Content-
 async function loadAds(){ads=await api('/ads');mAds.textContent=ads.length;renderAds();renderPickers()}function renderAds(){adsList.innerHTML=ads.map(a=>`<div class="ad-item"><b>${esc(a.name)}</b><br><small>${esc(a.note||'')}</small><div class="desc">${esc((a.message||'').slice(0,120))}</div>${a.mediaUrl?`<a href="${a.mediaUrl}" target="_blank">Mídia</a>`:''} <button class="red" onclick="delAd('${a.id}')">Excluir</button></div>`).join('')||'Nenhum anúncio.'}async function saveAd(){let fd=new FormData();fd.append('name',adName.value);fd.append('message',adMessage.value);fd.append('note',adNote.value);if(adMedia.files[0])fd.append('media',adMedia.files[0]);let r=await api('/ads',{method:'POST',body:fd});toast(r.success?'Anúncio salvo':r.error);loadAds()}async function delAd(id){await api('/ads/'+id,{method:'DELETE'});loadAds()}
 function renderPickers(){let html=ads.map(a=>`<label class="ad-item"><input type="checkbox" class="savedAd" value="${a.id}"> ${esc(a.name)}</label>`).join('')||'Nenhum anúncio salvo.';savedAdsPicker.innerHTML=html;gSavedAdsPicker.innerHTML=html.replaceAll('savedAd','gSavedAd')}
 function toggleAdMode(){let m=qs('input[name=adMode]:checked').value;manualBox.classList.toggle('hidden',m==='saved');savedBox.classList.toggle('hidden',m==='manual')}function toggleGroupAdMode(){let m=qs('input[name=gAdMode]:checked').value;gManualBox.classList.toggle('hidden',m==='saved');gSavedBox.classList.toggle('hidden',m==='manual');loadAds()}
-function setDelay(a,b){minDelay.value=a;maxDelay.value=b}function setGDelay(a,b){gMinDelay.value=a;gMaxDelay.value=b}function result(d){if(!d||typeof d!=='object')return d;let txt=`✅ Finalizado\n\nEnviados: ${d.sent||0}\nFalhas: ${d.failed||0}\nCampanhas usadas: ${d.adsUsed||0}`;if(d.sessionsUsed)txt+=`\nWhatsApps: ${d.sessionsUsed.join(', ')}`;if(d.errors?.length)txt+='\n\nFalhas:\n'+d.errors.slice(0,5).map(e=>'• '+(e.target||'destino')+': '+e.error).join('\n');return txt}
-function buildAds(fd,prefix=''){for(let i=1;i<=3;i++){let m=qs('#'+prefix+'Msg'+i)||qs('#msg'+i), f=qs('#'+prefix+'Media'+i)||qs('#media'+i);fd.append(prefix+'msg'+i,m?.value||'');if(f?.files[0])fd.append(prefix+'media'+i,f.files[0])}}
-async function sendNumbers(){let fd=new FormData();fd.append('sessions',JSON.stringify(selectedSessions('list')));fd.append('targets',targets.value);fd.append('adMode',qs('input[name=adMode]:checked').value);fd.append('savedAds',JSON.stringify(qsa('.savedAd:checked').map(i=>i.value)));fd.append('minDelay',minDelay.value);fd.append('maxDelay',maxDelay.value);if(listFile.files[0])fd.append('listFile',listFile.files[0]);buildAds(fd,'');numberResult.textContent='Enviando...';let r=await api('/campaign',{method:'POST',body:fd});numberResult.textContent=result(r)}
+function setDelay(a,b){minDelay.value=a;maxDelay.value=b}function setGDelay(a,b){gMinDelay.value=a;gMaxDelay.value=b}function result(d){if(!d||typeof d!=='object')return d;let txt=`Finalizado\n\nEnviados: ${d.sent||0}\nFalhas: ${d.failed||0}\nCampanhas usadas: ${d.adsUsed||0}`;if(d.sessionsUsed)txt+=`\nWhatsApps: ${d.sessionsUsed.join(', ')}`;if(d.errors?.length)txt+='\n\nFalhas:\n'+d.errors.slice(0,5).map(e=>'• '+(e.target||'destino')+': '+e.error).join('\n');return txt}
+function buildAds(fd,prefix=''){
+  for(let i=1;i<=3;i++){
+    let m=qs('#'+prefix+'Msg'+i)||qs('#msg'+i)
+    let f=qs('#'+prefix+'Media'+i)||qs('#media'+i)
+    const msgKey = prefix==='g' ? 'gMsg'+i : 'msg'+i
+    const mediaKey = prefix==='g' ? 'gMedia'+i : 'media'+i
+    fd.append(msgKey,m?.value||'')
+    if(f?.files[0])fd.append(mediaKey,f.files[0])
+  }
+}
+function hasManualContent(prefix=''){
+  for(let i=1;i<=3;i++){
+    let m=qs('#'+prefix+'Msg'+i)||qs('#msg'+i)
+    let f=qs('#'+prefix+'Media'+i)||qs('#media'+i)
+    if(String(m?.value||'').trim() || f?.files?.[0]) return true
+  }
+  return false
+}
+function selectedSavedCount(cls){return qsa(cls+':checked').length}
+function validateCampaign(mode,prefix='',savedCls='.savedAd'){
+  if(mode==='manual' && !hasManualContent(prefix)) return 'Preencha pelo menos um anúncio criado na hora com texto, foto ou vídeo.'
+  if(mode==='saved' && !selectedSavedCount(savedCls)) return 'Selecione pelo menos um anúncio salvo.'
+  if(mode==='mix' && !hasManualContent(prefix) && !selectedSavedCount(savedCls)) return 'Crie um anúncio na hora ou selecione anúncios salvos.'
+  return ''
+}
+function normalizeHelp(){
+  return `O sistema normaliza os números automaticamente. Exemplos aceitos:\n11999999999\n1199999999\n5511999999999\n551199999999\nTambém tenta com e sem o 9 quando necessário.`
+}
+async function sendNumbers(){
+  let mode=qs('input[name=adMode]:checked').value
+  let err=validateCampaign(mode,'','.savedAd')
+  if(err){numberResult.textContent=err;return}
+  let sessions=selectedSessions('list')
+  if(!sessions.length){numberResult.textContent='Conecte ou selecione pelo menos um WhatsApp.';return}
+  if(!targets.value.trim() && !listFile.files[0]){numberResult.textContent='Cole uma lista de números ou envie uma planilha.';return}
+  let fd=new FormData()
+  fd.append('sessions',JSON.stringify(sessions))
+  fd.append('targets',targets.value)
+  fd.append('adMode',mode)
+  fd.append('savedAds',JSON.stringify(qsa('.savedAd:checked').map(i=>i.value)))
+  fd.append('minDelay',minDelay.value)
+  fd.append('maxDelay',maxDelay.value)
+  if(listFile.files[0])fd.append('listFile',listFile.files[0])
+  buildAds(fd,'')
+  numberResult.textContent='Enviando...\n'+normalizeHelp()
+  let r=await api('/campaign',{method:'POST',body:fd})
+  numberResult.textContent=result(r)
+}
 async function loadGroups(){let s=qs('input[name=readGroup]:checked')?.value||connectedNames()[0];let r=await api('/groups/'+s);if(!r.success)return toast(r.error);groupsCache=r.groups||[];mGroups.textContent=groupsCache.length;renderGroups()}function renderGroups(){let q=groupSearch.value.toLowerCase();groupsList.innerHTML=groupsCache.filter(g=>g.name.toLowerCase().includes(q)).map(g=>`<div class="group-item ${selectedGroups.has(g.id)?'selected':''}" onclick="selectedGroups.has('${g.id}')?selectedGroups.delete('${g.id}'):selectedGroups.add('${g.id}');renderGroups()"><b>${esc(g.name)}</b><br><small>${g.participants} membros</small></div>`).join('')||'Nenhum grupo.'}function selectAllGroups(){groupsCache.forEach(g=>selectedGroups.add(g.id));renderGroups()}
 async function saveGroupManualAsAds(){for(let i=1;i<=3;i++){let msg=qs('#gMsg'+i).value, file=qs('#gMedia'+i).files[0];if(!msg&&!file)continue;let fd=new FormData();fd.append('name','Grupo anúncio '+i);fd.append('message',msg);fd.append('note','Criado em grupos');if(file)fd.append('media',file);await api('/ads',{method:'POST',body:fd})}toast('Campanhas salvas');loadAds()}
-async function sendGroups(){let fd=new FormData();fd.append('sessions',JSON.stringify(selectedSessions('groups')));fd.append('groups',JSON.stringify([...selectedGroups]));fd.append('gAdMode',qs('input[name=gAdMode]:checked').value);fd.append('savedAds',JSON.stringify(qsa('.gSavedAd:checked').map(i=>i.value)));fd.append('minDelay',gMinDelay.value);fd.append('maxDelay',gMaxDelay.value);buildAds(fd,'g');groupResult.textContent='Enviando...';let r=await api('/campaign-groups',{method:'POST',body:fd});groupResult.textContent=result(r)}
+async function sendGroups(){
+  let mode=qs('input[name=gAdMode]:checked').value
+  let err=validateCampaign(mode,'g','.gSavedAd')
+  if(err){groupResult.textContent=err;return}
+  let sessions=selectedSessions('groups')
+  if(!sessions.length){groupResult.textContent='Conecte ou selecione pelo menos um WhatsApp.';return}
+  if(!selectedGroups.size){groupResult.textContent='Selecione pelo menos um grupo.';return}
+  let fd=new FormData()
+  fd.append('sessions',JSON.stringify(sessions))
+  fd.append('groups',JSON.stringify([...selectedGroups]))
+  fd.append('gAdMode',mode)
+  fd.append('savedAds',JSON.stringify(qsa('.gSavedAd:checked').map(i=>i.value)))
+  fd.append('minDelay',gMinDelay.value)
+  fd.append('maxDelay',gMaxDelay.value)
+  buildAds(fd,'g')
+  groupResult.textContent='Enviando...'
+  let r=await api('/campaign-groups',{method:'POST',body:fd})
+  groupResult.textContent=result(r)
+}
 async function loadBilling(){let d=await api('/api/billing');if(!d.success)return;billingInfo.innerHTML=`Plano: <b>${esc(d.plan?.name||d.user.planName||'-')}</b><br>Vence: ${esc(d.user.expiresAt||'-')}`;renewPlans.innerHTML=d.plans.map(p=>`<label class="ad-item"><input type="radio" name="renew" value="${p.id}" ${!selectedRenewPlanId&&p.id===d.user.planId?'checked':''}> ${esc(p.name)} - ${money(p.price)}</label>`).join('');pixInfo.innerHTML=`Chave PIX: <b>${esc(d.settings.pixKey||'')}</b><br>${esc(d.settings.instruction||'')}`}async function requestRenewal(){let id=qs('input[name=renew]:checked')?.value;let r=await api('/api/billing/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({planId:id})});billingResult.textContent=r.success?'Pedido de renovação criado. Faça o PIX e aguarde aprovação.':r.error}
 check();loadSessions();loadAds();setInterval(loadSessions,12000)</script></body></html>
