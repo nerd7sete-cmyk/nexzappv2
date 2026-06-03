@@ -89,3 +89,17 @@ Correções:
 - Mantidos botões Comprar agora, Entrar agora e Quero ser revendedor.
 - Vídeos: tenta enviar como vídeo e, se falhar, envia como documento.
 - Melhor suporte para MP4, MOV, AVI, MKV, WEBM, M4V e 3GP conforme aceitação do WhatsApp.
+
+## Rebuild V6 - Renovação, Grupos e Anúncios
+
+- Renovação agora abre modal PIX profissional.
+- Modal mostra valor, plano, chave PIX, botão copiar e WhatsApp de comprovante configurado no admin.
+- Aba grupos mostra somente grupos do WhatsApp selecionado.
+- Disparo em grupos usa apenas o WhatsApp selecionado.
+- Seleção de grupos salva no cache por WhatsApp.
+- Explicação da lista simplificada.
+- Corrigido `saveAd` para async.
+- Biblioteca de anúncios mostra mídia, duplicar e excluir.
+- Landing mais compacta.
+- Área de revendedor com botão de login.
+- Aprovação de revendedor cria/atualiza usuário de revenda.
